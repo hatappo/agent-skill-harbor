@@ -2,15 +2,24 @@
 
 # Agent Skill Harbor
 
+> Know what your agents know.
+
 組織向けの Agent Skill カタログ・ガバナンスツール。
+
+## スクリーンショット
+
+| スキルカタログ | スキル詳細 |
+|:---:|:---:|
+| ![スキルカタログ](docs/agent-skill-harbor-screenshot02.jpeg) | ![スキル詳細](docs/agent-skill-harbor-screenshot01.jpeg) |
 
 ## 概要
 
 Agent Skill Harbor は、GitHub Organization 内のリポジトリから Agent Skill (SKILL.md) を収集し、ガバナンス管理機能を提供し、GitHub Pages 上でブラウズ可能なカタログを公開します。
 
-- **データベース不要** - データは Git 内に YAML/JSON として保存
-- **バックエンド不要** - フロントエンドのみの Web アプリ (SvelteKit, プリレンダリング)
-- **GitHub ネイティブ** - GitHub Actions で収集、GitHub Pages でホスティング
+- データベース不要 — データは Git 内に YAML/JSON として保存
+- バックエンド不要 — フロントエンドのみの Web アプリ (SvelteKit, プリレンダリング)
+- GitHub ネイティブ — GitHub Actions で収集、GitHub Pages でホスティング
+- トレーサビリティ — 外部からインストールしたスキルも含め、すべてのスキルの出所・来歴を追跡可能
 
 ## クイックスタート
 

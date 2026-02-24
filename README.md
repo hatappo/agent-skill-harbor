@@ -2,15 +2,24 @@
 
 # Agent Skill Harbor
 
+> Know what your agents know.
+
 Internal agent skill catalog and governance for organizations.
+
+## Screenshots
+
+| Skill Catalog | Skill Detail |
+|:---:|:---:|
+| ![Skill Catalog](docs/agent-skill-harbor-screenshot02.jpeg) | ![Skill Detail](docs/agent-skill-harbor-screenshot01.jpeg) |
 
 ## Overview
 
 Agent Skill Harbor collects Agent Skills (SKILL.md) from your GitHub Organization's repositories, provides governance controls, and serves a browsable catalog via GitHub Pages.
 
-- **No database** - Data stored as YAML/JSON in Git
-- **No backend** - Frontend-only web app (SvelteKit, prerendered)
-- **GitHub-native** - GitHub Actions for collection, GitHub Pages for hosting
+- No database — Data stored as YAML/JSON in Git
+- No backend — Frontend-only web app (SvelteKit, prerendered)
+- GitHub-native — GitHub Actions for collection, GitHub Pages for hosting
+- Traceable — Track the origin and provenance of every skill, even those installed from external sources
 
 ## Quick Start
 
