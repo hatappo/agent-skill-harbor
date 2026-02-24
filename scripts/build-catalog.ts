@@ -214,6 +214,22 @@ function buildFlatCatalog(
 			const key = `${repoKey}/${skillPath}`;
 			const gov = governance[key];
 
+			// Determine visibility: if _from's last entry points to a repo not in this catalog, mark as private
+			let visibility: string = repoEntry.visibility;
+			const fromArray = skillData.frontmatter._from;
+			if (Array.isArray(fromArray) && fromArray.length > 0) {
+				const lastFrom = String(fromArray[fromArray.length - 1]);
+				try {
+					const url = new URL(lastFrom);
+					const lastFromRepoKey = (url.host + url.pathname).replace(/\/$/, '');
+					if (!catalog.repositories[lastFromRepoKey]) {
+						visibility = 'private';
+					}
+				} catch {
+					// If URL parsing fails, keep repo-level visibility
+				}
+			}
+
 			const entry: FlatSkillEntry = {
 				key,
 				repoKey,
@@ -221,7 +237,7 @@ function buildFlatCatalog(
 				platform,
 				owner,
 				repo,
-				visibility: repoEntry.visibility,
+				visibility,
 				frontmatter: skillData.frontmatter,
 				files: skillData.files,
 				usagePolicy: gov?.usagePolicy ?? 'none',
