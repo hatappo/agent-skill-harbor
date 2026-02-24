@@ -2,88 +2,67 @@ import { Octokit } from '@octokit/rest';
 import matter from 'gray-matter';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 
 const DATA_DIR = join(import.meta.dirname, '..', 'data');
-const ORG_SKILLS_DIR = join(DATA_DIR, 'skills', 'org');
-const GOVERNANCE_PATH = join(DATA_DIR, 'governance.yaml');
-const PREVIEW_LENGTH = 500;
+const SKILLS_DIR = join(DATA_DIR, 'skills');
+const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
 
-interface GovernancePolicy {
-	slug: string;
-	source: string;
-	status: string;
-	note?: string;
-	updated_by?: string;
-	updated_at?: string;
-}
-
-interface GovernanceConfig {
-	version: string;
-	defaults: {
-		org_skills: string;
-		public_skills: string;
-	};
-	policies: GovernancePolicy[];
-}
-
-interface SkillData {
-	slug: string;
-	source: 'org' | 'public';
-	repository: {
-		owner: string;
-		name: string;
-		url: string;
-		default_branch: string;
-	};
-	skill: {
-		name: string;
-		description: string;
-		metadata?: Record<string, string>;
-	};
-	instructions_preview: string;
+interface SkillEntry {
+	tree_sha: string | null;
+	frontmatter: Record<string, unknown>;
 	files: string[];
-	governance: {
-		status: string;
-		note?: string;
-		updated_by?: string;
-		updated_at?: string;
-	};
-	collected_at: string;
-	skill_md_sha: string;
 }
 
-function loadGovernance(): GovernanceConfig {
-	if (!existsSync(GOVERNANCE_PATH)) {
-		return { version: '1', defaults: { org_skills: 'none', public_skills: 'none' }, policies: [] };
+interface RepositoryEntry {
+	visibility: string;
+	repo_sha?: string;
+	collected_at?: string;
+	skills: Record<string, SkillEntry>;
+}
+
+interface CatalogYaml {
+	repositories: Record<string, RepositoryEntry>;
+}
+
+interface TreeEntry {
+	path?: string;
+	mode?: string;
+	type?: string;
+	sha?: string;
+	size?: number;
+}
+
+interface DiscoveredSkill {
+	skillPath: string;
+	dirPath: string | null; // null for root-level SKILL.md
+	treeSha: string | null;
+	filePaths: string[];
+}
+
+function loadCatalog(): CatalogYaml {
+	if (!existsSync(CATALOG_YAML_PATH)) {
+		return { repositories: {} };
 	}
-	return yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8')) as GovernanceConfig;
-}
-
-function findGovernancePolicy(
-	governance: GovernanceConfig,
-	slug: string,
-	source: 'org' | 'public'
-): GovernancePolicy | undefined {
-	return governance.policies.find((p) => p.slug === slug && p.source === source);
-}
-
-function loadExistingSkill(repoName: string): SkillData | null {
-	const skillPath = join(ORG_SKILLS_DIR, repoName, 'skill.yaml');
-	if (!existsSync(skillPath)) return null;
 	try {
-		return yamlLoad(readFileSync(skillPath, 'utf-8')) as SkillData;
+		const raw = yamlLoad(readFileSync(CATALOG_YAML_PATH, 'utf-8')) as CatalogYaml;
+		return raw?.repositories ? raw : { repositories: {} };
 	} catch {
-		return null;
+		return { repositories: {} };
 	}
 }
 
-function saveSkill(repoName: string, skill: SkillData): void {
-	const dir = join(ORG_SKILLS_DIR, repoName);
+function saveCatalog(catalog: CatalogYaml): void {
+	writeFileSync(CATALOG_YAML_PATH, yamlDump(catalog, { lineWidth: 120, noRefs: true }));
+}
+
+function saveFile(repoDir: string, filePath: string, content: string): void {
+	const fullPath = join(repoDir, filePath);
+	const dir = dirname(fullPath);
 	if (!existsSync(dir)) {
 		mkdirSync(dir, { recursive: true });
 	}
-	writeFileSync(join(dir, 'skill.yaml'), yamlDump(skill, { lineWidth: 120, noRefs: true }));
+	writeFileSync(fullPath, content);
 }
 
 async function sleep(ms: number): Promise<void> {
@@ -104,23 +83,81 @@ async function checkRateLimit(octokit: Octokit): Promise<void> {
 	}
 }
 
-interface SkillFileInfo {
-	path: string;
-	sha: string;
+/**
+ * Discover skills from the recursive tree.
+ * Returns SKILL.md locations, their parent directory tree SHAs, and related file paths.
+ */
+function discoverSkillsFromTree(treeEntries: TreeEntry[]): DiscoveredSkill[] {
+	// Find all SKILL.md blobs
+	const skillMdEntries = treeEntries.filter(
+		(e) => e.type === 'blob' && e.path?.endsWith('/SKILL.md')
+	);
+
+	// Also check for root-level SKILL.md
+	const rootSkillMd = treeEntries.find(
+		(e) => e.type === 'blob' && e.path === 'SKILL.md'
+	);
+
+	const skills: DiscoveredSkill[] = [];
+
+	// Root-level SKILL.md
+	if (rootSkillMd) {
+		skills.push({
+			skillPath: 'SKILL.md',
+			dirPath: null,
+			treeSha: null,
+			filePaths: ['SKILL.md']
+		});
+	}
+
+	// Nested SKILL.md files
+	for (const entry of skillMdEntries) {
+		const skillPath = entry.path!;
+		const dirPath = skillPath.replace(/\/SKILL\.md$/, '');
+
+		// Find tree SHA for the skill directory
+		const dirTreeEntry = treeEntries.find(
+			(e) => e.type === 'tree' && e.path === dirPath
+		);
+		const treeSha = dirTreeEntry?.sha ?? null;
+
+		// Find all files under this directory
+		const filePaths = treeEntries
+			.filter((e) => e.type === 'blob' && e.path?.startsWith(`${dirPath}/`))
+			.map((e) => e.path!)
+			.sort();
+
+		skills.push({
+			skillPath,
+			dirPath,
+			treeSha,
+			filePaths
+		});
+	}
+
+	return skills;
 }
 
-async function findSkillFiles(
+/**
+ * Fallback: find skills using getContent API (when tree is truncated).
+ */
+async function findSkillFilesFallback(
 	octokit: Octokit,
 	owner: string,
 	repo: string
-): Promise<SkillFileInfo[]> {
-	const files: SkillFileInfo[] = [];
+): Promise<DiscoveredSkill[]> {
+	const skills: DiscoveredSkill[] = [];
 
 	// Check root SKILL.md
 	try {
 		const { data } = await octokit.repos.getContent({ owner, repo, path: 'SKILL.md' });
 		if (!Array.isArray(data) && data.type === 'file') {
-			files.push({ path: 'SKILL.md', sha: data.sha });
+			skills.push({
+				skillPath: 'SKILL.md',
+				dirPath: null,
+				treeSha: null,
+				filePaths: ['SKILL.md']
+			});
 		}
 	} catch {
 		// Not found at root
@@ -139,7 +176,12 @@ async function findSkillFiles(
 							path: `${item.path}/SKILL.md`
 						});
 						if (!Array.isArray(skillFile) && skillFile.type === 'file') {
-							files.push({ path: `${item.path}/SKILL.md`, sha: skillFile.sha });
+							skills.push({
+								skillPath: `${item.path}/SKILL.md`,
+								dirPath: item.path,
+								treeSha: null,
+								filePaths: [`${item.path}/SKILL.md`]
+							});
 						}
 					} catch {
 						// No SKILL.md in this skill directory
@@ -151,7 +193,32 @@ async function findSkillFiles(
 		// No .claude/skills directory
 	}
 
-	return files;
+	return skills;
+}
+
+/**
+ * Append a source URL to the _from array in SKILL.md frontmatter.
+ * Returns the modified content, or the original content if it's not a SKILL.md.
+ */
+function appendFromToSkillMd(content: string, sourceUrl: string): string {
+	const parsed = matter(content);
+	const existing = parsed.data._from;
+	let fromArray: string[];
+
+	if (Array.isArray(existing)) {
+		fromArray = existing;
+	} else if (existing != null) {
+		fromArray = [String(existing)];
+	} else {
+		fromArray = [];
+	}
+
+	if (!fromArray.includes(sourceUrl)) {
+		fromArray.push(sourceUrl);
+	}
+
+	parsed.data._from = fromArray;
+	return matter.stringify(parsed.content, parsed.data);
 }
 
 async function fetchFileContent(
@@ -167,14 +234,6 @@ async function fetchFileContent(
 	return Buffer.from(data.content, 'base64').toString('utf-8');
 }
 
-function parseSkillMd(content: string): { frontmatter: Record<string, unknown>; body: string } {
-	const parsed = matter(content);
-	return {
-		frontmatter: parsed.data as Record<string, unknown>,
-		body: parsed.content.trim()
-	};
-}
-
 async function main(): Promise<void> {
 	const token = process.env.GITHUB_TOKEN;
 	const org = process.env.GITHUB_ORG;
@@ -185,12 +244,18 @@ async function main(): Promise<void> {
 	}
 
 	const octokit = new Octokit({ auth: token });
-	const governance = loadGovernance();
+	const platform = 'github.com';
+	const catalog = loadCatalog();
 
 	console.log(`Collecting skills from organization: ${org}`);
 
 	// Fetch all repositories in the org
-	const repos: Array<{ name: string; default_branch: string; html_url: string }> = [];
+	const repos: Array<{
+		name: string;
+		default_branch: string;
+		html_url: string;
+		visibility: string;
+	}> = [];
 	let page = 1;
 
 	while (true) {
@@ -208,7 +273,8 @@ async function main(): Promise<void> {
 			repos.push({
 				name: repo.name,
 				default_branch: repo.default_branch ?? 'main',
-				html_url: repo.html_url
+				html_url: repo.html_url,
+				visibility: repo.visibility ?? 'private'
 			});
 		}
 
@@ -218,89 +284,112 @@ async function main(): Promise<void> {
 	console.log(`Found ${repos.length} repositories`);
 
 	let collectedCount = 0;
-	let skippedCount = 0;
+	let skippedRepoCount = 0;
+	let skippedSkillCount = 0;
 
 	for (const repo of repos) {
 		try {
+			const repoKey = `${platform}/${org}/${repo.name}`;
+			const existingRepo = catalog.repositories[repoKey];
+
+			// Check HEAD SHA to skip unchanged repos
 			await checkRateLimit(octokit);
-			const skillFiles = await findSkillFiles(octokit, org, repo.name);
+			const { data: branchData } = await octokit.repos.getBranch({
+				owner: org,
+				repo: repo.name,
+				branch: repo.default_branch
+			});
+			const headSha = branchData.commit.sha;
 
-			if (skillFiles.length === 0) {
+			if (existingRepo?.repo_sha === headSha) {
+				skippedRepoCount++;
 				continue;
 			}
 
-			// Use first SKILL.md found (root takes priority)
-			const primarySkillFile = skillFiles[0];
+			// Get recursive tree for skill discovery and tree_sha extraction
+			await checkRateLimit(octokit);
+			const { data: treeData } = await octokit.git.getTree({
+				owner: org,
+				repo: repo.name,
+				tree_sha: headSha,
+				recursive: 'true'
+			});
 
-			// Check if already collected with same SHA
-			const existing = loadExistingSkill(repo.name);
-			if (existing && existing.skill_md_sha === primarySkillFile.sha) {
-				// Update governance only
-				const policy = findGovernancePolicy(governance, repo.name, 'org');
-				const governanceStatus = policy
-					? { status: policy.status, note: policy.note, updated_by: policy.updated_by, updated_at: policy.updated_at }
-					: { status: governance.defaults.org_skills };
+			let discoveredSkills: DiscoveredSkill[];
 
-				if (JSON.stringify(existing.governance) !== JSON.stringify(governanceStatus)) {
-					existing.governance = governanceStatus;
-					saveSkill(repo.name, existing);
-					console.log(`  [governance] ${repo.name}`);
-				} else {
-					skippedCount++;
-				}
-				continue;
+			if (treeData.truncated) {
+				console.log(`  [warn] ${repo.name}: tree truncated, falling back to getContent`);
+				discoveredSkills = await findSkillFilesFallback(octokit, org, repo.name);
+			} else {
+				discoveredSkills = discoverSkillsFromTree(treeData.tree as TreeEntry[]);
 			}
 
-			// Fetch and parse SKILL.md
-			const content = await fetchFileContent(octokit, org, repo.name, primarySkillFile.path);
-			const { frontmatter, body } = parseSkillMd(content);
+			if (discoveredSkills.length === 0) continue;
 
-			// Build governance
-			const policy = findGovernancePolicy(governance, repo.name, 'org');
-			const governanceData = policy
-				? { status: policy.status, note: policy.note, updated_by: policy.updated_by, updated_at: policy.updated_at }
-				: { status: governance.defaults.org_skills };
+			const repoDir = join(SKILLS_DIR, platform, org, repo.name);
+			const newSkills: Record<string, SkillEntry> = {};
 
-			// Extract metadata (all frontmatter fields except name/description)
-			const { name, description, ...restMeta } = frontmatter;
-			const metadata: Record<string, string> = {};
-			for (const [key, value] of Object.entries(restMeta)) {
-				if (typeof value === 'string') {
-					metadata[key] = value;
+			for (const skill of discoveredSkills) {
+				// Check tree_sha for skill-level skip
+				const existingSkill = existingRepo?.skills?.[skill.skillPath];
+				if (
+					skill.treeSha &&
+					existingSkill?.tree_sha === skill.treeSha
+				) {
+					// Skill directory unchanged, preserve existing entry
+					newSkills[skill.skillPath] = existingSkill;
+					skippedSkillCount++;
+					console.log(`  [skip] ${org}/${repo.name} -> ${skill.skillPath} (tree_sha unchanged)`);
+					continue;
 				}
+
+				// Download all files in the skill directory
+				const sourceUrl = `https://${platform}/${org}/${repo.name}`;
+				for (const filePath of skill.filePaths) {
+					try {
+						let content = await fetchFileContent(octokit, org, repo.name, filePath);
+						if (filePath.endsWith('/SKILL.md') || filePath === 'SKILL.md') {
+							content = appendFromToSkillMd(content, sourceUrl);
+						}
+						saveFile(repoDir, filePath, content);
+						console.log(`  [collected] ${org}/${repo.name} -> ${filePath}`);
+					} catch (error) {
+						const message = error instanceof Error ? error.message : String(error);
+						console.error(`  [error] ${org}/${repo.name} -> ${filePath}: ${message}`);
+					}
+				}
+
+				collectedCount++;
+
+				newSkills[skill.skillPath] = {
+					tree_sha: skill.treeSha,
+					frontmatter: {},
+					files: skill.filePaths
+				};
 			}
 
-			const skillData: SkillData = {
-				slug: repo.name,
-				source: 'org',
-				repository: {
-					owner: org,
-					name: repo.name,
-					url: repo.html_url,
-					default_branch: repo.default_branch
-				},
-				skill: {
-					name: (name as string) ?? repo.name,
-					description: (description as string) ?? '',
-					...(Object.keys(metadata).length > 0 ? { metadata } : {})
-				},
-				instructions_preview: body.slice(0, PREVIEW_LENGTH),
-				files: skillFiles.map((f) => f.path),
-				governance: governanceData,
+			// Update catalog entry
+			catalog.repositories[repoKey] = {
+				visibility: repo.visibility,
+				repo_sha: headSha,
 				collected_at: new Date().toISOString(),
-				skill_md_sha: primarySkillFile.sha
+				skills: {
+					...existingRepo?.skills,
+					...newSkills
+				}
 			};
-
-			saveSkill(repo.name, skillData);
-			collectedCount++;
-			console.log(`  [collected] ${repo.name} (${skillFiles.length} skill file(s))`);
 		} catch (error) {
 			const message = error instanceof Error ? error.message : String(error);
 			console.error(`  [error] ${repo.name}: ${message}`);
 		}
 	}
 
-	console.log(`\nDone: ${collectedCount} collected, ${skippedCount} unchanged`);
+	saveCatalog(catalog);
+	console.log(
+		`\nDone: ${collectedCount} skill(s) collected, ` +
+			`${skippedRepoCount} repo(s) unchanged, ` +
+			`${skippedSkillCount} skill(s) unchanged (tree_sha)`
+	);
 }
 
 main();

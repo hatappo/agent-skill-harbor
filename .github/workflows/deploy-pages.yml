@@ -37,11 +37,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build catalog
+      - name: Build catalog (yaml + json)
         run: pnpm run build:catalog
-
-      - name: Copy catalog to web static
-        run: cp data/catalog.json web/static/catalog.json
 
       - name: Build SvelteKit
         working-directory: web

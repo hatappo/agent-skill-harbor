@@ -1,21 +1,21 @@
-import type { GovernanceStatus, SkillEntry, SkillSource } from '$lib/types';
+import type { FlatSkillEntry, UsagePolicy, Visibility } from '$lib/types';
 
 export interface FilterState {
-	statuses: GovernanceStatus[];
-	sources: SkillSource[];
+	statuses: UsagePolicy[];
+	visibilities: Visibility[];
 }
 
 export const defaultFilterState: FilterState = {
 	statuses: [],
-	sources: []
+	visibilities: []
 };
 
-export function filterSkills(skills: SkillEntry[], filters: FilterState): SkillEntry[] {
+export function filterSkills(skills: FlatSkillEntry[], filters: FilterState): FlatSkillEntry[] {
 	return skills.filter((skill) => {
-		if (filters.statuses.length > 0 && !filters.statuses.includes(skill.governance.status)) {
+		if (filters.statuses.length > 0 && !filters.statuses.includes(skill.usagePolicy as UsagePolicy)) {
 			return false;
 		}
-		if (filters.sources.length > 0 && !filters.sources.includes(skill.source)) {
+		if (filters.visibilities.length > 0 && !filters.visibilities.includes(skill.visibility as Visibility)) {
 			return false;
 		}
 		return true;

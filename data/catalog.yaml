@@ -1,0 +1,71 @@
+repositories:
+  github.com/anthropics/prompt-library:
+    visibility: public
+    repo_sha: a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+    collected_at: '2026-02-23T09:00:00Z'
+    skills:
+      SKILL.md:
+        tree_sha: null
+        frontmatter:
+          name: Prompt Library
+          description: A curated collection of prompts and prompt engineering patterns for various AI assistant tasks.
+          metadata:
+            author: anthropics
+            version: 1.0.0
+          _from:
+            - https://github.com/anthropics/prompt-library
+          _excerpt: |-
+            Use this skill to access curated prompt templates:
+            - Code generation prompts
+            - Analysis and review prompts
+            - Creative writing prompts
+            - Data transformation prompts
+        files:
+          - SKILL.md
+  github.com/example-org/code-review-assistant:
+    visibility: private
+    repo_sha: b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3
+    collected_at: '2026-02-20T10:00:00Z'
+    skills:
+      .claude/skills/review/SKILL.md:
+        tree_sha: d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5
+        frontmatter:
+          name: Code Review Assistant
+          description: Automated code review skill that checks for common issues, security vulnerabilities, and style violations.
+          metadata:
+            author: platform-team
+            version: 2.1.0
+          _from:
+            - https://github.com/example-org/code-review-assistant
+          _excerpt: |-
+            When reviewing code, follow these guidelines:
+            1. Check for security vulnerabilities (SQL injection, XSS, etc.)
+            2. Verify error handling is appropriate
+            3. Ensure code follows the project's style guide
+            4. Look for potential performance issues
+            5. Validate that tests cover the changes
+        files:
+          - .claude/skills/review/SKILL.md
+  github.com/example-org/deploy-helper:
+    visibility: private
+    repo_sha: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
+    collected_at: '2026-02-22T14:30:00Z'
+    skills:
+      SKILL.md:
+        tree_sha: null
+        frontmatter:
+          name: Deploy Helper
+          description: Assists with deployment workflows, including staging validation, canary releases, and rollback procedures.
+          metadata:
+            author: infra-team
+            version: 1.3.0
+          _from:
+            - https://github.com/example-org/deploy-helper
+          _excerpt: |-
+            This skill helps with deployment workflows:
+            - Validate staging environment before production deploy
+            - Manage canary release percentages
+            - Execute rollback procedures when issues are detected
+            - Generate deployment reports
+        files:
+          - SKILL.md

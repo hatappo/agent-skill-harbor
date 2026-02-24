@@ -1,38 +1,43 @@
-export type GovernanceStatus = 'required' | 'recommended' | 'deprecated' | 'prohibited' | 'none';
-export type SkillSource = 'org' | 'public';
+export type UsagePolicy = 'required' | 'recommended' | 'discouraged' | 'prohibited' | 'none';
+export type Visibility = 'public' | 'private' | 'internal';
 
-export interface Repository {
-	owner: string;
-	name: string;
-	url: string;
-	default_branch: string;
-}
-
-export interface SkillMeta {
-	name: string;
-	description: string;
-	metadata?: Record<string, string>;
-}
-
-export interface Governance {
-	status: GovernanceStatus;
+export interface SkillMetadata {
+	usagePolicy: UsagePolicy;
 	note?: string;
-	updated_by?: string;
-	updated_at?: string;
 }
 
-export interface SkillEntry {
-	slug: string;
-	source: SkillSource;
-	repository: Repository;
-	skill: SkillMeta;
-	instructions_preview: string;
+export interface CatalogSkillEntry {
+	tree_sha: string | null;
+	frontmatter: Record<string, unknown>;
 	files: string[];
-	governance: Governance;
-	collected_at: string;
+}
+
+export interface RepositoryEntry {
+	visibility: Visibility;
+	repo_sha?: string;
+	collected_at?: string;
+	skills: Record<string, CatalogSkillEntry>;
 }
 
 export interface Catalog {
+	repositories: Record<string, RepositoryEntry>;
+}
+
+export interface FlatSkillEntry {
+	key: string;
+	repoKey: string;
+	skillPath: string;
+	platform: string;
+	owner: string;
+	repo: string;
+	visibility: Visibility;
+	frontmatter: Record<string, unknown>;
+	files: string[];
+	usagePolicy: UsagePolicy;
+	note?: string;
+}
+
+export interface FlatCatalog {
 	generated_at: string;
-	skills: SkillEntry[];
+	skills: FlatSkillEntry[];
 }

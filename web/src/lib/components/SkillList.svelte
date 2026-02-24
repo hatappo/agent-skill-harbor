@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { SkillEntry } from '$lib/types';
+	import type { FlatSkillEntry } from '$lib/types';
 	import SkillCard from './SkillCard.svelte';
 
 	interface Props {
-		skills: SkillEntry[];
+		skills: FlatSkillEntry[];
 	}
 
 	let { skills }: Props = $props();
@@ -15,7 +15,7 @@
 	</div>
 {:else}
 	<div class="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-		{#each skills as skill (skill.slug)}
+		{#each skills as skill (skill.key)}
 			<SkillCard {skill} />
 		{/each}
 	</div>

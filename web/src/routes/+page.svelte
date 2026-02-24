@@ -5,12 +5,12 @@
 	import SkillList from '$lib/components/SkillList.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
-	import type { Catalog, GovernanceStatus, SkillSource } from '$lib/types';
+	import type { FlatCatalog, UsagePolicy, Visibility } from '$lib/types';
 	import { createSearchIndex, searchSkills } from '$lib/utils/search';
 	import { filterSkills, type FilterState } from '$lib/utils/filter';
 
 	interface Props {
-		data: { catalog: Catalog };
+		data: { catalog: FlatCatalog };
 	}
 
 	let { data }: Props = $props();
@@ -19,7 +19,7 @@
 
 	// Client-side state
 	let query = $state('');
-	let filters = $state<FilterState>({ statuses: [], sources: [] });
+	let filters = $state<FilterState>({ statuses: [], visibilities: [] });
 
 	// Read initial state from URL on mount
 	$effect(() => {
@@ -27,8 +27,8 @@
 			const params = new URLSearchParams(window.location.search);
 			query = params.get('q') ?? '';
 			filters = {
-				statuses: (params.get('status')?.split(',').filter(Boolean) ?? []) as GovernanceStatus[],
-				sources: (params.get('source')?.split(',').filter(Boolean) ?? []) as SkillSource[]
+				statuses: (params.get('status')?.split(',').filter(Boolean) ?? []) as UsagePolicy[],
+				visibilities: (params.get('visibility')?.split(',').filter(Boolean) ?? []) as Visibility[]
 			};
 		}
 	});
@@ -45,7 +45,7 @@
 		const params = new URLSearchParams();
 		if (newQuery) params.set('q', newQuery);
 		if (newFilters.statuses.length) params.set('status', newFilters.statuses.join(','));
-		if (newFilters.sources.length) params.set('source', newFilters.sources.join(','));
+		if (newFilters.visibilities.length) params.set('visibility', newFilters.visibilities.join(','));
 		const search = params.toString();
 		goto(`${base}/${search ? '?' + search : ''}`, { replaceState: true, keepFocus: true, noScroll: true });
 	}
@@ -60,7 +60,7 @@
 		updateUrl(query, newFilters);
 	}
 
-	let hasFilters = $derived(query !== '' || filters.statuses.length > 0 || filters.sources.length > 0);
+	let hasFilters = $derived(query !== '' || filters.statuses.length > 0 || filters.visibilities.length > 0);
 </script>
 
 <svelte:head>
