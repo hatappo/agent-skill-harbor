@@ -9,7 +9,6 @@ web/.svelte-kit/
 web/build/
 
 # Generated
-data/catalog.json
 web/static/catalog.json
 
 # OS

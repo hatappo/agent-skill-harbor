@@ -1,6 +1,6 @@
 # セットアップガイド
 
-組織に Skill Warehouse をデプロイする手順を説明します。
+組織に Agent Skill Harbor をデプロイする手順を説明します。
 
 ## 前提条件
 
@@ -13,8 +13,8 @@
 このリポジトリを組織内に**プライベート**リポジトリとしてクローンします。
 
 ```bash
-git clone https://github.com/your-org/skill-warehouse.git
-cd skill-warehouse
+git clone https://github.com/your-org/agent-skill-harbor.git
+cd agent-skill-harbor
 pnpm install
 ```
 

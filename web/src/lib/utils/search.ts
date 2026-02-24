@@ -1,22 +1,23 @@
 import Fuse from 'fuse.js';
-import type { SkillEntry } from '$lib/types';
+import type { FlatSkillEntry } from '$lib/types';
 
-const fuseOptions: Fuse.IFuseOptions<SkillEntry> = {
+const fuseOptions: ConstructorParameters<typeof Fuse<FlatSkillEntry>>[1] = {
 	keys: [
-		{ name: 'skill.name', weight: 3 },
-		{ name: 'skill.description', weight: 2 },
-		{ name: 'skill.metadata.author', weight: 1 },
-		{ name: 'repository.name', weight: 1 }
+		{ name: 'frontmatter.name', weight: 3 },
+		{ name: 'frontmatter.description', weight: 2 },
+		{ name: 'frontmatter.metadata.author', weight: 1 },
+		{ name: 'owner', weight: 1 },
+		{ name: 'repo', weight: 1 }
 	],
 	threshold: 0.3,
 	includeScore: true
 };
 
-export function createSearchIndex(skills: SkillEntry[]): Fuse<SkillEntry> {
+export function createSearchIndex(skills: FlatSkillEntry[]): Fuse<FlatSkillEntry> {
 	return new Fuse(skills, fuseOptions);
 }
 
-export function searchSkills(fuse: Fuse<SkillEntry>, query: string): SkillEntry[] {
+export function searchSkills(fuse: Fuse<FlatSkillEntry>, query: string): FlatSkillEntry[] {
 	if (!query.trim()) return [];
 	return fuse.search(query).map((result) => result.item);
 }

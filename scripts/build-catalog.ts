@@ -1,151 +1,288 @@
-import { load as yamlLoad } from 'js-yaml';
-import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import matter from 'gray-matter';
+import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { join, relative } from 'node:path';
 
 const DATA_DIR = join(import.meta.dirname, '..', 'data');
-const ORG_SKILLS_DIR = join(DATA_DIR, 'skills', 'org');
-const PUBLIC_SKILLS_DIR = join(DATA_DIR, 'skills', 'public');
+const SKILLS_DIR = join(DATA_DIR, 'skills');
 const GOVERNANCE_PATH = join(DATA_DIR, 'governance.yaml');
-const CATALOG_PATH = join(DATA_DIR, 'catalog.json');
+const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
+const WEB_CATALOG_PATH = join(import.meta.dirname, '..', 'web', 'static', 'catalog.json');
 
-interface GovernancePolicy {
-	slug: string;
-	source: string;
-	status: string;
+type UsagePolicy = 'required' | 'recommended' | 'discouraged' | 'prohibited' | 'none';
+
+interface GovernanceEntry {
+	usagePolicy: UsagePolicy;
 	note?: string;
-	updated_by?: string;
-	updated_at?: string;
-}
-
-interface GovernanceConfig {
-	version: string;
-	defaults: {
-		org_skills: string;
-		public_skills: string;
-	};
-	policies: GovernancePolicy[];
 }
 
 interface SkillEntry {
-	slug: string;
-	source: string;
-	repository: {
-		owner: string;
-		name: string;
-		url: string;
-		default_branch: string;
-	};
-	skill: {
-		name: string;
-		description: string;
-		metadata?: Record<string, string>;
-	};
-	instructions_preview: string;
+	tree_sha: string | null;
+	frontmatter: Record<string, unknown>;
 	files: string[];
-	governance: {
-		status: string;
-		note?: string;
-	};
-	collected_at: string;
 }
 
-function loadGovernance(): GovernanceConfig {
+interface RepositoryEntry {
+	visibility: string;
+	repo_sha?: string;
+	collected_at?: string;
+	skills: Record<string, SkillEntry>;
+}
+
+interface CatalogYaml {
+	repositories: Record<string, RepositoryEntry>;
+}
+
+interface FlatSkillEntry {
+	key: string;
+	repoKey: string;
+	skillPath: string;
+	platform: string;
+	owner: string;
+	repo: string;
+	visibility: string;
+	frontmatter: Record<string, unknown>;
+	files: string[];
+	usagePolicy: string;
+	note?: string;
+}
+
+interface DiscoveredSkill {
+	frontmatter: Record<string, unknown>;
+	files: string[];
+}
+
+function loadGovernance(): Record<string, GovernanceEntry> {
 	if (!existsSync(GOVERNANCE_PATH)) {
-		return { version: '1', defaults: { org_skills: 'none', public_skills: 'none' }, policies: [] };
+		return {};
 	}
-	return yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8')) as GovernanceConfig;
+	const raw = yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8'));
+	if (!raw || typeof raw !== 'object') return {};
+	return raw as Record<string, GovernanceEntry>;
 }
 
-function loadSkillsFromDir(dir: string): SkillEntry[] {
-	if (!existsSync(dir)) return [];
+function loadExistingCatalog(): CatalogYaml {
+	if (!existsSync(CATALOG_YAML_PATH)) {
+		return { repositories: {} };
+	}
+	try {
+		const raw = yamlLoad(readFileSync(CATALOG_YAML_PATH, 'utf-8')) as CatalogYaml;
+		return raw?.repositories ? raw : { repositories: {} };
+	} catch {
+		return { repositories: {} };
+	}
+}
 
-	const entries: SkillEntry[] = [];
+/**
+ * Collect all files in a skill directory (relative to repoDir).
+ * For root-level SKILL.md, returns just ["SKILL.md"].
+ * For nested skills (e.g., .claude/skills/review/SKILL.md), returns all files in that directory.
+ */
+function collectSkillFiles(repoDir: string, skillPath: string): string[] {
+	const skillDir = skillPath === 'SKILL.md' ? null : skillPath.replace(/\/SKILL\.md$/, '');
 
-	for (const name of readdirSync(dir)) {
-		const skillPath = join(dir, name, 'skill.yaml');
-		if (!existsSync(skillPath)) continue;
+	if (!skillDir) {
+		return ['SKILL.md'];
+	}
 
-		try {
-			const data = yamlLoad(readFileSync(skillPath, 'utf-8')) as SkillEntry;
-			entries.push(data);
-		} catch (error) {
-			const message = error instanceof Error ? error.message : String(error);
-			console.error(`  [skip] ${name}: ${message}`);
+	const fullSkillDir = join(repoDir, skillDir);
+	if (!existsSync(fullSkillDir) || !statSync(fullSkillDir).isDirectory()) {
+		return [skillPath];
+	}
+
+	const files: string[] = [];
+	walkForFiles(fullSkillDir, skillDir, files);
+	return files.sort();
+}
+
+function walkForFiles(currentDir: string, relPrefix: string, files: string[]): void {
+	for (const entry of readdirSync(currentDir)) {
+		if (entry.startsWith('_')) continue;
+		const fullPath = join(currentDir, entry);
+		const stat = statSync(fullPath);
+
+		if (stat.isFile()) {
+			files.push(`${relPrefix}/${entry}`);
+		} else if (stat.isDirectory()) {
+			walkForFiles(fullPath, `${relPrefix}/${entry}`, files);
 		}
 	}
-
-	return entries;
 }
 
-function applyGovernance(skills: SkillEntry[], governance: GovernanceConfig): SkillEntry[] {
-	return skills.map((skill) => {
-		const policy = governance.policies.find(
-			(p) => p.slug === skill.slug && p.source === skill.source
-		);
+/**
+ * Walk a repo directory to find all SKILL.md files and parse their frontmatter + files.
+ */
+function findSkillMdFiles(repoDir: string): Record<string, DiscoveredSkill> {
+	const skills: Record<string, DiscoveredSkill> = {};
+	walkForSkillMd(repoDir, repoDir, skills);
+	return skills;
+}
 
-		if (policy) {
-			return {
-				...skill,
-				governance: {
-					status: policy.status,
-					note: policy.note
-				}
+function walkForSkillMd(
+	baseDir: string,
+	currentDir: string,
+	skills: Record<string, DiscoveredSkill>
+): void {
+	for (const entry of readdirSync(currentDir)) {
+		if (entry.startsWith('_')) continue;
+		const fullPath = join(currentDir, entry);
+		const stat = statSync(fullPath);
+
+		if (stat.isFile() && entry === 'SKILL.md') {
+			const relDir = relative(baseDir, currentDir);
+			const skillPath = relDir ? `${relDir}/SKILL.md` : 'SKILL.md';
+
+			try {
+				const content = readFileSync(fullPath, 'utf-8');
+				const parsed = matter(content);
+				const body = parsed.content.trim();
+				const frontmatter: Record<string, unknown> = {
+					...parsed.data,
+					...(body ? { _excerpt: body.slice(0, 500) } : {})
+				};
+				const files = collectSkillFiles(baseDir, skillPath);
+
+				skills[skillPath] = { frontmatter, files };
+			} catch (error) {
+				const message = error instanceof Error ? error.message : String(error);
+				console.error(`  [skip] ${fullPath}: ${message}`);
+			}
+		} else if (stat.isDirectory()) {
+			walkForSkillMd(baseDir, fullPath, skills);
+		}
+	}
+}
+
+/**
+ * Discover all repos under data/skills/github.com/ and merge with existing catalog metadata.
+ */
+function buildCatalog(existing: CatalogYaml): CatalogYaml {
+	const catalog: CatalogYaml = { repositories: {} };
+
+	const platformDir = join(SKILLS_DIR, 'github.com');
+	if (!existsSync(platformDir)) return catalog;
+
+	for (const owner of readdirSync(platformDir)) {
+		const ownerDir = join(platformDir, owner);
+		if (!statSync(ownerDir).isDirectory()) continue;
+
+		for (const repo of readdirSync(ownerDir)) {
+			const repoDir = join(ownerDir, repo);
+			if (!statSync(repoDir).isDirectory()) continue;
+
+			const repoKey = `github.com/${owner}/${repo}`;
+			const existingRepo = existing.repositories[repoKey];
+			const freshSkills = findSkillMdFiles(repoDir);
+
+			if (Object.keys(freshSkills).length === 0) continue;
+
+			const mergedSkills: Record<string, SkillEntry> = {};
+			for (const [skillPath, discovered] of Object.entries(freshSkills)) {
+				const existingSkill = existingRepo?.skills?.[skillPath];
+				mergedSkills[skillPath] = {
+					tree_sha: (existingSkill as SkillEntry | undefined)?.tree_sha ?? null,
+					frontmatter: discovered.frontmatter,
+					files: discovered.files
+				};
+			}
+
+			catalog.repositories[repoKey] = {
+				visibility: existingRepo?.visibility ?? 'public',
+				...(existingRepo?.repo_sha ? { repo_sha: existingRepo.repo_sha } : {}),
+				...(existingRepo?.collected_at ? { collected_at: existingRepo.collected_at } : {}),
+				skills: mergedSkills
 			};
 		}
+	}
 
-		// Apply defaults
-		const defaultStatus =
-			skill.source === 'org'
-				? governance.defaults.org_skills
-				: governance.defaults.public_skills;
+	return catalog;
+}
 
-		return {
-			...skill,
-			governance: {
-				...skill.governance,
-				status: skill.governance?.status ?? defaultStatus
+function buildFlatCatalog(
+	catalog: CatalogYaml,
+	governance: Record<string, GovernanceEntry>
+): { generated_at: string; skills: FlatSkillEntry[] } {
+	const skills: FlatSkillEntry[] = [];
+
+	for (const [repoKey, repoEntry] of Object.entries(catalog.repositories)) {
+		const parts = repoKey.split('/');
+		const platform = parts[0];
+		const owner = parts[1];
+		const repo = parts[2];
+
+		for (const [skillPath, skillData] of Object.entries(repoEntry.skills)) {
+			const key = `${repoKey}/${skillPath}`;
+			const gov = governance[key];
+
+			// Determine visibility: if _from's last entry points to a repo not in this catalog, mark as private
+			let visibility: string = repoEntry.visibility;
+			const fromArray = skillData.frontmatter._from;
+			if (Array.isArray(fromArray) && fromArray.length > 0) {
+				const lastFrom = String(fromArray[fromArray.length - 1]);
+				try {
+					const url = new URL(lastFrom);
+					const lastFromRepoKey = (url.host + url.pathname).replace(/\/$/, '');
+					if (!catalog.repositories[lastFromRepoKey]) {
+						visibility = 'private';
+					}
+				} catch {
+					// If URL parsing fails, keep repo-level visibility
+				}
 			}
-		};
+
+			const entry: FlatSkillEntry = {
+				key,
+				repoKey,
+				skillPath,
+				platform,
+				owner,
+				repo,
+				visibility,
+				frontmatter: skillData.frontmatter,
+				files: skillData.files,
+				usagePolicy: gov?.usagePolicy ?? 'none',
+				...(gov?.note ? { note: gov.note } : {})
+			};
+
+			skills.push(entry);
+		}
+	}
+
+	skills.sort((a, b) => {
+		const nameA = String(a.frontmatter.name ?? a.key).toLowerCase();
+		const nameB = String(b.frontmatter.name ?? b.key).toLowerCase();
+		return nameA.localeCompare(nameB);
 	});
+
+	return { generated_at: new Date().toISOString(), skills };
 }
 
 function main(): void {
 	console.log('Building skill catalog...');
 
 	const governance = loadGovernance();
+	console.log(`  Loaded ${Object.keys(governance).length} governance policy(ies)`);
 
-	// Load skills from both directories
-	const orgSkills = loadSkillsFromDir(ORG_SKILLS_DIR);
-	console.log(`  Loaded ${orgSkills.length} org skill(s)`);
+	const existing = loadExistingCatalog();
+	const catalog = buildCatalog(existing);
 
-	const publicSkills = loadSkillsFromDir(PUBLIC_SKILLS_DIR);
-	console.log(`  Loaded ${publicSkills.length} public skill(s)`);
+	const repoCount = Object.keys(catalog.repositories).length;
+	const skillCount = Object.values(catalog.repositories).reduce(
+		(sum, r) => sum + Object.keys(r.skills).length,
+		0
+	);
+	console.log(`  Discovered ${skillCount} skill(s) in ${repoCount} repository(ies)`);
 
-	const allSkills = [...orgSkills, ...publicSkills];
+	// Write catalog.yaml (preserving operational metadata, updating frontmatter)
+	writeFileSync(CATALOG_YAML_PATH, yamlDump(catalog, { lineWidth: 120, noRefs: true }));
+	console.log(`  Written ${CATALOG_YAML_PATH}`);
 
-	// Apply latest governance policies
-	const skillsWithGovernance = applyGovernance(allSkills, governance);
+	// Generate web JSON
+	const flatCatalog = buildFlatCatalog(catalog, governance);
+	writeFileSync(WEB_CATALOG_PATH, JSON.stringify(flatCatalog, null, 2) + '\n');
+	console.log(`  Written ${WEB_CATALOG_PATH}`);
 
-	// Sort by name
-	skillsWithGovernance.sort((a, b) => a.skill.name.localeCompare(b.skill.name));
-
-	// Build catalog
-	const catalog = {
-		generated_at: new Date().toISOString(),
-		skills: skillsWithGovernance.map((s) => ({
-			slug: s.slug,
-			source: s.source,
-			repository: s.repository,
-			skill: s.skill,
-			instructions_preview: s.instructions_preview,
-			files: s.files,
-			governance: s.governance,
-			collected_at: s.collected_at
-		}))
-	};
-
-	writeFileSync(CATALOG_PATH, JSON.stringify(catalog, null, 2) + '\n');
-	console.log(`\nCatalog written to ${CATALOG_PATH} (${catalog.skills.length} skills)`);
+	console.log(`\nDone: ${flatCatalog.skills.length} skills in catalog`);
 }
 
 main();

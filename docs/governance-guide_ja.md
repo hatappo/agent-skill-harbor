@@ -1,6 +1,6 @@
 # ガバナンスガイド
 
-Skill Warehouse は、組織内での Agent Skill の利用を管理するためのガバナンス機能を提供します。
+Agent Skill Harbor は、組織内での Agent Skill の利用を管理するためのガバナンス機能を提供します。
 
 ## ガバナンスステータス
 

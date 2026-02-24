@@ -1,5 +1,5 @@
 {
-  "name": "skill-warehouse",
+  "name": "agent-skill-harbor",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,11 +8,11 @@
   "scripts": {
     "collect": "tsx scripts/collect-org-skills.ts",
     "build:catalog": "tsx scripts/build-catalog.ts",
-    "dev": "pnpm --filter skill-warehouse-web dev",
-    "build": "pnpm run build:catalog && pnpm --filter skill-warehouse-web build",
-    "preview": "pnpm --filter skill-warehouse-web preview",
-    "lint": "pnpm --filter skill-warehouse-web lint",
-    "check": "pnpm --filter skill-warehouse-web check"
+    "dev": "pnpm --filter agent-skill-harbor-web dev",
+    "build": "pnpm run build:catalog && pnpm --filter agent-skill-harbor-web build",
+    "preview": "pnpm --filter agent-skill-harbor-web preview",
+    "lint": "pnpm --filter agent-skill-harbor-web lint",
+    "check": "pnpm --filter agent-skill-harbor-web check"
   },
   "pnpm": {
     "onlyBuiltDependencies": ["esbuild"]

@@ -1,80 +1,97 @@
 ---
 name: manage-skill
-description: Manage public skills in the Skill Warehouse catalog. Add, remove, list public skills, or update governance status.
+description: Manage skills in the Agent Skill Harbor catalog. Add, remove, list skills, or update governance policy.
 ---
 
-# Skill Warehouse - Manage Skills
+# Agent Skill Harbor - Manage Skills
 
-You are managing the Skill Warehouse public skill catalog. All changes are local and should be submitted as a PR.
+You are managing the Agent Skill Harbor skill catalog. All changes are local and should be submitted as a PR.
+
+## Directory Structure
+
+Actual SKILL.md files are stored under `data/skills/github.com/{owner}/{repo}/{skill-path}/SKILL.md`.
+
+Examples:
+- `data/skills/github.com/anthropics/prompt-library/SKILL.md` (root-level)
+- `data/skills/github.com/example-org/code-review/.claude/skills/review/SKILL.md` (nested)
 
 ## File Locations
 
-- Public skill data: `data/skills/public/{owner}_{repo}/skill.yaml`
-- Governance policies: `data/governance.yaml`
-- Catalog (auto-generated): `data/catalog.json`
+- Skill files: `data/skills/github.com/{owner}/{repo}/...SKILL.md`
+- Catalog: `data/catalog.yaml` (operational metadata + frontmatter; git-tracked)
+- Governance: `data/governance.yaml`
+- Web JSON: `web/static/catalog.json` (auto-generated, git-ignored)
 
 ## Actions
 
 Parse the user's intent and execute the appropriate action below.
 
-### Add a Public Skill
+### Add a Skill
 
-When the user wants to add a public skill (e.g., `add owner/repo`):
+When the user wants to add a skill (e.g., `add owner/repo` or `add owner/repo .claude/skills/review/SKILL.md`):
 
 1. Validate the GitHub repository exists by checking its URL
-2. Create directory `data/skills/public/{owner}_{repo}/`
-3. Create `data/skills/public/{owner}_{repo}/skill.yaml` with this structure:
+2. Determine the skill path: if the user specifies a path, use it; otherwise default to root-level (`SKILL.md`)
+3. Fetch the SKILL.md from the repository
+4. Add `_from` to the SKILL.md frontmatter with the source URL (e.g., `_from: ["https://github.com/{owner}/{repo}"]`). If `_from` already exists, append the URL (avoid duplicates).
+5. Save it to `data/skills/github.com/{owner}/{repo}/{skill-path}/SKILL.md`
+6. Add an entry to `data/catalog.yaml`:
 
 ```yaml
-slug: "{owner}_{repo}"
-source: "public"
-repository:
-  owner: "{owner}"
-  name: "{repo}"
-  url: "https://github.com/{owner}/{repo}"
-  default_branch: "main"
-skill:
-  name: "{name from SKILL.md or repo name}"
-  description: "{description from SKILL.md or repo description}"
-instructions_preview: ""
-files:
-  - "SKILL.md"
-governance:
-  status: "none"
-collected_at: "{current ISO timestamp}"
-skill_md_sha: ""
+repositories:
+  github.com/{owner}/{repo}:
+    visibility: "public"  # or "private" / "internal"
+    collected_at: "{current ISO timestamp}"
+    skills:
+      {skill-path}/SKILL.md:
+        tree_sha: null
+        frontmatter: {}
+        files:
+          - {skill-path}/SKILL.md
 ```
 
-4. If possible, fetch the SKILL.md from the repository to populate `name`, `description`, `instructions_preview`, and `metadata` fields.
+7. Run `pnpm run build:catalog` to update the catalog with frontmatter from the SKILL.md
 
-### Remove a Public Skill
+### Remove a Skill
 
-When the user wants to remove a public skill (e.g., `remove owner/repo`):
+When the user wants to remove a skill (e.g., `remove owner/repo` or `remove owner/repo .claude/skills/review/SKILL.md`):
 
-1. Delete the directory `data/skills/public/{owner}_{repo}/`
-2. Remove any matching entry from `data/governance.yaml` policies array
+1. Delete the SKILL.md file (and its directory if empty)
+2. Remove the skill entry from `data/catalog.yaml`
+3. If no skills remain for the repo, remove the entire repo entry
+4. Remove any matching entry from `data/governance.yaml`
 
-### List Public Skills
+### List Skills
 
-When the user wants to list registered public skills:
+When the user wants to list registered skills:
 
-1. Read all `skill.yaml` files under `data/skills/public/`
-2. Display a table with: slug, name, governance status, repository URL
+1. Read `data/catalog.yaml`
+2. Display a table with: key, name (from frontmatter), usagePolicy (from governance)
 
-### Update Governance Status
+### Update Governance Policy
 
-When the user wants to change governance (e.g., `govern {slug} required "reason"`):
+When the user wants to change governance (e.g., `govern github.com/owner/repo/SKILL.md required "reason"`):
 
-Valid statuses: `required`, `recommended`, `deprecated`, `prohibited`, `none`
+Valid usagePolicy values: `required`, `recommended`, `discouraged`, `prohibited`, `none`
 
 1. Read `data/governance.yaml`
-2. Find or create a policy entry matching the slug
-3. Update the status, note, updated_by, and updated_at fields
-4. Write back `data/governance.yaml`
+2. Find or create an entry with the key (format: `github.com/{owner}/{repo}/{skill-file-path}`)
+3. Set `usagePolicy` and optionally `note`
+4. If usagePolicy is `none`, remove the entry from governance.yaml
+5. Write back `data/governance.yaml`
+
+## Key Format
+
+The skill key is: `github.com/{owner}/{repo}/{skill-file-path}`
+
+Examples:
+- `github.com/example-org/code-review/.claude/skills/review/SKILL.md`
+- `github.com/anthropics/prompt-library/SKILL.md`
+
+This key is used consistently in `catalog.yaml`, `governance.yaml`, and the Web UI URL.
 
 ## Important Notes
 
 - All changes are made to local files only
 - Remind the user to create a PR to apply changes
 - After making changes, run `pnpm run build:catalog` to regenerate the catalog
-- The slug for public skills uses the format `{owner}_{repo}`

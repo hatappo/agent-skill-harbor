@@ -1,16 +1,25 @@
 <p align="center"><a href="./README.md">en</a> | <a href="./README_ja.md">ja</a></p>
 
-# Skill Warehouse
+# Agent Skill Harbor
+
+> Know what your agents know.
 
 組織向けの Agent Skill カタログ・ガバナンスツール。
 
+## スクリーンショット
+
+| スキルカタログ | スキル詳細 |
+|:---:|:---:|
+| ![スキルカタログ](docs/agent-skill-harbor-screenshot02.jpeg) | ![スキル詳細](docs/agent-skill-harbor-screenshot01.jpeg) |
+
 ## 概要
 
-Skill Warehouse は、GitHub Organization 内のリポジトリから Agent Skill (SKILL.md) を収集し、ガバナンス管理機能を提供し、GitHub Pages 上でブラウズ可能なカタログを公開します。
+Agent Skill Harbor は、GitHub Organization 内のリポジトリから Agent Skill (SKILL.md) を収集し、ガバナンス管理機能を提供し、GitHub Pages 上でブラウズ可能なカタログを公開します。
 
-- **データベース不要** - データは Git 内に YAML/JSON として保存
-- **バックエンド不要** - フロントエンドのみの Web アプリ (SvelteKit, プリレンダリング)
-- **GitHub ネイティブ** - GitHub Actions で収集、GitHub Pages でホスティング
+- データベース不要 — データは Git 内に YAML/JSON として保存
+- バックエンド不要 — フロントエンドのみの Web アプリ (SvelteKit, プリレンダリング)
+- GitHub ネイティブ — GitHub Actions で収集、GitHub Pages でホスティング
+- トレーサビリティ — 外部からインストールしたスキルも含め、すべてのスキルの出所・来歴を追跡可能
 
 ## クイックスタート
 
@@ -56,6 +65,10 @@ pnpm run build
 ├── web/                  # SvelteKit フロントエンドアプリケーション
 └── .github/workflows/    # GitHub Actions (収集 + デプロイ)
 ```
+
+## スキルの来歴追跡
+
+[agent-command-sync](https://github.com/hatappo/agent-command-sync) (`acs`) を使ってスキルのインストール・管理を行うと、SKILL.md frontmatter の `_from` 履歴が自動記録され、すべてのスキルの出所を追跡できます。
 
 ## ライセンス
 

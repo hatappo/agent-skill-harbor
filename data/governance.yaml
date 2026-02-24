@@ -1,21 +1,19 @@
-version: "1"
+github.com/anthropics/skills/skills/skill-creator/SKILL.md:
+  usagePolicy: recommended
+  note: "New team members should use this when creating their first skill"
 
-# デフォルトのガバナンスステータス
-defaults:
-  org_skills: "none"
-  public_skills: "none"
+github.com/hashicorp/agent-skills/terraform/code-generation/skills/terraform-style-guide/SKILL.md:
+  usagePolicy: required
+  note: "All Terraform code must follow this style guide"
 
-# 個別スキルのガバナンスポリシー
-policies:
-  - slug: "code-review-assistant"
-    source: "org"
-    status: "required"
-    note: "All developers must use this skill for code reviews"
-    updated_by: "security-team"
-    updated_at: "2026-02-20T00:00:00Z"
-  - slug: "deploy-helper"
-    source: "org"
-    status: "recommended"
-    note: "Recommended for all teams managing production deployments"
-    updated_by: "infra-team"
-    updated_at: "2026-02-22T00:00:00Z"
+github.com/hashicorp/agent-skills/terraform/code-generation/skills/terraform-test/SKILL.md:
+  usagePolicy: recommended
+  note: "Use for all new Terraform modules"
+
+github.com/example-org/internal-tools/skills/legacy-rest-client/SKILL.md:
+  usagePolicy: discouraged
+  note: "Platform API v1 is scheduled for deprecation. Use v2 skills instead."
+
+github.com/example-org/internal-tools/skills/manual-db-migration/SKILL.md:
+  usagePolicy: prohibited
+  note: "Direct SQL migrations are prohibited. All schema changes must go through the approved migration framework (Flyway)."

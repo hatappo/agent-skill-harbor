@@ -1,6 +1,6 @@
 # Setup Guide
 
-This guide explains how to deploy Skill Warehouse for your organization.
+This guide explains how to deploy Agent Skill Harbor for your organization.
 
 ## Prerequisites
 
@@ -13,8 +13,8 @@ This guide explains how to deploy Skill Warehouse for your organization.
 Clone this repository as a **private** repository within your organization.
 
 ```bash
-git clone https://github.com/your-org/skill-warehouse.git
-cd skill-warehouse
+git clone https://github.com/your-org/agent-skill-harbor.git
+cd agent-skill-harbor
 pnpm install
 ```
 
