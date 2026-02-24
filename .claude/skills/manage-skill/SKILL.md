@@ -1,11 +1,11 @@
 ---
 name: manage-skill
-description: Manage skills in the Skill Warehouse catalog. Add, remove, list skills, or update governance policy.
+description: Manage skills in the Agent Skill Harbor catalog. Add, remove, list skills, or update governance policy.
 ---
 
-# Skill Warehouse - Manage Skills
+# Agent Skill Harbor - Manage Skills
 
-You are managing the Skill Warehouse skill catalog. All changes are local and should be submitted as a PR.
+You are managing the Agent Skill Harbor skill catalog. All changes are local and should be submitted as a PR.
 
 ## Directory Structure
 

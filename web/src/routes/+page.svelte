@@ -64,7 +64,7 @@
 </script>
 
 <svelte:head>
-	<title>Skill Warehouse</title>
+	<title>Agent Skill Harbor</title>
 	<meta name="description" content="Internal agent skill catalog and governance" />
 </svelte:head>
 

@@ -1,12 +1,12 @@
 <p align="center"><a href="./README.md">en</a> | <a href="./README_ja.md">ja</a></p>
 
-# Skill Warehouse
+# Agent Skill Harbor
 
 Internal agent skill catalog and governance for organizations.
 
 ## Overview
 
-Skill Warehouse collects Agent Skills (SKILL.md) from your GitHub Organization's repositories, provides governance controls, and serves a browsable catalog via GitHub Pages.
+Agent Skill Harbor collects Agent Skills (SKILL.md) from your GitHub Organization's repositories, provides governance controls, and serves a browsable catalog via GitHub Pages.
 
 - **No database** - Data stored as YAML/JSON in Git
 - **No backend** - Frontend-only web app (SvelteKit, prerendered)

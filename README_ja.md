@@ -1,12 +1,12 @@
 <p align="center"><a href="./README.md">en</a> | <a href="./README_ja.md">ja</a></p>
 
-# Skill Warehouse
+# Agent Skill Harbor
 
 組織向けの Agent Skill カタログ・ガバナンスツール。
 
 ## 概要
 
-Skill Warehouse は、GitHub Organization 内のリポジトリから Agent Skill (SKILL.md) を収集し、ガバナンス管理機能を提供し、GitHub Pages 上でブラウズ可能なカタログを公開します。
+Agent Skill Harbor は、GitHub Organization 内のリポジトリから Agent Skill (SKILL.md) を収集し、ガバナンス管理機能を提供し、GitHub Pages 上でブラウズ可能なカタログを公開します。
 
 - **データベース不要** - データは Git 内に YAML/JSON として保存
 - **バックエンド不要** - フロントエンドのみの Web アプリ (SvelteKit, プリレンダリング)

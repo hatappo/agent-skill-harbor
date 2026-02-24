@@ -28,7 +28,7 @@
 </script>
 
 <svelte:head>
-	<title>{skillName} - Skill Warehouse</title>
+	<title>{skillName} - Agent Skill Harbor</title>
 	<meta name="description" content={skillDescription} />
 </svelte:head>
 

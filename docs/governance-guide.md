@@ -1,6 +1,6 @@
 # Governance Guide
 
-Skill Warehouse provides governance controls to manage how Agent Skills are used within your organization.
+Agent Skill Harbor provides governance controls to manage how Agent Skills are used within your organization.
 
 ## Governance Statuses
 
