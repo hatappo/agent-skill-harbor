@@ -66,6 +66,10 @@ pnpm run build
 └── .github/workflows/    # GitHub Actions (収集 + デプロイ)
 ```
 
+## スキルの来歴追跡
+
+[agent-command-sync](https://github.com/hatappo/agent-command-sync) (`acs`) を使ってスキルのインストール・管理を行うと、SKILL.md frontmatter の `_from` 履歴が自動記録され、すべてのスキルの出所を追跡できます。
+
 ## ライセンス
 
 MIT
