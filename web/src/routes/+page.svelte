@@ -70,8 +70,8 @@
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 	<div class="mb-8">
-		<h1 class="text-3xl font-bold text-gray-900">Skill Catalog</h1>
-		<p class="mt-2 text-gray-600">
+		<h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Skill Catalog</h1>
+		<p class="mt-2 text-gray-600 dark:text-gray-400">
 			{allSkills.length} skill{allSkills.length !== 1 ? 's' : ''} registered
 		</p>
 	</div>
@@ -82,7 +82,7 @@
 	</div>
 
 	{#if hasFilters}
-		<p class="mb-4 text-sm text-gray-500">
+		<p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
 			Showing {displayedSkills.length} of {allSkills.length} skills
 		</p>
 	{/if}
