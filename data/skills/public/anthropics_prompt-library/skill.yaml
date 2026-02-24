@@ -1,0 +1,25 @@
+slug: anthropics_prompt-library
+source: public
+repository:
+  owner: anthropics
+  name: prompt-library
+  url: https://github.com/anthropics/prompt-library
+  default_branch: main
+skill:
+  name: Prompt Library
+  description: A curated collection of prompts and prompt engineering patterns for various AI assistant tasks.
+  metadata:
+    author: anthropics
+    version: "1.0.0"
+instructions_preview: |
+  Use this skill to access curated prompt templates:
+  - Code generation prompts
+  - Analysis and review prompts
+  - Creative writing prompts
+  - Data transformation prompts
+files:
+  - SKILL.md
+governance:
+  status: none
+collected_at: "2026-02-23T09:00:00Z"
+skill_md_sha: jkl345mno678

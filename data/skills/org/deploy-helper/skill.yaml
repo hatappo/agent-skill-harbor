@@ -1,0 +1,26 @@
+slug: deploy-helper
+source: org
+repository:
+  owner: example-org
+  name: deploy-helper
+  url: https://github.com/example-org/deploy-helper
+  default_branch: main
+skill:
+  name: Deploy Helper
+  description: Assists with deployment workflows, including staging validation, canary releases, and rollback procedures.
+  metadata:
+    author: infra-team
+    version: "1.3.0"
+instructions_preview: |
+  This skill helps with deployment workflows:
+  - Validate staging environment before production deploy
+  - Manage canary release percentages
+  - Execute rollback procedures when issues are detected
+  - Generate deployment reports
+files:
+  - SKILL.md
+governance:
+  status: recommended
+  note: Recommended for all teams managing production deployments
+collected_at: "2026-02-22T14:30:00Z"
+skill_md_sha: def789ghi012

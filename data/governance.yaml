@@ -1,0 +1,21 @@
+version: "1"
+
+# デフォルトのガバナンスステータス
+defaults:
+  org_skills: "none"
+  public_skills: "none"
+
+# 個別スキルのガバナンスポリシー
+policies:
+  - slug: "code-review-assistant"
+    source: "org"
+    status: "required"
+    note: "All developers must use this skill for code reviews"
+    updated_by: "security-team"
+    updated_at: "2026-02-20T00:00:00Z"
+  - slug: "deploy-helper"
+    source: "org"
+    status: "recommended"
+    note: "Recommended for all teams managing production deployments"
+    updated_by: "infra-team"
+    updated_at: "2026-02-22T00:00:00Z"

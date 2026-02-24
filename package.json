@@ -1,0 +1,29 @@
+{
+  "name": "skill-warehouse",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Internal agent skill governance and catalog for organizations",
+  "license": "MIT",
+  "scripts": {
+    "collect": "tsx scripts/collect-org-skills.ts",
+    "build:catalog": "tsx scripts/build-catalog.ts",
+    "dev": "pnpm --filter skill-warehouse-web dev",
+    "build": "pnpm run build:catalog && pnpm --filter skill-warehouse-web build",
+    "preview": "pnpm --filter skill-warehouse-web preview",
+    "lint": "pnpm --filter skill-warehouse-web lint",
+    "check": "pnpm --filter skill-warehouse-web check"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  },
+  "devDependencies": {
+    "@octokit/rest": "^21.1.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.15.0",
+    "gray-matter": "^4.0.3",
+    "js-yaml": "^4.1.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}

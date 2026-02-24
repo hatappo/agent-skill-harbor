@@ -1,0 +1,23 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+
+# SvelteKit
+web/.svelte-kit/
+web/build/
+
+# Generated
+data/catalog.json
+web/static/catalog.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

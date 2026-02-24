@@ -1,0 +1,62 @@
+<p align="center"><a href="./README.md">en</a> | <a href="./README_ja.md">ja</a></p>
+
+# Skill Warehouse
+
+組織向けの Agent Skill カタログ・ガバナンスツール。
+
+## 概要
+
+Skill Warehouse は、GitHub Organization 内のリポジトリから Agent Skill (SKILL.md) を収集し、ガバナンス管理機能を提供し、GitHub Pages 上でブラウズ可能なカタログを公開します。
+
+- **データベース不要** - データは Git 内に YAML/JSON として保存
+- **バックエンド不要** - フロントエンドのみの Web アプリ (SvelteKit, プリレンダリング)
+- **GitHub ネイティブ** - GitHub Actions で収集、GitHub Pages でホスティング
+
+## クイックスタート
+
+### 前提条件
+
+- Node.js 22+
+- pnpm 10+
+
+### 開発
+
+```bash
+# 依存関係のインストール
+pnpm install
+
+# 開発サーバーの起動
+pnpm dev
+
+# YAML データからカタログをビルド
+pnpm run build:catalog
+
+# すべてをビルド (カタログ + Web)
+pnpm run build
+```
+
+### 組織へのセットアップ
+
+1. このリポジトリを組織内にプライベートとしてクローン
+2. GitHub リポジトリの変数とシークレットを設定:
+   - 変数 `GITHUB_ORG`: GitHub Organization 名
+   - シークレット `ORG_GITHUB_TOKEN`: Organization の `repo` スコープを持つトークン
+3. GitHub Pages を有効化 (Settings > Pages > Source: GitHub Actions)
+4. `data/governance.yaml` を編集してガバナンスポリシーを定義
+5. "Collect Skills" ワークフローを手動トリガーして初回収集を実行
+
+## プロジェクト構成
+
+```
+├── data/                 # スキルデータ (YAML) とガバナンスポリシー
+│   ├── skills/org/       # Org リポジトリから自動収集
+│   ├── skills/public/    # 手動追加された公開スキル
+│   └── governance.yaml   # ガバナンスポリシー定義
+├── scripts/              # 収集・ビルドスクリプト
+├── web/                  # SvelteKit フロントエンドアプリケーション
+└── .github/workflows/    # GitHub Actions (収集 + デプロイ)
+```
+
+## ライセンス
+
+MIT
