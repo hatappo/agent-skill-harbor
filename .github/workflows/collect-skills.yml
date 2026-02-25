@@ -32,7 +32,7 @@ jobs:
       - name: Collect skills from org repositories
         env:
           GITHUB_TOKEN: ${{ secrets.ORG_GITHUB_TOKEN }}
-          GITHUB_ORG: ${{ vars.GITHUB_ORG }}
+          GH_ORG: ${{ vars.GH_ORG }}
         run: pnpm run collect
 
       - name: Build catalog

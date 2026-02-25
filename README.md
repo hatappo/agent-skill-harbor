@@ -48,7 +48,7 @@ pnpm run build
 
 1. Clone this repository privately into your organization
 2. Configure GitHub repository variables and secrets:
-   - Variable `GITHUB_ORG`: Your GitHub organization name
+   - Variable `GH_ORG`: Your GitHub organization name
    - Secret `ORG_GITHUB_TOKEN`: A token with `repo` scope for your organization
 3. Enable GitHub Pages (Settings > Pages > Source: GitHub Actions)
 4. Edit `config/governance.yaml` to define your governance policies

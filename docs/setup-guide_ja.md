@@ -26,7 +26,7 @@ pnpm install
 
 | 変数 | 説明 | 例 |
 |------|------|-----|
-| `GITHUB_ORG` | GitHub Organization 名 | `my-org` |
+| `GH_ORG` | GitHub Organization 名 | `my-org` |
 
 ### リポジトリシークレット
 

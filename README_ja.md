@@ -48,7 +48,7 @@ pnpm run build
 
 1. このリポジトリを組織内にプライベートとしてクローン
 2. GitHub リポジトリの変数とシークレットを設定:
-   - 変数 `GITHUB_ORG`: GitHub Organization 名
+   - 変数 `GH_ORG`: GitHub Organization 名
    - シークレット `ORG_GITHUB_TOKEN`: Organization の `repo` スコープを持つトークン
 3. GitHub Pages を有効化 (Settings > Pages > Source: GitHub Actions)
 4. `config/governance.yaml` を編集してガバナンスポリシーを定義

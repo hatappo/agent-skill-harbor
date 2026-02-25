@@ -26,7 +26,7 @@ Go to your repository's **Settings > Secrets and variables > Actions**.
 
 | Variable | Description | Example |
 |----------|-------------|---------|
-| `GITHUB_ORG` | Your GitHub organization name | `my-org` |
+| `GH_ORG` | Your GitHub organization name | `my-org` |
 
 ### Repository Secrets
 
