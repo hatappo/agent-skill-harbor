@@ -6,8 +6,8 @@
   "description": "Internal agent skill governance and catalog for organizations",
   "license": "MIT",
   "scripts": {
-    "collect": "tsx scripts/collect-org-skills.ts",
-    "build:catalog": "tsx scripts/build-catalog.ts",
+    "collect": "tsx --env-file-if-exists=.env scripts/collect-org-skills.ts",
+    "build:catalog": "tsx --env-file-if-exists=.env scripts/build-catalog.ts",
     "dev": "pnpm --filter agent-skill-harbor-web dev",
     "build": "pnpm run build:catalog && pnpm --filter agent-skill-harbor-web build",
     "preview": "pnpm --filter agent-skill-harbor-web preview",

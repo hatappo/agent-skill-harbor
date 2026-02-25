@@ -14,5 +14,17 @@ export async function load({ params, fetch }) {
 		throw error(404, 'Skill not found');
 	}
 
-	return { skill };
+	// Fetch full skill body from per-skill static file
+	const skillDir = path.replace(/\/SKILL\.md$/, '');
+	let body = '';
+	try {
+		const bodyRes = await fetch(`/skills/${skillDir}/body.md`);
+		if (bodyRes.ok) {
+			body = await bodyRes.text();
+		}
+	} catch {
+		// body file may not exist
+	}
+
+	return { skill, allSkills: catalog.skills, body };
 }
