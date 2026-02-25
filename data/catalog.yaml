@@ -150,6 +150,7 @@ repositories:
   github.com/remotion-dev/skills:
     visibility: public
     repo_sha: d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5
+    fork: true
     skills:
       skills/remotion/SKILL.md:
         tree_sha: fad4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
@@ -170,6 +171,7 @@ repositories:
   github.com/wshobson/agents:
     visibility: public
     repo_sha: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
+    fork: true
     skills:
       plugins/database-design/skills/postgresql/SKILL.md:
         tree_sha: fbe5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5

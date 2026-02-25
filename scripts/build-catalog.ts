@@ -42,6 +42,7 @@ interface SkillEntry {
 interface RepositoryEntry {
 	visibility: string;
 	repo_sha?: string;
+	fork?: boolean;
 	skills: Record<string, SkillEntry>;
 }
 
@@ -67,6 +68,7 @@ interface FlatSkillEntry {
 	registered_at?: string;
 	repo_sha?: string;
 	tree_sha?: string | null;
+	is_fork?: boolean;
 }
 
 interface DiscoveredSkill {
@@ -76,8 +78,8 @@ interface DiscoveredSkill {
 }
 
 function detectOrg(): string | null {
-	if (process.env.GITHUB_ORG) {
-		return process.env.GITHUB_ORG;
+	if (process.env.GH_ORG) {
+		return process.env.GH_ORG;
 	}
 	try {
 		const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
@@ -249,6 +251,7 @@ function buildCatalog(existing: CatalogYaml): { catalog: CatalogYaml; bodyMap: M
 			catalog.repositories[repoKey] = {
 				visibility: existingRepo?.visibility ?? 'public',
 				...(existingRepo?.repo_sha ? { repo_sha: existingRepo.repo_sha } : {}),
+				...(existingRepo?.fork ? { fork: true } : {}),
 				skills: mergedSkills
 			};
 		}
@@ -294,7 +297,8 @@ function buildFlatCatalog(
 				...(skillData.updated_at ? { updated_at: skillData.updated_at } : {}),
 				...(skillData.registered_at ? { registered_at: skillData.registered_at } : {}),
 				...(repoEntry.repo_sha ? { repo_sha: repoEntry.repo_sha } : {}),
-				tree_sha: skillData.tree_sha ?? null
+				tree_sha: skillData.tree_sha ?? null,
+				...(repoEntry.fork ? { is_fork: true } : {})
 			};
 
 			skills.push(entry);

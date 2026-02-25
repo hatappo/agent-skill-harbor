@@ -40,6 +40,7 @@ interface SkillEntry {
 interface RepositoryEntry {
 	visibility: string;
 	repo_sha?: string;
+	fork?: boolean;
 	skills: Record<string, SkillEntry>;
 }
 
@@ -258,10 +259,10 @@ async function fetchFileContent(
 
 async function main(): Promise<void> {
 	const token = process.env.GITHUB_TOKEN;
-	const org = process.env.GITHUB_ORG;
+	const org = process.env.GH_ORG;
 
 	if (!token || !org) {
-		console.error('Error: GITHUB_TOKEN and GITHUB_ORG environment variables are required.');
+		console.error('Error: GITHUB_TOKEN and GH_ORG environment variables are required.');
 		process.exit(1);
 	}
 
@@ -407,6 +408,7 @@ async function main(): Promise<void> {
 			catalog.repositories[repoKey] = {
 				visibility: repo.visibility,
 				repo_sha: headSha,
+				...(repo.fork ? { fork: true } : {}),
 				skills: {
 					...existingRepo?.skills,
 					...newSkills

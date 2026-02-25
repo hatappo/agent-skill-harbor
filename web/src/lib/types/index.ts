@@ -42,6 +42,7 @@ export interface FlatSkillEntry {
 	registered_at?: string;
 	repo_sha?: string;
 	tree_sha?: string | null;
+	is_fork?: boolean;
 }
 
 export interface FlatCatalog {
