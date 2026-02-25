@@ -1,5 +1,6 @@
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { resolve } from 'node:path';
 
 const dev = process.argv.includes('dev');
 
@@ -16,6 +17,9 @@ const config = {
 		}),
 		paths: {
 			base: dev ? '' : process.env.BASE_PATH || ''
+		},
+		env: {
+			dir: resolve(import.meta.dirname, '..')
 		}
 	}
 };

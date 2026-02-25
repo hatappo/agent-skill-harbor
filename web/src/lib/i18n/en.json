@@ -59,6 +59,11 @@
 		"skillCount_other": "{count} skills registered",
 		"showing": "Showing {displayed} of {total} skills"
 	},
+	"error": {
+		"title": "Page not found",
+		"message": "The page you're looking for doesn't exist or has been moved.",
+		"backToCatalog": "Back to Catalog"
+	},
 	"detail": {
 		"viewRepository": "View Repository",
 		"viewSkillMd": "View SKILL.md",

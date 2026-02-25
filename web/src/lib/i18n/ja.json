@@ -59,6 +59,11 @@
 		"skillCount_other": "{count} \u4ef6\u306e\u30b9\u30ad\u30eb\u304c\u767b\u9332\u6e08\u307f",
 		"showing": "{total} \u4ef6\u4e2d {displayed} \u4ef6\u3092\u8868\u793a"
 	},
+	"error": {
+		"title": "ページが見つかりません",
+		"message": "お探しのページは存在しないか、移動された可能性があります。",
+		"backToCatalog": "カタログに戻る"
+	},
 	"detail": {
 		"viewRepository": "\u30ea\u30dd\u30b8\u30c8\u30ea\u3092\u898b\u308b",
 		"viewSkillMd": "SKILL.md \u3092\u898b\u308b",

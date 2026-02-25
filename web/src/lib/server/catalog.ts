@@ -3,6 +3,7 @@ import { load as yamlLoad } from 'js-yaml';
 import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { GH_ORG } from '$env/static/private';
 import type { FlatSkillEntry, Visibility } from '$lib/types';
 
 declare const __PROJECT_ROOT__: string;
@@ -60,8 +61,8 @@ const GOVERNANCE_PATH = join(CONFIG_DIR, 'governance.yaml');
 const ADMIN_PATH = join(CONFIG_DIR, 'admin.yaml');
 
 function detectOrg(): string | null {
-	if (process.env.GH_ORG) {
-		return process.env.GH_ORG;
+	if (GH_ORG) {
+		return GH_ORG;
 	}
 	try {
 		const remoteUrl = execSync('git remote get-url origin', {
@@ -206,7 +207,17 @@ function buildCatalogData(): CatalogResult {
 		}
 	}
 
+	const now = Date.now();
+	const freshMs = freshPeriodDays * 86_400_000;
+	const isNew = (s: FlatSkillEntry) =>
+		freshPeriodDays > 0 &&
+		!!s.registered_at &&
+		now - new Date(s.registered_at).getTime() < freshMs;
+
 	skills.sort((a, b) => {
+		const aNew = isNew(a);
+		const bNew = isNew(b);
+		if (aNew !== bNew) return aNew ? -1 : 1;
 		const nameA = String(a.frontmatter.name ?? a.key).toLowerCase();
 		const nameB = String(b.frontmatter.name ?? b.key).toLowerCase();
 		return nameA.localeCompare(nameB);
