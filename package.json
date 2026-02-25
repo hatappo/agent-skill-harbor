@@ -5,6 +5,9 @@
   "type": "module",
   "description": "Internal agent skill governance and catalog for organizations",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "collect": "tsx --env-file-if-exists=.env scripts/collect-org-skills.ts",
     "build:catalog": "tsx --env-file-if-exists=.env scripts/build-catalog.ts",
