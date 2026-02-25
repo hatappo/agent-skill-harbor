@@ -1,0 +1,88 @@
+{
+	"header": {
+		"title": "Agent Skill Harbor",
+		"catalog": "Catalog"
+	},
+	"footer": {
+		"tagline": "Agent Skill Harbor \u2014 Know what your agents know."
+	},
+	"search": {
+		"placeholder": "Search skills..."
+	},
+	"filter": {
+		"label": "Filter:",
+		"clearAll": "Clear all"
+	},
+	"skillList": {
+		"empty": "No skills found matching your criteria."
+	},
+	"skillCard": {
+		"community": "Community"
+	},
+	"governance": {
+		"required": "Required",
+		"recommended": "Recommended",
+		"discouraged": "Discouraged",
+		"prohibited": "Prohibited",
+		"unclassified": "Unclassified",
+		"requiredTip": "Must be used — mandated by policy",
+		"recommendedTip": "Suggested for use — reviewed and approved",
+		"discouragedTip": "Avoid if possible — better alternatives exist",
+		"prohibitedTip": "Do not use — blocked by policy",
+		"unclassifiedTip": "Not yet reviewed by governance"
+	},
+	"common": {
+		"visibility": {
+			"public": "Public",
+			"private": "Private",
+			"internal": "Internal",
+			"publicTip": "Visible to everyone",
+			"privateTip": "Visible only to repository collaborators",
+			"internalTip": "Visible within the organization"
+		},
+		"orgOwnership": {
+			"org": "1st party",
+			"community": "Community",
+			"orgTip": "Owned by your organization",
+			"communityTip": "Created by the community"
+		}
+	},
+	"theme": {
+		"light": "Light",
+		"dark": "Dark",
+		"system": "System"
+	},
+	"catalog": {
+		"title": "Skill Catalog",
+		"pageTitle": "Agent Skill Harbor",
+		"pageDescription": "Internal agent skill catalog and governance",
+		"skillCount_one": "{count} skill registered",
+		"skillCount_other": "{count} skills registered",
+		"showing": "Showing {displayed} of {total} skills"
+	},
+	"detail": {
+		"viewRepository": "View Repository",
+		"viewSkillMd": "View SKILL.md",
+		"community": "Community",
+		"section": {
+			"details": "Details",
+			"governance": "Governance",
+			"sourceHistory": "Source History",
+			"instructions": "Skill Instructions",
+			"files": "Files"
+		},
+		"viewMode": {
+			"raw": "Raw",
+			"rendered": "Rendered"
+		},
+		"field": {
+			"origin": "Origin:",
+			"repository": "Repository:",
+			"skillPath": "Skill path:",
+			"platform": "Platform:",
+			"visibility": "Visibility:",
+			"author": "Author:",
+			"version": "Version:"
+		}
+	}
+}

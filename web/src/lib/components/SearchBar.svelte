@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { t } from '$lib/i18n';
+
 	interface Props {
 		value: string;
 		onchange: (value: string) => void;
@@ -20,7 +22,7 @@
 <div class="relative">
 	<input
 		type="text"
-		placeholder="Search skills..."
+		placeholder={$t('search.placeholder')}
 		{value}
 		oninput={handleInput}
 		class="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 pl-10 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"

@@ -16,10 +16,10 @@
 
 Agent Skill Harbor は、GitHub Organization 内のリポジトリから Agent Skill (SKILL.md) を収集し、ガバナンス管理機能を提供し、GitHub Pages 上でブラウズ可能なカタログを公開します。
 
-- データベース不要 — データは Git 内に YAML/JSON として保存
-- バックエンド不要 — フロントエンドのみの Web アプリ (SvelteKit, プリレンダリング)
-- GitHub ネイティブ — GitHub Actions で収集、GitHub Pages でホスティング
 - トレーサビリティ — 外部からインストールしたスキルも含め、すべてのスキルの出所・来歴を追跡可能
+- 柔軟な監査 - 社内スキルの監査はプロンプトを柔軟に設定可能
+- Serverless/DB-less — 社内スキルのクローリングと監査は GitHub Actions 、データは Git に YAML/JSON として保存し、GitHub Pages でプライベート・ホスティング
+- 運用負荷なし/コスト最適 - 常時稼働リソースがないのでメンテナンスが楽で安価
 
 ## クイックスタート
 

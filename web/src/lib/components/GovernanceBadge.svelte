@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { UsagePolicy } from '$lib/types';
+	import { t } from '$lib/i18n';
 
 	interface Props {
 		status: UsagePolicy;
@@ -15,15 +16,15 @@
 		none: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700'
 	};
 
-	const labels: Record<UsagePolicy, string> = {
-		required: 'Required',
-		recommended: 'Recommended',
-		discouraged: 'Discouraged',
-		prohibited: 'Prohibited',
-		none: 'Unclassified'
+	const labelKeys: Record<UsagePolicy, string> = {
+		required: 'governance.required',
+		recommended: 'governance.recommended',
+		discouraged: 'governance.discouraged',
+		prohibited: 'governance.prohibited',
+		none: 'governance.unclassified'
 	};
 </script>
 
 <span class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium {styles[status]}">
-	{labels[status]}
+	{$t(labelKeys[status])}
 </span>

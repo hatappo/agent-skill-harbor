@@ -7,7 +7,8 @@
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
 	import type { FlatCatalog, UsagePolicy, Visibility } from '$lib/types';
 	import { createSearchIndex, searchSkills } from '$lib/utils/search';
-	import { filterSkills, type FilterState } from '$lib/utils/filter';
+	import { filterSkills, type FilterState, type OrgOwnership } from '$lib/utils/filter';
+	import { t } from '$lib/i18n';
 
 	interface Props {
 		data: { catalog: FlatCatalog };
@@ -19,7 +20,7 @@
 
 	// Client-side state
 	let query = $state('');
-	let filters = $state<FilterState>({ statuses: [], visibilities: [] });
+	let filters = $state<FilterState>({ statuses: [], visibilities: [], orgOwnerships: [] });
 
 	// Read initial state from URL on mount
 	$effect(() => {
@@ -28,7 +29,8 @@
 			query = params.get('q') ?? '';
 			filters = {
 				statuses: (params.get('status')?.split(',').filter(Boolean) ?? []) as UsagePolicy[],
-				visibilities: (params.get('visibility')?.split(',').filter(Boolean) ?? []) as Visibility[]
+				visibilities: (params.get('visibility')?.split(',').filter(Boolean) ?? []) as Visibility[],
+				orgOwnerships: (params.get('origin')?.split(',').filter(Boolean) ?? []) as OrgOwnership[]
 			};
 		}
 	});
@@ -46,6 +48,7 @@
 		if (newQuery) params.set('q', newQuery);
 		if (newFilters.statuses.length) params.set('status', newFilters.statuses.join(','));
 		if (newFilters.visibilities.length) params.set('visibility', newFilters.visibilities.join(','));
+		if (newFilters.orgOwnerships.length) params.set('origin', newFilters.orgOwnerships.join(','));
 		const search = params.toString();
 		goto(`${base}/${search ? '?' + search : ''}`, { replaceState: true, keepFocus: true, noScroll: true });
 	}
@@ -60,19 +63,19 @@
 		updateUrl(query, newFilters);
 	}
 
-	let hasFilters = $derived(query !== '' || filters.statuses.length > 0 || filters.visibilities.length > 0);
+	let hasFilters = $derived(query !== '' || filters.statuses.length > 0 || filters.visibilities.length > 0 || filters.orgOwnerships.length > 0);
 </script>
 
 <svelte:head>
-	<title>Agent Skill Harbor</title>
-	<meta name="description" content="Internal agent skill catalog and governance" />
+	<title>{$t('catalog.pageTitle')}</title>
+	<meta name="description" content={$t('catalog.pageDescription')} />
 </svelte:head>
 
 <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
 	<div class="mb-8">
-		<h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Skill Catalog</h1>
+		<h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{$t('catalog.title')}</h1>
 		<p class="mt-2 text-gray-600 dark:text-gray-400">
-			{allSkills.length} skill{allSkills.length !== 1 ? 's' : ''} registered
+			{$t('catalog.skillCount', { count: allSkills.length })}
 		</p>
 	</div>
 
@@ -83,7 +86,7 @@
 
 	{#if hasFilters}
 		<p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
-			Showing {displayedSkills.length} of {allSkills.length} skills
+			{$t('catalog.showing', { displayed: displayedSkills.length, total: allSkills.length })}
 		</p>
 	{/if}
 
