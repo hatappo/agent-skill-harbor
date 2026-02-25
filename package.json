@@ -5,6 +5,7 @@
   "type": "module",
   "description": "Internal agent skill governance and catalog for organizations",
   "license": "MIT",
+  "packageManager": "pnpm@10.30.2",
   "engines": {
     "node": ">=22"
   },

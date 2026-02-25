@@ -6,6 +6,7 @@ on:
     paths:
       - 'web/**'
       - 'data/**'
+      - 'config/**'
   workflow_run:
     workflows: ['Collect Skills']
     types: [completed]
