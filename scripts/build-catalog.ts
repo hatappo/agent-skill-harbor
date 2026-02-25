@@ -20,6 +20,8 @@ interface GovernanceEntry {
 
 interface SkillEntry {
 	tree_sha: string | null;
+	updated_at?: string;
+	registered_at?: string;
 	frontmatter: Record<string, unknown>;
 	files: string[];
 }
@@ -27,7 +29,6 @@ interface SkillEntry {
 interface RepositoryEntry {
 	visibility: string;
 	repo_sha?: string;
-	collected_at?: string;
 	skills: Record<string, SkillEntry>;
 }
 
@@ -49,6 +50,10 @@ interface FlatSkillEntry {
 	excerpt: string;
 	usagePolicy: string;
 	note?: string;
+	updated_at?: string;
+	registered_at?: string;
+	repo_sha?: string;
+	tree_sha?: string | null;
 }
 
 interface DiscoveredSkill {
@@ -201,9 +206,11 @@ function buildCatalog(existing: CatalogYaml): { catalog: CatalogYaml; bodyMap: M
 
 			const mergedSkills: Record<string, SkillEntry> = {};
 			for (const [skillPath, discovered] of Object.entries(freshSkills)) {
-				const existingSkill = existingRepo?.skills?.[skillPath];
+				const existingSkill = existingRepo?.skills?.[skillPath] as SkillEntry | undefined;
 				mergedSkills[skillPath] = {
-					tree_sha: (existingSkill as SkillEntry | undefined)?.tree_sha ?? null,
+					tree_sha: existingSkill?.tree_sha ?? null,
+					...(existingSkill?.updated_at ? { updated_at: existingSkill.updated_at } : {}),
+					...(existingSkill?.registered_at ? { registered_at: existingSkill.registered_at } : {}),
 					frontmatter: discovered.frontmatter,
 					files: discovered.files
 				};
@@ -216,7 +223,6 @@ function buildCatalog(existing: CatalogYaml): { catalog: CatalogYaml; bodyMap: M
 			catalog.repositories[repoKey] = {
 				visibility: existingRepo?.visibility ?? 'public',
 				...(existingRepo?.repo_sha ? { repo_sha: existingRepo.repo_sha } : {}),
-				...(existingRepo?.collected_at ? { collected_at: existingRepo.collected_at } : {}),
 				skills: mergedSkills
 			};
 		}
@@ -257,7 +263,11 @@ function buildFlatCatalog(
 				files: skillData.files,
 				excerpt: body.slice(0, 300),
 				usagePolicy: gov?.usagePolicy ?? 'none',
-				...(gov?.note ? { note: gov.note } : {})
+				...(gov?.note ? { note: gov.note } : {}),
+				...(skillData.updated_at ? { updated_at: skillData.updated_at } : {}),
+				...(skillData.registered_at ? { registered_at: skillData.registered_at } : {}),
+				...(repoEntry.repo_sha ? { repo_sha: repoEntry.repo_sha } : {}),
+				tree_sha: skillData.tree_sha ?? null
 			};
 
 			skills.push(entry);

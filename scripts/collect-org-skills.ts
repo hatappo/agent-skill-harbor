@@ -10,6 +10,8 @@ const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
 
 interface SkillEntry {
 	tree_sha: string | null;
+	updated_at?: string;
+	registered_at?: string;
 	frontmatter: Record<string, unknown>;
 	files: string[];
 }
@@ -17,7 +19,6 @@ interface SkillEntry {
 interface RepositoryEntry {
 	visibility: string;
 	repo_sha?: string;
-	collected_at?: string;
 	skills: Record<string, SkillEntry>;
 }
 
@@ -365,8 +366,11 @@ async function main(): Promise<void> {
 
 				collectedCount++;
 
+				const now = new Date().toISOString();
 				newSkills[skill.skillPath] = {
 					tree_sha: skill.treeSha,
+					updated_at: now,
+					registered_at: existingSkill?.registered_at ?? now,
 					frontmatter: {},
 					files: skill.filePaths
 				};
@@ -376,7 +380,6 @@ async function main(): Promise<void> {
 			catalog.repositories[repoKey] = {
 				visibility: repo.visibility,
 				repo_sha: headSha,
-				collected_at: new Date().toISOString(),
 				skills: {
 					...existingRepo?.skills,
 					...newSkills

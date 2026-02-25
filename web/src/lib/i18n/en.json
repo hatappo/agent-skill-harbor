@@ -82,7 +82,9 @@
 			"platform": "Platform:",
 			"visibility": "Visibility:",
 			"author": "Author:",
-			"version": "Version:"
+			"version": "Version:",
+			"registeredAt": "Registered:",
+			"updatedAt": "Updated:"
 		}
 	}
 }

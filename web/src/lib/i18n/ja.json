@@ -82,7 +82,9 @@
 			"platform": "\u30d7\u30e9\u30c3\u30c8\u30d5\u30a9\u30fc\u30e0:",
 			"visibility": "\u516c\u958b\u7bc4\u56f2:",
 			"author": "\u4f5c\u8005:",
-			"version": "\u30d0\u30fc\u30b8\u30e7\u30f3:"
+			"version": "\u30d0\u30fc\u30b8\u30e7\u30f3:",
+			"registeredAt": "\u767b\u9332\u65e5:",
+			"updatedAt": "\u66f4\u65b0\u65e5:"
 		}
 	}
 }

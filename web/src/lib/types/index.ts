@@ -8,6 +8,8 @@ export interface SkillMetadata {
 
 export interface CatalogSkillEntry {
 	tree_sha: string | null;
+	updated_at?: string;
+	registered_at?: string;
 	frontmatter: Record<string, unknown>;
 	files: string[];
 }
@@ -15,7 +17,6 @@ export interface CatalogSkillEntry {
 export interface RepositoryEntry {
 	visibility: Visibility;
 	repo_sha?: string;
-	collected_at?: string;
 	skills: Record<string, CatalogSkillEntry>;
 }
 
@@ -37,6 +38,10 @@ export interface FlatSkillEntry {
 	excerpt: string;
 	usagePolicy: UsagePolicy;
 	note?: string;
+	updated_at?: string;
+	registered_at?: string;
+	repo_sha?: string;
+	tree_sha?: string | null;
 }
 
 export interface FlatCatalog {

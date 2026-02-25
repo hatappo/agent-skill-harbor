@@ -1,7 +1,8 @@
 <script lang="ts">
 	import GovernanceBadge from '$lib/components/GovernanceBadge.svelte';
+	import * as Tooltip from '$lib/components/ui/tooltip';
 	import type { FlatSkillEntry, UsagePolicy } from '$lib/types';
-	import { t } from '$lib/i18n';
+	import { t, locale } from '$lib/i18n';
 	import { base } from '$app/paths';
 	import { marked } from 'marked';
 	import DOMPurify from 'isomorphic-dompurify';
@@ -36,6 +37,7 @@
 			: `https://${skill.repoKey}/tree/HEAD/${skill.skillPath.replace(/\/SKILL\.md$/, '')}`
 	);
 	let metadata = $derived((skill.frontmatter.metadata ?? {}) as Record<string, unknown>);
+	let formatDate = (iso: string) => new Date(iso).toLocaleDateString($locale, { year: 'numeric', month: 'short', day: 'numeric' });
 	let fromHistory = $derived(
 		Array.isArray(skill.frontmatter._from) ? skill.frontmatter._from.map(String) : []
 	);
@@ -182,11 +184,35 @@
 				</div>
 				<div class="flex gap-2">
 					<dt class="text-gray-500 dark:text-gray-400">{$t('detail.field.repository')}</dt>
-					<dd class="font-medium text-gray-900 dark:text-gray-100">{skill.owner}/{skill.repo}</dd>
+					<dd class="flex items-center gap-1.5 font-medium text-gray-900 dark:text-gray-100">
+						{skill.owner}/{skill.repo}
+						{#if skill.repo_sha}
+							<Tooltip.Root>
+								<Tooltip.Trigger>
+									<span class="inline-flex cursor-default rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">{skill.repo_sha.slice(0, 7)}</span>
+								</Tooltip.Trigger>
+								<Tooltip.Content>
+									<p class="font-mono text-xs">{skill.repo_sha}</p>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						{/if}
+					</dd>
 				</div>
 				<div class="flex gap-2">
 					<dt class="text-gray-500 dark:text-gray-400">{$t('detail.field.skillPath')}</dt>
-					<dd class="font-medium text-gray-900 dark:text-gray-100">{skill.skillPath}</dd>
+					<dd class="flex items-center gap-1.5 font-medium text-gray-900 dark:text-gray-100">
+						{skill.skillPath}
+						{#if skill.tree_sha}
+							<Tooltip.Root>
+								<Tooltip.Trigger>
+									<span class="inline-flex cursor-default rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">{skill.tree_sha.slice(0, 7)}</span>
+								</Tooltip.Trigger>
+								<Tooltip.Content>
+									<p class="font-mono text-xs">{skill.tree_sha}</p>
+								</Tooltip.Content>
+							</Tooltip.Root>
+						{/if}
+					</dd>
 				</div>
 				<div class="flex gap-2">
 					<dt class="text-gray-500 dark:text-gray-400">{$t('detail.field.platform')}</dt>
@@ -206,6 +232,18 @@
 					<div class="flex gap-2">
 						<dt class="text-gray-500 dark:text-gray-400">{$t('detail.field.version')}</dt>
 						<dd class="font-medium text-gray-900 dark:text-gray-100">{metadata.version}</dd>
+					</div>
+				{/if}
+				{#if skill.registered_at}
+					<div class="flex gap-2">
+						<dt class="text-gray-500 dark:text-gray-400">{$t('detail.field.registeredAt')}</dt>
+						<dd class="font-medium text-gray-900 dark:text-gray-100">{formatDate(skill.registered_at)}</dd>
+					</div>
+				{/if}
+				{#if skill.updated_at}
+					<div class="flex gap-2">
+						<dt class="text-gray-500 dark:text-gray-400">{$t('detail.field.updatedAt')}</dt>
+						<dd class="font-medium text-gray-900 dark:text-gray-100">{formatDate(skill.updated_at)}</dd>
 					</div>
 				{/if}
 			</dl>
