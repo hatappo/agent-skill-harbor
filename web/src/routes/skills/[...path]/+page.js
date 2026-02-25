@@ -26,5 +26,5 @@ export async function load({ params, fetch }) {
 		// body file may not exist
 	}
 
-	return { skill, allSkills: catalog.skills, body };
+	return { skill, allSkills: catalog.skills, body, freshPeriodDays: catalog.fresh_period_days ?? 0 };
 }

@@ -51,16 +51,18 @@ pnpm run build
    - Variable `GITHUB_ORG`: Your GitHub organization name
    - Secret `ORG_GITHUB_TOKEN`: A token with `repo` scope for your organization
 3. Enable GitHub Pages (Settings > Pages > Source: GitHub Actions)
-4. Edit `data/governance.yaml` to define your governance policies
+4. Edit `config/governance.yaml` to define your governance policies
 5. Trigger the "Collect Skills" workflow manually for initial collection
 
 ## Project Structure
 
 ```
-├── data/                 # Skill data (YAML) and governance policies
-│   ├── skills/org/       # Auto-collected from org repos
-│   ├── skills/public/    # Manually added public skills
+├── config/               # Human-managed configuration
+│   ├── admin.yaml        # Application settings
 │   └── governance.yaml   # Governance policy definitions
+├── data/                 # Machine-generated skill data
+│   ├── catalog.yaml      # Skill catalog metadata
+│   └── skills/           # Collected SKILL.md files
 ├── scripts/              # Collection and build scripts
 ├── web/                  # SvelteKit frontend application
 └── .github/workflows/    # GitHub Actions (collect + deploy)

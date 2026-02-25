@@ -1,8 +1,8 @@
-export type UsagePolicy = 'required' | 'recommended' | 'discouraged' | 'prohibited' | 'none';
+export type UsagePolicy = 'recommended' | 'discouraged' | 'prohibited' | 'none';
 export type Visibility = 'public' | 'private' | 'internal';
 
 export interface SkillMetadata {
-	usagePolicy: UsagePolicy;
+	usage_policy: UsagePolicy;
 	note?: string;
 }
 
@@ -36,7 +36,7 @@ export interface FlatSkillEntry {
 	frontmatter: Record<string, unknown>;
 	files: string[];
 	excerpt: string;
-	usagePolicy: UsagePolicy;
+	usage_policy: UsagePolicy;
 	note?: string;
 	updated_at?: string;
 	registered_at?: string;
@@ -46,5 +46,6 @@ export interface FlatSkillEntry {
 
 export interface FlatCatalog {
 	generated_at: string;
+	fresh_period_days: number;
 	skills: FlatSkillEntry[];
 }

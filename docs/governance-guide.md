@@ -6,15 +6,14 @@ Agent Skill Harbor provides governance controls to manage how Agent Skills are u
 
 | Status | Description | Badge Color |
 |--------|-------------|-------------|
-| **required** | Must be used by all teams/developers | Blue |
-| **recommended** | Encouraged for use, but not mandatory | Green |
+| **recommended** | Encouraged for use, reviewed and approved | Green |
 | **deprecated** | Should be phased out, use alternatives | Amber |
 | **prohibited** | Must not be used due to security/compliance concerns | Red |
 | **none** | No governance policy assigned (default) | Gray |
 
 ## Configuration
 
-Governance policies are defined in `data/governance.yaml`.
+Governance policies are defined in `config/governance.yaml`.
 
 ### Structure
 
@@ -28,7 +27,7 @@ defaults:
 policies:
   - slug: "skill-slug"
     source: "org"          # "org" or "public"
-    status: "required"
+    status: "recommended"
     note: "Reason for this policy"
     updated_by: "team-or-person"
     updated_at: "2026-02-24T00:00:00Z"
@@ -50,12 +49,12 @@ policies:
 Use the manage-skill slash command:
 
 ```
-/manage-skill govern code-review-assistant required "All developers must use this"
+/manage-skill govern code-review-assistant recommended "Reviewed and approved for use"
 ```
 
 ### Via Direct Edit
 
-1. Edit `data/governance.yaml`
+1. Edit `config/governance.yaml`
 2. Add or modify a policy entry
 3. Commit and push (or create a PR)
 4. The catalog will be rebuilt automatically
@@ -65,13 +64,13 @@ Use the manage-skill slash command:
 For organizations that require governance changes to go through review:
 
 1. Create a branch
-2. Edit `data/governance.yaml`
+2. Edit `config/governance.yaml`
 3. Submit a PR for review
 4. After merge, the catalog rebuilds and the web UI updates
 
 ## Collection Behavior
 
-During skill collection (via GitHub Actions), the governance status from `data/governance.yaml` is merged into each skill's YAML data. This means:
+During skill collection (via GitHub Actions), the governance status from `config/governance.yaml` is merged into each skill's YAML data. This means:
 
 - Governance changes take effect on the next collection run or catalog build
 - The web UI always reflects the latest governance state after a build

@@ -7,6 +7,27 @@ import { dirname, join } from 'node:path';
 const DATA_DIR = join(import.meta.dirname, '..', 'data');
 const SKILLS_DIR = join(DATA_DIR, 'skills');
 const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
+const CONFIG_DIR = join(import.meta.dirname, '..', 'config');
+const ADMIN_PATH = join(CONFIG_DIR, 'admin.yaml');
+
+interface AdminConfig {
+	collector?: {
+		exclude_forks?: boolean;
+	};
+}
+
+function loadAdmin(): AdminConfig {
+	if (!existsSync(ADMIN_PATH)) {
+		return {};
+	}
+	try {
+		const raw = yamlLoad(readFileSync(ADMIN_PATH, 'utf-8'));
+		if (!raw || typeof raw !== 'object') return {};
+		return raw as AdminConfig;
+	} catch {
+		return {};
+	}
+}
 
 interface SkillEntry {
 	tree_sha: string | null;
@@ -250,12 +271,16 @@ async function main(): Promise<void> {
 
 	console.log(`Collecting skills from organization: ${org}`);
 
+	const admin = loadAdmin();
+	const excludeForks = admin.collector?.exclude_forks ?? false;
+
 	// Fetch all repositories in the org
 	const repos: Array<{
 		name: string;
 		default_branch: string;
 		html_url: string;
 		visibility: string;
+		fork: boolean;
 	}> = [];
 	let page = 1;
 
@@ -271,18 +296,20 @@ async function main(): Promise<void> {
 		if (data.length === 0) break;
 
 		for (const repo of data) {
+			if (excludeForks && repo.fork) continue;
 			repos.push({
 				name: repo.name,
 				default_branch: repo.default_branch ?? 'main',
 				html_url: repo.html_url,
-				visibility: repo.visibility ?? 'private'
+				visibility: repo.visibility ?? 'private',
+				fork: repo.fork
 			});
 		}
 
 		page++;
 	}
 
-	console.log(`Found ${repos.length} repositories`);
+	console.log(`Found ${repos.length} repositories${excludeForks ? ' (forks excluded)' : ''}`);
 
 	let collectedCount = 0;
 	let skippedRepoCount = 0;

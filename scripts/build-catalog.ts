@@ -6,16 +6,29 @@ import { dirname, join, relative } from 'node:path';
 
 const DATA_DIR = join(import.meta.dirname, '..', 'data');
 const SKILLS_DIR = join(DATA_DIR, 'skills');
-const GOVERNANCE_PATH = join(DATA_DIR, 'governance.yaml');
 const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
+const CONFIG_DIR = join(import.meta.dirname, '..', 'config');
+const GOVERNANCE_PATH = join(CONFIG_DIR, 'governance.yaml');
+const ADMIN_PATH = join(CONFIG_DIR, 'admin.yaml');
 const WEB_STATIC_DIR = join(import.meta.dirname, '..', 'web', 'static');
 const WEB_CATALOG_PATH = join(WEB_STATIC_DIR, 'catalog.json');
 
-type UsagePolicy = 'required' | 'recommended' | 'discouraged' | 'prohibited' | 'none';
+type UsagePolicy = 'recommended' | 'discouraged' | 'prohibited' | 'none';
 
 interface GovernanceEntry {
-	usagePolicy: UsagePolicy;
+	usage_policy: UsagePolicy;
 	note?: string;
+}
+
+interface AdminConfig {
+	collector?: {
+		exclude_forks?: boolean;
+	};
+	catalog?: {
+		skill?: {
+			fresh_period_days?: number;
+		};
+	};
 }
 
 interface SkillEntry {
@@ -48,7 +61,7 @@ interface FlatSkillEntry {
 	frontmatter: Record<string, unknown>;
 	files: string[];
 	excerpt: string;
-	usagePolicy: string;
+	usage_policy: string;
 	note?: string;
 	updated_at?: string;
 	registered_at?: string;
@@ -84,9 +97,22 @@ function loadGovernance(): Record<string, GovernanceEntry> {
 	if (!existsSync(GOVERNANCE_PATH)) {
 		return {};
 	}
-	const raw = yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8'));
+	const raw = yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8')) as { policies?: Record<string, GovernanceEntry> } | null;
 	if (!raw || typeof raw !== 'object') return {};
-	return raw as Record<string, GovernanceEntry>;
+	return raw.policies ?? {};
+}
+
+function loadAdmin(): AdminConfig {
+	if (!existsSync(ADMIN_PATH)) {
+		return {};
+	}
+	try {
+		const raw = yamlLoad(readFileSync(ADMIN_PATH, 'utf-8'));
+		if (!raw || typeof raw !== 'object') return {};
+		return raw as AdminConfig;
+	} catch {
+		return {};
+	}
 }
 
 function loadExistingCatalog(): CatalogYaml {
@@ -235,8 +261,9 @@ function buildFlatCatalog(
 	catalog: CatalogYaml,
 	governance: Record<string, GovernanceEntry>,
 	orgName: string | null,
-	bodyMap: Map<string, string>
-): { generated_at: string; skills: FlatSkillEntry[] } {
+	bodyMap: Map<string, string>,
+	freshPeriodDays: number
+): { generated_at: string; fresh_period_days: number; skills: FlatSkillEntry[] } {
 	const skills: FlatSkillEntry[] = [];
 
 	for (const [repoKey, repoEntry] of Object.entries(catalog.repositories)) {
@@ -262,7 +289,7 @@ function buildFlatCatalog(
 				frontmatter: skillData.frontmatter,
 				files: skillData.files,
 				excerpt: body.slice(0, 300),
-				usagePolicy: gov?.usagePolicy ?? 'none',
+				usage_policy: gov?.usage_policy ?? 'none',
 				...(gov?.note ? { note: gov.note } : {}),
 				...(skillData.updated_at ? { updated_at: skillData.updated_at } : {}),
 				...(skillData.registered_at ? { registered_at: skillData.registered_at } : {}),
@@ -287,7 +314,7 @@ function buildFlatCatalog(
 		return nameA.localeCompare(nameB);
 	});
 
-	return { generated_at: new Date().toISOString(), skills };
+	return { generated_at: new Date().toISOString(), fresh_period_days: freshPeriodDays, skills };
 }
 
 function main(): void {
@@ -295,6 +322,10 @@ function main(): void {
 
 	const orgName = detectOrg();
 	console.log(`  Org: ${orgName ?? '(not detected)'}`);
+
+	const admin = loadAdmin();
+	const freshPeriodDays = admin.catalog?.skill?.fresh_period_days ?? 0;
+	console.log(`  Fresh period: ${freshPeriodDays} day(s)`);
 
 	const governance = loadGovernance();
 	console.log(`  Loaded ${Object.keys(governance).length} governance policy(ies)`);
@@ -314,7 +345,7 @@ function main(): void {
 	console.log(`  Written ${CATALOG_YAML_PATH}`);
 
 	// Generate web JSON + per-skill body files
-	const flatCatalog = buildFlatCatalog(catalog, governance, orgName, bodyMap);
+	const flatCatalog = buildFlatCatalog(catalog, governance, orgName, bodyMap, freshPeriodDays);
 	writeFileSync(WEB_CATALOG_PATH, JSON.stringify(flatCatalog, null, 2) + '\n');
 	console.log(`  Written ${WEB_CATALOG_PATH}`);
 

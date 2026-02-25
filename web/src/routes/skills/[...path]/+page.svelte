@@ -17,12 +17,18 @@
 	});
 
 	interface Props {
-		data: { skill: FlatSkillEntry; allSkills: FlatSkillEntry[]; body: string };
+		data: { skill: FlatSkillEntry; allSkills: FlatSkillEntry[]; body: string; freshPeriodDays: number };
 	}
 
 	let { data }: Props = $props();
 	let skill = $derived(data.skill);
 	let body = $derived(data.body);
+	let freshPeriodDays = $derived(data.freshPeriodDays);
+	let isNew = $derived(
+		freshPeriodDays > 0 &&
+		!!skill.registered_at &&
+		Date.now() - new Date(skill.registered_at).getTime() < freshPeriodDays * 86_400_000
+	);
 
 	let viewMode = $state<'rendered' | 'raw'>('rendered');
 	// Layer 2: DOMPurify as final safety net
@@ -44,11 +50,11 @@
 
 	let isPublic = $derived(skill.visibility === 'public');
 
-	// Build a map from _from URL pattern to usagePolicy for governance badge lookup
+	// Build a map from _from URL pattern to usage_policy for governance badge lookup
 	let policyByKey = $derived.by(() => {
 		const map = new Map<string, UsagePolicy>();
 		for (const s of data.allSkills) {
-			map.set(s.key, s.usagePolicy as UsagePolicy);
+			map.set(s.key, s.usage_policy as UsagePolicy);
 		}
 		return map;
 	});
@@ -101,7 +107,14 @@
 	<div class="mb-8">
 		<div class="flex items-start justify-between gap-4">
 			<h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{skillName}</h1>
-			<GovernanceBadge status={skill.usagePolicy as UsagePolicy} />
+			<div class="flex shrink-0 items-center gap-2">
+				{#if isNew}
+					<span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+						{$t('skillCard.new')}
+					</span>
+				{/if}
+				<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
+			</div>
 		</div>
 		<p class="mt-3 text-lg text-gray-600 dark:text-gray-400">{skillDescription}</p>
 		<div class="mt-4 flex flex-wrap items-center gap-3">
@@ -189,7 +202,9 @@
 						{#if skill.repo_sha}
 							<Tooltip.Root>
 								<Tooltip.Trigger>
-									<span class="inline-flex cursor-default rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">{skill.repo_sha.slice(0, 7)}</span>
+									{#snippet child({ props })}
+										<span {...props} class="inline-flex cursor-default rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">{skill.repo_sha!.slice(0, 7)}</span>
+									{/snippet}
 								</Tooltip.Trigger>
 								<Tooltip.Content>
 									<p class="font-mono text-xs">{skill.repo_sha}</p>
@@ -205,7 +220,9 @@
 						{#if skill.tree_sha}
 							<Tooltip.Root>
 								<Tooltip.Trigger>
-									<span class="inline-flex cursor-default rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">{skill.tree_sha.slice(0, 7)}</span>
+									{#snippet child({ props })}
+										<span {...props} class="inline-flex cursor-default rounded bg-gray-100 px-1.5 py-0.5 font-mono text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">{skill.tree_sha!.slice(0, 7)}</span>
+									{/snippet}
 								</Tooltip.Trigger>
 								<Tooltip.Content>
 									<p class="font-mono text-xs">{skill.tree_sha}</p>
@@ -253,7 +270,7 @@
 		<div class="rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
 			<h2 class="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">{$t('detail.section.governance')}</h2>
 			<div class="flex items-center gap-3">
-				<GovernanceBadge status={skill.usagePolicy as UsagePolicy} />
+				<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
 			</div>
 			{#if skill.note}
 				<p class="mt-3 text-sm text-gray-700 dark:text-gray-300">{skill.note}</p>

@@ -51,7 +51,7 @@ pnpm install
 
 ## ステップ 5: ガバナンスポリシーの設定
 
-`data/governance.yaml` を編集して、組織のスキルポリシーを定義します:
+`config/governance.yaml` を編集して、組織のスキルポリシーを定義します:
 
 ```yaml
 version: "1"
@@ -63,7 +63,7 @@ defaults:
 policies:
   - slug: "your-skill-repo"
     source: "org"
-    status: "required"       # required | recommended | deprecated | prohibited | none
+    status: "recommended"    # recommended | discouraged | prohibited | none
     note: "このステータスの理由"
     updated_by: "team-name"
     updated_at: "2026-02-24T00:00:00Z"

@@ -6,15 +6,14 @@ Agent Skill Harbor は、組織内での Agent Skill の利用を管理するた
 
 | ステータス | 説明 | バッジ色 |
 |-----------|------|---------|
-| **required** | 全チーム・全開発者が使用すべき | 青 |
-| **recommended** | 利用を推奨するが必須ではない | 緑 |
+| **recommended** | 利用を推奨（レビュー済み・承認済み） | 緑 |
 | **deprecated** | 段階的に廃止、代替を使用すべき | 黄 |
 | **prohibited** | セキュリティ・コンプライアンス上の理由で使用禁止 | 赤 |
 | **none** | ガバナンスポリシー未設定 (デフォルト) | 灰 |
 
 ## 設定
 
-ガバナンスポリシーは `data/governance.yaml` で定義します。
+ガバナンスポリシーは `config/governance.yaml` で定義します。
 
 ### 構造
 
@@ -28,7 +27,7 @@ defaults:
 policies:
   - slug: "skill-slug"
     source: "org"          # "org" または "public"
-    status: "required"
+    status: "recommended"
     note: "このポリシーの理由"
     updated_by: "team-or-person"
     updated_at: "2026-02-24T00:00:00Z"
@@ -50,12 +49,12 @@ policies:
 manage-skill スラッシュコマンドを使用します:
 
 ```
-/manage-skill govern code-review-assistant required "全開発者が使用すること"
+/manage-skill govern code-review-assistant recommended "レビュー済み・利用推奨"
 ```
 
 ### 直接編集
 
-1. `data/governance.yaml` を編集
+1. `config/governance.yaml` を編集
 2. ポリシーエントリを追加または変更
 3. コミット・プッシュ (または PR を作成)
 4. カタログが自動的に再ビルドされます
@@ -65,13 +64,13 @@ manage-skill スラッシュコマンドを使用します:
 ガバナンス変更にレビューを必須とする組織向け:
 
 1. ブランチを作成
-2. `data/governance.yaml` を編集
+2. `config/governance.yaml` を編集
 3. レビュー用に PR を提出
 4. マージ後、カタログが再ビルドされ Web UI が更新されます
 
 ## 収集時の動作
 
-スキル収集 (GitHub Actions) の際、`data/governance.yaml` のガバナンスステータスが各スキルの YAML データにマージされます。つまり:
+スキル収集 (GitHub Actions) の際、`config/governance.yaml` のガバナンスステータスが各スキルの YAML データにマージされます。つまり:
 
 - ガバナンス変更は次回の収集実行またはカタログビルド時に反映されます
 - Web UI はビルド後に常に最新のガバナンス状態を表示します

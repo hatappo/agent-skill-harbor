@@ -16,6 +16,7 @@
 
 	let { data }: Props = $props();
 	let allSkills = $derived(data.catalog.skills);
+	let freshPeriodDays = $derived(data.catalog.fresh_period_days ?? 0);
 	let searchIndex = $derived(createSearchIndex(allSkills));
 
 	// Client-side state
@@ -90,5 +91,5 @@
 		</p>
 	{/if}
 
-	<SkillList skills={displayedSkills} />
+	<SkillList skills={displayedSkills} {freshPeriodDays} />
 </div>

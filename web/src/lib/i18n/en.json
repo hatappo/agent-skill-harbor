@@ -17,15 +17,14 @@
 		"empty": "No skills found matching your criteria."
 	},
 	"skillCard": {
-		"community": "Community"
+		"community": "Community",
+		"new": "New"
 	},
 	"governance": {
-		"required": "Required",
 		"recommended": "Recommended",
 		"discouraged": "Discouraged",
 		"prohibited": "Prohibited",
 		"unclassified": "Unclassified",
-		"requiredTip": "Must be used — mandated by policy",
 		"recommendedTip": "Suggested for use — reviewed and approved",
 		"discouragedTip": "Avoid if possible — better alternatives exist",
 		"prohibitedTip": "Do not use — blocked by policy",

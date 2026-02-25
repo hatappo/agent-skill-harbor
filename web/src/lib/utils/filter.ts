@@ -16,7 +16,7 @@ export const defaultFilterState: FilterState = {
 
 export function filterSkills(skills: FlatSkillEntry[], filters: FilterState): FlatSkillEntry[] {
 	return skills.filter((skill) => {
-		if (filters.statuses.length > 0 && !filters.statuses.includes(skill.usagePolicy as UsagePolicy)) {
+		if (filters.statuses.length > 0 && !filters.statuses.includes(skill.usage_policy as UsagePolicy)) {
 			return false;
 		}
 		if (filters.visibilities.length > 0 && !filters.visibilities.includes(skill.visibility as Visibility)) {

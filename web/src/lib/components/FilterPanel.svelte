@@ -12,7 +12,6 @@
 	let { filters, onchange }: Props = $props();
 
 	const policyOptions: { value: UsagePolicy; labelKey: string; tooltipKey: string; color: string }[] = [
-		{ value: 'required', labelKey: 'governance.required', tooltipKey: 'governance.requiredTip', color: 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700' },
 		{ value: 'recommended', labelKey: 'governance.recommended', tooltipKey: 'governance.recommendedTip', color: 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700' },
 		{ value: 'discouraged', labelKey: 'governance.discouraged', tooltipKey: 'governance.discouragedTip', color: 'bg-amber-100 text-amber-800 border-amber-300 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700' },
 		{ value: 'prohibited', labelKey: 'governance.prohibited', tooltipKey: 'governance.prohibitedTip', color: 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700' },
@@ -65,14 +64,17 @@
 	{#each policyOptions as opt}
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<button
-					onclick={() => toggleStatus(opt.value)}
-					class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.statuses.includes(opt.value)
-						? opt.color + ' ring-1 ring-offset-1 dark:ring-offset-gray-950'
-						: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
-				>
-					{$t(opt.labelKey)}
-				</button>
+				{#snippet child({ props })}
+					<button
+						{...props}
+						onclick={() => toggleStatus(opt.value)}
+						class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.statuses.includes(opt.value)
+							? opt.color + ' ring-1 ring-offset-1 dark:ring-offset-gray-950'
+							: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
+					>
+						{$t(opt.labelKey)}
+					</button>
+				{/snippet}
 			</Tooltip.Trigger>
 			<Tooltip.Content>{$t(opt.tooltipKey)}</Tooltip.Content>
 		</Tooltip.Root>
@@ -84,14 +86,17 @@
 	{#each visibilityOptions as opt}
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<button
-					onclick={() => toggleVisibility(opt.value)}
-					class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.visibilities.includes(opt.value)
-						? 'border-indigo-300 bg-indigo-100 text-indigo-800 ring-1 ring-offset-1 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 dark:ring-offset-gray-950'
-						: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
-				>
-					{$t(opt.labelKey)}
-				</button>
+				{#snippet child({ props })}
+					<button
+						{...props}
+						onclick={() => toggleVisibility(opt.value)}
+						class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.visibilities.includes(opt.value)
+							? 'border-indigo-300 bg-indigo-100 text-indigo-800 ring-1 ring-offset-1 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300 dark:ring-offset-gray-950'
+							: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
+					>
+						{$t(opt.labelKey)}
+					</button>
+				{/snippet}
 			</Tooltip.Trigger>
 			<Tooltip.Content>{$t(opt.tooltipKey)}</Tooltip.Content>
 		</Tooltip.Root>
@@ -103,14 +108,17 @@
 	{#each orgOwnershipOptions as opt}
 		<Tooltip.Root>
 			<Tooltip.Trigger>
-				<button
-					onclick={() => toggleOrgOwnership(opt.value)}
-					class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.orgOwnerships.includes(opt.value)
-						? 'border-blue-300 bg-blue-100 text-blue-800 ring-1 ring-offset-1 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-offset-gray-950'
-						: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
-				>
-					{$t(opt.labelKey)}
-				</button>
+				{#snippet child({ props })}
+					<button
+						{...props}
+						onclick={() => toggleOrgOwnership(opt.value)}
+						class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.orgOwnerships.includes(opt.value)
+							? 'border-blue-300 bg-blue-100 text-blue-800 ring-1 ring-offset-1 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-offset-gray-950'
+							: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
+					>
+						{$t(opt.labelKey)}
+					</button>
+				{/snippet}
 			</Tooltip.Trigger>
 			<Tooltip.Content>{$t(opt.tooltipKey)}</Tooltip.Content>
 		</Tooltip.Root>

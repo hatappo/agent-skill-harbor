@@ -6,9 +6,16 @@
 
 	interface Props {
 		skill: FlatSkillEntry;
+		freshPeriodDays?: number;
 	}
 
-	let { skill }: Props = $props();
+	let { skill, freshPeriodDays = 0 }: Props = $props();
+
+	let isNew = $derived(
+		freshPeriodDays > 0 &&
+		!!skill.registered_at &&
+		Date.now() - new Date(skill.registered_at).getTime() < freshPeriodDays * 86_400_000
+	);
 
 	let visibilityStyle = $derived(
 		skill.visibility === 'public'
@@ -43,7 +50,12 @@
 			{/if}
 		</div>
 		<div class="flex shrink-0 flex-col items-end gap-1.5">
-			<GovernanceBadge status={skill.usagePolicy as UsagePolicy} />
+			{#if isNew}
+				<span class="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">
+					{$t('skillCard.new')}
+				</span>
+			{/if}
+			<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
 			<span class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium {visibilityStyle}">
 				{skill.visibility}
 			</span>

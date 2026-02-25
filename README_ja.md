@@ -51,16 +51,18 @@ pnpm run build
    - 変数 `GITHUB_ORG`: GitHub Organization 名
    - シークレット `ORG_GITHUB_TOKEN`: Organization の `repo` スコープを持つトークン
 3. GitHub Pages を有効化 (Settings > Pages > Source: GitHub Actions)
-4. `data/governance.yaml` を編集してガバナンスポリシーを定義
+4. `config/governance.yaml` を編集してガバナンスポリシーを定義
 5. "Collect Skills" ワークフローを手動トリガーして初回収集を実行
 
 ## プロジェクト構成
 
 ```
-├── data/                 # スキルデータ (YAML) とガバナンスポリシー
-│   ├── skills/org/       # Org リポジトリから自動収集
-│   ├── skills/public/    # 手動追加された公開スキル
+├── config/               # 人が管理する設定
+│   ├── admin.yaml        # アプリケーション設定
 │   └── governance.yaml   # ガバナンスポリシー定義
+├── data/                 # マシン生成の収集データ
+│   ├── catalog.yaml      # スキルカタログメタデータ
+│   └── skills/           # 収集された SKILL.md ファイル
 ├── scripts/              # 収集・ビルドスクリプト
 ├── web/                  # SvelteKit フロントエンドアプリケーション
 └── .github/workflows/    # GitHub Actions (収集 + デプロイ)

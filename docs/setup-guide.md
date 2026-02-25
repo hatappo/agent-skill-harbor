@@ -51,7 +51,7 @@ The token needs read access to all repositories in the organization to scan for 
 
 ## Step 5: Configure Governance Policies
 
-Edit `data/governance.yaml` to define your organization's skill policies:
+Edit `config/governance.yaml` to define your organization's skill policies:
 
 ```yaml
 version: "1"
@@ -63,7 +63,7 @@ defaults:
 policies:
   - slug: "your-skill-repo"
     source: "org"
-    status: "required"       # required | recommended | deprecated | prohibited | none
+    status: "recommended"    # recommended | discouraged | prohibited | none
     note: "Reason for this status"
     updated_by: "team-name"
     updated_at: "2026-02-24T00:00:00Z"

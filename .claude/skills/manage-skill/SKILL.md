@@ -19,7 +19,7 @@ Examples:
 
 - Skill files: `data/skills/github.com/{owner}/{repo}/...SKILL.md`
 - Catalog: `data/catalog.yaml` (operational metadata + frontmatter; git-tracked)
-- Governance: `data/governance.yaml`
+- Governance: `config/governance.yaml`
 - Web JSON: `web/static/catalog.json` (auto-generated, git-ignored)
 
 ## Actions
@@ -59,26 +59,26 @@ When the user wants to remove a skill (e.g., `remove owner/repo` or `remove owne
 1. Delete the SKILL.md file (and its directory if empty)
 2. Remove the skill entry from `data/catalog.yaml`
 3. If no skills remain for the repo, remove the entire repo entry
-4. Remove any matching entry from `data/governance.yaml`
+4. Remove any matching entry from `config/governance.yaml`
 
 ### List Skills
 
 When the user wants to list registered skills:
 
 1. Read `data/catalog.yaml`
-2. Display a table with: key, name (from frontmatter), usagePolicy (from governance)
+2. Display a table with: key, name (from frontmatter), usage_policy (from governance)
 
 ### Update Governance Policy
 
-When the user wants to change governance (e.g., `govern github.com/owner/repo/SKILL.md required "reason"`):
+When the user wants to change governance (e.g., `govern github.com/owner/repo/SKILL.md recommended "reason"`):
 
-Valid usagePolicy values: `required`, `recommended`, `discouraged`, `prohibited`, `none`
+Valid usage_policy values: `recommended`, `discouraged`, `prohibited`, `none`
 
-1. Read `data/governance.yaml`
+1. Read `config/governance.yaml`
 2. Find or create an entry with the key (format: `github.com/{owner}/{repo}/{skill-file-path}`)
-3. Set `usagePolicy` and optionally `note`
-4. If usagePolicy is `none`, remove the entry from governance.yaml
-5. Write back `data/governance.yaml`
+3. Set `usage_policy` and optionally `note`
+4. If usage_policy is `none`, remove the entry from governance.yaml
+5. Write back `config/governance.yaml`
 
 ## Key Format
 
