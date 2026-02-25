@@ -1,10 +1,11 @@
+import { base } from '$app/paths';
 import { error } from '@sveltejs/kit';
 
 export const prerender = false;
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
-	const response = await fetch('/catalog.json');
+	const response = await fetch(`${base}/catalog.json`);
 	const catalog = await response.json();
 
 	const path = params.path.replace(/\/+$/, '');
@@ -18,7 +19,7 @@ export async function load({ params, fetch }) {
 	const skillDir = path.replace(/\/SKILL\.md$/, '');
 	let body = '';
 	try {
-		const bodyRes = await fetch(`/skills/${skillDir}/body.md`);
+		const bodyRes = await fetch(`${base}/skills/${skillDir}/body.md`);
 		if (bodyRes.ok) {
 			body = await bodyRes.text();
 		}
