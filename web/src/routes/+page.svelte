@@ -5,18 +5,18 @@
 	import SkillList from '$lib/components/SkillList.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
-	import type { FlatCatalog, UsagePolicy, Visibility } from '$lib/types';
+	import type { FlatSkillEntry, UsagePolicy, Visibility } from '$lib/types';
 	import { createSearchIndex, searchSkills } from '$lib/utils/search';
 	import { filterSkills, type FilterState, type OrgOwnership } from '$lib/utils/filter';
 	import { t } from '$lib/i18n';
 
 	interface Props {
-		data: { catalog: FlatCatalog };
+		data: { skills: FlatSkillEntry[]; freshPeriodDays: number };
 	}
 
 	let { data }: Props = $props();
-	let allSkills = $derived(data.catalog.skills);
-	let freshPeriodDays = $derived(data.catalog.fresh_period_days ?? 0);
+	let allSkills = $derived(data.skills);
+	let freshPeriodDays = $derived(data.freshPeriodDays);
 	let searchIndex = $derived(createSearchIndex(allSkills));
 
 	// Client-side state

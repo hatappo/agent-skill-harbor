@@ -44,10 +44,3 @@ export interface FlatSkillEntry {
 	tree_sha?: string | null;
 	is_fork?: boolean;
 }
-
-export interface FlatCatalog {
-	generated_at: string;
-	org_name: string | null;
-	fresh_period_days: number;
-	skills: FlatSkillEntry[];
-}

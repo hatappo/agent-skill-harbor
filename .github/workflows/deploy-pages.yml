@@ -39,9 +39,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build catalog (yaml + json)
-        run: pnpm run build:catalog
-
       - name: Build SvelteKit
         working-directory: web
         run: pnpm run build

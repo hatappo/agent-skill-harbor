@@ -35,9 +35,6 @@ jobs:
           GH_ORG: ${{ vars.GH_ORG }}
         run: pnpm run collect
 
-      - name: Build catalog
-        run: pnpm run build:catalog
-
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"

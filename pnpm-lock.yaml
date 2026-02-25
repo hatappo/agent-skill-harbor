@@ -50,6 +50,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.0.0
         version: 4.2.1(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0))
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       bits-ui:
         specifier: 2.16.2
         version: 2.16.2(@internationalized/date@3.11.0)(@sveltejs/kit@2.53.0(@sveltejs/vite-plugin-svelte@5.1.1(svelte@5.53.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)))(svelte@5.53.3)(typescript@5.9.3)(vite@6.4.1(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.31.1)(tsx@4.21.0)))(svelte@5.53.3)
@@ -68,9 +71,15 @@ importers:
       fuse.js:
         specifier: ^7.1.0
         version: 7.1.0
+      gray-matter:
+        specifier: ^4.0.3
+        version: 4.0.3
       isomorphic-dompurify:
         specifier: 3.0.0
         version: 3.0.0
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.1
       marked:
         specifier: 17.0.3
         version: 17.0.3
