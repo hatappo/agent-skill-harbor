@@ -344,7 +344,11 @@ async function main(): Promise<void> {
 				}
 
 				// Download all files in the skill directory
-				const sourceUrl = `https://${platform}/${org}/${repo.name}`;
+				const repoBaseUrl = `https://${platform}/${org}/${repo.name}`;
+				const skillDir = skill.skillPath.replace(/\/SKILL\.md$/, '').replace(/^SKILL\.md$/, '');
+				const sourceUrl = skillDir
+					? `${repoBaseUrl}/tree/HEAD/${skillDir}`
+					: `${repoBaseUrl}/blob/HEAD/SKILL.md`;
 				for (const filePath of skill.filePaths) {
 					try {
 						let content = await fetchFileContent(octokit, org, repo.name, filePath);

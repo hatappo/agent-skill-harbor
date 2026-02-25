@@ -2,8 +2,8 @@
 name: terraform-style-guide
 description: "Generate Terraform HCL code following HashiCorp's official style conventions and best practices."
 _from:
-  - https://github.com/hashicorp/agent-skills
-  - https://github.com/example-org/infra-skills
+  - https://github.com/hashicorp/agent-skills/tree/main/terraform/code-generation/skills/terraform-style-guide
+  - https://github.com/example-org/infra-skills/tree/main/skills/terraform-style-guide
 ---
 
 # Terraform Style Guide

@@ -1,13 +1,15 @@
 import matter from 'gray-matter';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { execSync } from 'node:child_process';
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
 
 const DATA_DIR = join(import.meta.dirname, '..', 'data');
 const SKILLS_DIR = join(DATA_DIR, 'skills');
 const GOVERNANCE_PATH = join(DATA_DIR, 'governance.yaml');
 const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
-const WEB_CATALOG_PATH = join(import.meta.dirname, '..', 'web', 'static', 'catalog.json');
+const WEB_STATIC_DIR = join(import.meta.dirname, '..', 'web', 'static');
+const WEB_CATALOG_PATH = join(WEB_STATIC_DIR, 'catalog.json');
 
 type UsagePolicy = 'required' | 'recommended' | 'discouraged' | 'prohibited' | 'none';
 
@@ -41,15 +43,36 @@ interface FlatSkillEntry {
 	owner: string;
 	repo: string;
 	visibility: string;
+	isOrgOwned: boolean;
 	frontmatter: Record<string, unknown>;
 	files: string[];
+	excerpt: string;
 	usagePolicy: string;
 	note?: string;
 }
 
 interface DiscoveredSkill {
 	frontmatter: Record<string, unknown>;
+	body: string;
 	files: string[];
+}
+
+function detectOrg(): string | null {
+	if (process.env.GITHUB_ORG) {
+		return process.env.GITHUB_ORG;
+	}
+	try {
+		const remoteUrl = execSync('git remote get-url origin', { encoding: 'utf-8' }).trim();
+		// SSH: git@github.com:owner/repo.git
+		const sshMatch = remoteUrl.match(/^git@[^:]+:([^/]+)\//);
+		if (sshMatch) return sshMatch[1];
+		// HTTPS: https://github.com/owner/repo.git
+		const httpsMatch = remoteUrl.match(/^https?:\/\/[^/]+\/([^/]+)\//);
+		if (httpsMatch) return httpsMatch[1];
+	} catch {
+		// git command failed
+	}
+	return null;
 }
 
 function loadGovernance(): Record<string, GovernanceEntry> {
@@ -136,13 +159,11 @@ function walkForSkillMd(
 				const content = readFileSync(fullPath, 'utf-8');
 				const parsed = matter(content);
 				const body = parsed.content.trim();
-				const frontmatter: Record<string, unknown> = {
-					...parsed.data,
-					...(body ? { _excerpt: body.slice(0, 500) } : {})
-				};
+				const frontmatter: Record<string, unknown> = { ...parsed.data };
+				delete frontmatter._excerpt;
 				const files = collectSkillFiles(baseDir, skillPath);
 
-				skills[skillPath] = { frontmatter, files };
+				skills[skillPath] = { frontmatter, body, files };
 			} catch (error) {
 				const message = error instanceof Error ? error.message : String(error);
 				console.error(`  [skip] ${fullPath}: ${message}`);
@@ -155,12 +176,14 @@ function walkForSkillMd(
 
 /**
  * Discover all repos under data/skills/github.com/ and merge with existing catalog metadata.
+ * Returns catalog and a map of skill key → body text.
  */
-function buildCatalog(existing: CatalogYaml): CatalogYaml {
+function buildCatalog(existing: CatalogYaml): { catalog: CatalogYaml; bodyMap: Map<string, string> } {
 	const catalog: CatalogYaml = { repositories: {} };
+	const bodyMap = new Map<string, string>();
 
 	const platformDir = join(SKILLS_DIR, 'github.com');
-	if (!existsSync(platformDir)) return catalog;
+	if (!existsSync(platformDir)) return { catalog, bodyMap };
 
 	for (const owner of readdirSync(platformDir)) {
 		const ownerDir = join(platformDir, owner);
@@ -184,6 +207,10 @@ function buildCatalog(existing: CatalogYaml): CatalogYaml {
 					frontmatter: discovered.frontmatter,
 					files: discovered.files
 				};
+
+				if (discovered.body) {
+					bodyMap.set(`${repoKey}/${skillPath}`, discovered.body);
+				}
 			}
 
 			catalog.repositories[repoKey] = {
@@ -195,12 +222,14 @@ function buildCatalog(existing: CatalogYaml): CatalogYaml {
 		}
 	}
 
-	return catalog;
+	return { catalog, bodyMap };
 }
 
 function buildFlatCatalog(
 	catalog: CatalogYaml,
-	governance: Record<string, GovernanceEntry>
+	governance: Record<string, GovernanceEntry>,
+	orgName: string | null,
+	bodyMap: Map<string, string>
 ): { generated_at: string; skills: FlatSkillEntry[] } {
 	const skills: FlatSkillEntry[] = [];
 
@@ -213,22 +242,7 @@ function buildFlatCatalog(
 		for (const [skillPath, skillData] of Object.entries(repoEntry.skills)) {
 			const key = `${repoKey}/${skillPath}`;
 			const gov = governance[key];
-
-			// Determine visibility: if _from's last entry points to a repo not in this catalog, mark as private
-			let visibility: string = repoEntry.visibility;
-			const fromArray = skillData.frontmatter._from;
-			if (Array.isArray(fromArray) && fromArray.length > 0) {
-				const lastFrom = String(fromArray[fromArray.length - 1]);
-				try {
-					const url = new URL(lastFrom);
-					const lastFromRepoKey = (url.host + url.pathname).replace(/\/$/, '');
-					if (!catalog.repositories[lastFromRepoKey]) {
-						visibility = 'private';
-					}
-				} catch {
-					// If URL parsing fails, keep repo-level visibility
-				}
-			}
+			const body = bodyMap.get(key) ?? '';
 
 			const entry: FlatSkillEntry = {
 				key,
@@ -237,14 +251,23 @@ function buildFlatCatalog(
 				platform,
 				owner,
 				repo,
-				visibility,
+				visibility: repoEntry.visibility,
+				isOrgOwned: orgName != null && owner === orgName,
 				frontmatter: skillData.frontmatter,
 				files: skillData.files,
+				excerpt: body.slice(0, 300),
 				usagePolicy: gov?.usagePolicy ?? 'none',
 				...(gov?.note ? { note: gov.note } : {})
 			};
 
 			skills.push(entry);
+
+			// Write full body to static file
+			if (body) {
+				const bodyPath = join(WEB_STATIC_DIR, 'skills', key.replace(/\/SKILL\.md$/, ''), 'body.md');
+				mkdirSync(dirname(bodyPath), { recursive: true });
+				writeFileSync(bodyPath, body);
+			}
 		}
 	}
 
@@ -260,11 +283,14 @@ function buildFlatCatalog(
 function main(): void {
 	console.log('Building skill catalog...');
 
+	const orgName = detectOrg();
+	console.log(`  Org: ${orgName ?? '(not detected)'}`);
+
 	const governance = loadGovernance();
 	console.log(`  Loaded ${Object.keys(governance).length} governance policy(ies)`);
 
 	const existing = loadExistingCatalog();
-	const catalog = buildCatalog(existing);
+	const { catalog, bodyMap } = buildCatalog(existing);
 
 	const repoCount = Object.keys(catalog.repositories).length;
 	const skillCount = Object.values(catalog.repositories).reduce(
@@ -277,8 +303,8 @@ function main(): void {
 	writeFileSync(CATALOG_YAML_PATH, yamlDump(catalog, { lineWidth: 120, noRefs: true }));
 	console.log(`  Written ${CATALOG_YAML_PATH}`);
 
-	// Generate web JSON
-	const flatCatalog = buildFlatCatalog(catalog, governance);
+	// Generate web JSON + per-skill body files
+	const flatCatalog = buildFlatCatalog(catalog, governance, orgName, bodyMap);
 	writeFileSync(WEB_CATALOG_PATH, JSON.stringify(flatCatalog, null, 2) + '\n');
 	console.log(`  Written ${WEB_CATALOG_PATH}`);
 

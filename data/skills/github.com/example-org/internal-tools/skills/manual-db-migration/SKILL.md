@@ -6,7 +6,7 @@ metadata:
   author: data-team
   version: 0.9.0
 _from:
-  - https://github.com/example-org/data-team-tools
+  - https://github.com/example-org/data-team-tools/tree/main/skills/manual-db-migration
 ---
 
 # Manual Database Migration

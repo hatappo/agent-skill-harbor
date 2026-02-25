@@ -6,7 +6,7 @@ metadata:
   author: platform-team
   version: 1.2.0
 _from:
-  - https://github.com/example-org/dev-standards
+  - https://github.com/example-org/dev-standards/tree/main/skills/legacy-rest-client
 ---
 
 # Legacy Platform API v1 Client

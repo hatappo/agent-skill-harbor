@@ -3,8 +3,8 @@ name: mcp-builder
 description: "Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with external services through well-designed tools."
 license: Complete terms in LICENSE.txt
 _from:
-  - https://github.com/anthropics/skills
-  - https://github.com/example-org/curated-skills
+  - https://github.com/anthropics/skills/tree/main/skills/mcp-builder
+  - https://github.com/example-org/curated-skills/tree/main/skills/mcp-builder
 ---
 
 # MCP Server Builder

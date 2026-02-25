@@ -31,8 +31,10 @@ export interface FlatSkillEntry {
 	owner: string;
 	repo: string;
 	visibility: Visibility;
+	isOrgOwned: boolean;
 	frontmatter: Record<string, unknown>;
 	files: string[];
+	excerpt: string;
 	usagePolicy: UsagePolicy;
 	note?: string;
 }

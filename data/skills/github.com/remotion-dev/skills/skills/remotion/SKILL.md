@@ -4,8 +4,8 @@ description: "Best practices for Remotion - Video creation in React."
 metadata:
   tags: remotion, video, react, animation, composition
 _from:
-  - https://github.com/remotion-dev/skills
-  - https://github.com/example-org/creative-tools
+  - https://github.com/remotion-dev/skills/tree/main/skills/remotion
+  - https://github.com/example-org/creative-tools/tree/main/skills/remotion
 ---
 
 # Remotion Best Practices

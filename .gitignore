@@ -10,6 +10,7 @@ web/build/
 
 # Generated
 web/static/catalog.json
+web/static/skills/
 
 # OS
 .DS_Store
@@ -20,3 +21,9 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# AI
+AGENTS.md
+CODEX.md
+CLAUDE.md
+.claude/plans

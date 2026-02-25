@@ -3,7 +3,7 @@ name: pdf
 description: "Use this skill whenever the user wants to do anything with PDF files."
 license: Proprietary. LICENSE.txt has complete terms
 _from:
-  - https://github.com/anthropics/skills
+  - https://github.com/anthropics/skills/tree/main/skills/pdf
 ---
 
 # PDF Processing
