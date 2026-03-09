@@ -5,8 +5,7 @@ export type ThemeMode = 'light' | 'dark' | 'system';
 export const theme = writable<ThemeMode>('system');
 
 function applyTheme(mode: ThemeMode): void {
-	const dark =
-		mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+	const dark = mode === 'dark' || (mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
 	document.documentElement.classList.toggle('dark', dark);
 }
 

@@ -19,9 +19,7 @@ function resolve(obj: unknown, path: string): string | undefined {
 }
 
 function interpolate(template: string, params: Record<string, string | number>): string {
-	return template.replace(/\{(\w+)\}/g, (_, key) =>
-		params[key] != null ? String(params[key]) : `{${key}}`
-	);
+	return template.replace(/\{(\w+)\}/g, (_, key) => (params[key] != null ? String(params[key]) : `{${key}}`));
 }
 
 export const t = derived(locale, ($locale) => {
@@ -30,15 +28,13 @@ export const t = derived(locale, ($locale) => {
 		if (params && 'count' in params) {
 			const count = Number(params.count);
 			const pluralKey = count === 1 ? `${key}_one` : `${key}_other`;
-			const plural =
-				resolve(messages[$locale], pluralKey) ?? resolve(messages.en, pluralKey);
+			const plural = resolve(messages[$locale], pluralKey) ?? resolve(messages.en, pluralKey);
 			if (plural) {
 				return interpolate(plural, params);
 			}
 		}
 
-		const value =
-			resolve(messages[$locale], key) ?? resolve(messages.en, key) ?? key;
+		const value = resolve(messages[$locale], key) ?? resolve(messages.en, key) ?? key;
 		return params ? interpolate(value, params) : value;
 	};
 });

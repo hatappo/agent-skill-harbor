@@ -11,7 +11,7 @@ export interface FilterState {
 export const defaultFilterState: FilterState = {
 	statuses: [],
 	visibilities: [],
-	orgOwnerships: []
+	orgOwnerships: [],
 };
 
 export function filterSkills(skills: FlatSkillEntry[], filters: FilterState): FlatSkillEntry[] {

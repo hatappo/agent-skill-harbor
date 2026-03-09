@@ -19,7 +19,7 @@ export const load = ({ params }) => {
 		title: doc.title,
 		content: {
 			en: contentEn,
-			ja: contentJa ?? contentEn
-		}
+			ja: contentJa ?? contentEn,
+		},
 	};
 };

@@ -2,16 +2,10 @@ name: Deploy to GitHub Pages
 
 on:
   workflow_dispatch:
-  # push:
+  # workflow_run:
+  #   workflows: ['Collect Skills']
+  #   types: [completed]
   #   branches: [main]
-  #   paths:
-  #     - 'web/**'
-  #     - 'data/**'
-  #     - 'config/**'
-  workflow_run:
-    workflows: ['Collect Skills']
-    types: [completed]
-    branches: [main]
 
 permissions:
   pages: write
@@ -25,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    # if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -39,16 +33,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build SvelteKit
-        working-directory: web
-        run: pnpm run build
-        env:
-          BASE_PATH: '/${{ github.event.repository.name }}'
+      - name: Build
+        run: npx skill-harbor build --base=/${{ github.event.repository.name }}
+        # For local development (source repo), use instead:
+        # run: pnpm build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: web/build
+          path: build
 
   deploy:
     environment:

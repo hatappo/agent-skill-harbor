@@ -1,8 +1,15 @@
 node_modules/
 dist/
+build/
 .env
 .env.*
 !.env.example
+
+# Local development data (created by setup:dev)
+config/*
+!config/.gitkeep
+data/*
+!data/.gitkeep
 
 # SvelteKit
 web/.svelte-kit/

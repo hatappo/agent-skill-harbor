@@ -68,7 +68,7 @@ function detectOrgRepo(): { org: string | null; repo: string | null } {
 	try {
 		const remoteUrl = execSync('git remote get-url origin', {
 			encoding: 'utf-8',
-			cwd: PROJECT_ROOT
+			cwd: PROJECT_ROOT,
 		}).trim();
 		const sshMatch = remoteUrl.match(/^git@[^:]+:([^/]+)\/([^/.]+)/);
 		if (sshMatch) {
@@ -121,7 +121,7 @@ function loadCatalogYaml(): CatalogYaml {
 function walkForSkillMd(
 	baseDir: string,
 	currentDir: string,
-	results: Map<string, { frontmatter: Record<string, unknown>; body: string }>
+	results: Map<string, { frontmatter: Record<string, unknown>; body: string }>,
 ): void {
 	for (const entry of readdirSync(currentDir)) {
 		if (entry.startsWith('_')) continue;
@@ -173,10 +173,7 @@ function buildCatalogData(): CatalogResult {
 		if (!existsSync(repoDir)) continue;
 
 		// Read all SKILL.md from filesystem
-		const skillMdMap = new Map<
-			string,
-			{ frontmatter: Record<string, unknown>; body: string }
-		>();
+		const skillMdMap = new Map<string, { frontmatter: Record<string, unknown>; body: string }>();
 		walkForSkillMd(repoDir, repoDir, skillMdMap);
 
 		for (const [skillPath, skillData] of Object.entries(repoEntry.skills)) {
@@ -210,7 +207,7 @@ function buildCatalogData(): CatalogResult {
 				...(skillData.registered_at ? { registered_at: skillData.registered_at } : {}),
 				...(repoEntry.repo_sha ? { repo_sha: repoEntry.repo_sha } : {}),
 				tree_sha: skillData.tree_sha ?? null,
-				...(repoEntry.fork ? { is_fork: true } : {})
+				...(repoEntry.fork ? { is_fork: true } : {}),
 			};
 
 			skills.push(entry);
@@ -220,9 +217,7 @@ function buildCatalogData(): CatalogResult {
 	const now = Date.now();
 	const freshMs = freshPeriodDays * 86_400_000;
 	const isNew = (s: FlatSkillEntry) =>
-		freshPeriodDays > 0 &&
-		!!s.registered_at &&
-		now - new Date(s.registered_at).getTime() < freshMs;
+		freshPeriodDays > 0 && !!s.registered_at && now - new Date(s.registered_at).getTime() < freshMs;
 
 	skills.sort((a, b) => {
 		const aNew = isNew(a);
