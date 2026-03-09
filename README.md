@@ -11,7 +11,11 @@ Agent skill catalog and governance tool for organizations.
 
 |                        Skill Catalog                        |                        Skill Detail                        |
 | :---------------------------------------------------------: | :--------------------------------------------------------: |
-| ![Skill Catalog](docs/agent-skill-harbor-screenshot02.jpeg) | ![Skill Detail](docs/agent-skill-harbor-screenshot01.jpeg) |
+| ![Skill Catalog](https://raw.githubusercontent.com/skill-mill/agent-skill-harbor/main/docs/agent-skill-harbor-screenshot02.jpeg) | ![Skill Detail](https://raw.githubusercontent.com/skill-mill/agent-skill-harbor/main/docs/agent-skill-harbor-screenshot01.jpeg) |
+
+### Graph View
+
+![Graph View](https://raw.githubusercontent.com/skill-mill/agent-skill-harbor/main/docs/agent-skill-harbor-screenshot-graph.gif)
 
 ## Overview
 

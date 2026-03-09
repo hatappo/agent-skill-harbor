@@ -11,7 +11,11 @@
 
 |                        スキルカタログ                        |                        スキル詳細                        |
 | :----------------------------------------------------------: | :------------------------------------------------------: |
-| ![スキルカタログ](docs/agent-skill-harbor-screenshot02.jpeg) | ![スキル詳細](docs/agent-skill-harbor-screenshot01.jpeg) |
+| ![スキルカタログ](https://raw.githubusercontent.com/skill-mill/agent-skill-harbor/main/docs/agent-skill-harbor-screenshot02.jpeg) | ![スキル詳細](https://raw.githubusercontent.com/skill-mill/agent-skill-harbor/main/docs/agent-skill-harbor-screenshot01.jpeg) |
+
+### グラフビュー
+
+![グラフビュー](https://raw.githubusercontent.com/skill-mill/agent-skill-harbor/main/docs/agent-skill-harbor-screenshot-graph.gif)
 
 ## 概要
 
