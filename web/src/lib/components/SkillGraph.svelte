@@ -23,6 +23,67 @@
 		sigmaInstance?.getCamera().animatedReset();
 	}
 
+	export function getCanvasDataURL(): string | null {
+		if (!sigmaInstance || !graphInstance) return null;
+
+		const wasDark = dark;
+
+		// Temporarily switch to light mode colors for print
+		if (wasDark) {
+			const lightColors = getColors(false);
+			sigmaInstance.setSetting('labelColor', { color: '#1e293b' });
+			graphInstance.forEachNode((node: string) => {
+				const nt = graphInstance.getNodeAttribute(node, 'nodeType');
+				graphInstance.setNodeAttribute(node, 'color', nt === 'skill' ? lightColors.skill : lightColors.repo);
+			});
+			graphInstance.forEachEdge((edge: string) => {
+				const et = graphInstance.getEdgeAttribute(edge, 'edgeType');
+				graphInstance.setEdgeAttribute(
+					edge,
+					'color',
+					et === 'derived_from' ? lightColors.edgeDerivedFrom : lightColors.edgeLivesIn,
+				);
+			});
+			dark = false;
+			sigmaInstance.refresh();
+		}
+
+		const layers = sigmaInstance.getCanvases();
+		const firstKey = Object.keys(layers)[0];
+		if (!firstKey) return null;
+		const refCanvas = layers[firstKey] as HTMLCanvasElement;
+		const merged = document.createElement('canvas');
+		merged.width = refCanvas.width;
+		merged.height = refCanvas.height;
+		const ctx = merged.getContext('2d')!;
+		for (const key of Object.keys(layers)) {
+			ctx.drawImage(layers[key] as HTMLCanvasElement, 0, 0);
+		}
+		const dataURL = merged.toDataURL('image/png');
+
+		// Restore dark mode colors if needed
+		if (wasDark) {
+			const darkColors = getColors(true);
+			sigmaInstance.setSetting('labelColor', { color: '#e2e8f0' });
+			graphInstance.forEachNode((node: string) => {
+				const nt = graphInstance.getNodeAttribute(node, 'nodeType');
+				graphInstance.setNodeAttribute(node, 'color', nt === 'skill' ? darkColors.skill : darkColors.repo);
+			});
+			graphInstance.forEachEdge((edge: string) => {
+				const et = graphInstance.getEdgeAttribute(edge, 'edgeType');
+				graphInstance.setEdgeAttribute(
+					edge,
+					'color',
+					et === 'derived_from' ? darkColors.edgeDerivedFrom : darkColors.edgeLivesIn,
+				);
+			});
+			dark = true;
+			sigmaInstance.refresh();
+		}
+
+		return dataURL;
+	}
+
 	let container: HTMLDivElement;
 	let sigmaInstance = $state<any>(null);
 	let graphInstance: any = null;
@@ -134,6 +195,12 @@
 			},
 		});
 
+		// Patch createWebGLContext to enable preserveDrawingBuffer for canvas export
+		const origCreateWebGLContext = Sigma.prototype.createWebGLContext;
+		Sigma.prototype.createWebGLContext = function (id: string, options: Record<string, unknown> = {}) {
+			return origCreateWebGLContext.call(this, id, { ...options, preserveDrawingBuffer: true });
+		};
+
 		const sigma = new Sigma(graph, container, {
 			labelRenderedSizeThreshold: 8,
 			labelDensity: 0.3,
@@ -207,6 +274,9 @@
 				return res;
 			},
 		});
+
+		// Restore original createWebGLContext
+		Sigma.prototype.createWebGLContext = origCreateWebGLContext;
 
 		sigmaInstance = sigma;
 

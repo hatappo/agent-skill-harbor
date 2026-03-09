@@ -13,7 +13,20 @@
 	let { data }: Props = $props();
 
 	let searchQuery = $state('');
-	let graphRef: { zoomIn: () => void; zoomOut: () => void; zoomReset: () => void } | undefined = $state();
+	let graphRef:
+		| { zoomIn: () => void; zoomOut: () => void; zoomReset: () => void; getCanvasDataURL: () => string | null }
+		| undefined = $state();
+
+	function handlePrint() {
+		const dataURL = graphRef?.getCanvasDataURL();
+		if (!dataURL) return;
+		const win = window.open('', '_blank');
+		if (!win) return;
+		win.document.write(
+			`<!DOCTYPE html><html><head><title>Knowledge Graph</title><style>@media print{@page{margin:0.5cm}body{margin:0}}body{display:flex;justify-content:center;align-items:center;min-height:100vh;margin:0;background:#fff}img{max-width:100%;max-height:100vh;object-fit:contain}</style></head><body><img src="${dataURL}" onload="window.print();window.close()"></body></html>`,
+		);
+		win.document.close();
+	}
 
 	let selectedNodeId = $state<string | null>(null);
 	let selectedAttrs = $state<GraphNodeAttrs | null>(null);
@@ -100,8 +113,22 @@
 			</div>
 		</div>
 
-		<!-- Zoom controls (bottom-right) -->
-		<div class="pointer-events-none absolute bottom-3 right-3 z-10">
+		<!-- Controls (bottom-right) -->
+		<div class="pointer-events-none absolute bottom-3 right-3 z-10 flex items-end gap-2">
+			<button
+				onclick={handlePrint}
+				class="pointer-events-auto rounded-lg border border-gray-200 bg-white/80 px-2.5 py-2 text-gray-600 shadow-sm backdrop-blur-sm transition-colors hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-300 dark:hover:bg-gray-800"
+				aria-label="Print graph"
+				title="Print"
+			>
+				<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+					<path
+						fill-rule="evenodd"
+						d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z"
+						clip-rule="evenodd"
+					/>
+				</svg>
+			</button>
 			<div
 				class="pointer-events-auto flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white/80 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/80"
 			>
