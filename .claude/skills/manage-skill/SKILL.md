@@ -12,6 +12,7 @@ You are managing the Agent Skill Harbor skill catalog. All changes are local and
 Actual SKILL.md files are stored under `data/skills/github.com/{owner}/{repo}/{skill-path}/SKILL.md`.
 
 Examples:
+
 - `data/skills/github.com/anthropics/prompt-library/SKILL.md` (root-level)
 - `data/skills/github.com/example-org/code-review/.claude/skills/review/SKILL.md` (nested)
 
@@ -85,6 +86,7 @@ Valid usage_policy values: `recommended`, `discouraged`, `prohibited`, `none`
 The skill key is: `github.com/{owner}/{repo}/{skill-file-path}`
 
 Examples:
+
 - `github.com/example-org/code-review/.claude/skills/review/SKILL.md`
 - `github.com/anthropics/prompt-library/SKILL.md`
 
