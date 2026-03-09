@@ -1,11 +1,14 @@
 import { execFileSync } from 'node:child_process';
+import { resolve } from 'node:path';
 import { webRoot, userRoot } from '../paths.js';
+
+const viteCli = resolve(webRoot, 'node_modules/vite/bin/vite.js');
 
 console.log(`Starting preview server...`);
 console.log(`  Project root: ${userRoot}`);
 
 try {
-	execFileSync('npx', ['vite', 'preview'], {
+	execFileSync(process.execPath, [viteCli, 'preview'], {
 		cwd: webRoot,
 		stdio: 'inherit',
 		env: {

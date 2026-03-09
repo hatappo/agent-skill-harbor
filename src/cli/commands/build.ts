@@ -5,13 +5,14 @@ import { webRoot, userRoot } from '../paths.js';
 const args = process.argv.slice(3);
 const basePath = args.find((a) => a.startsWith('--base='))?.split('=')[1] ?? '';
 const outputDir = resolve(userRoot, 'build');
+const viteCli = resolve(webRoot, 'node_modules/vite/bin/vite.js');
 
 console.log(`Building web catalog...`);
 console.log(`  Project root: ${userRoot}`);
 console.log(`  Output:       ${outputDir}`);
 
 try {
-	execFileSync('npx', ['vite', 'build'], {
+	execFileSync(process.execPath, [viteCli, 'build'], {
 		cwd: webRoot,
 		stdio: 'inherit',
 		env: {
