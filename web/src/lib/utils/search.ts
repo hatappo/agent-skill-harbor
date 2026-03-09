@@ -7,10 +7,10 @@ const fuseOptions: ConstructorParameters<typeof Fuse<FlatSkillEntry>>[1] = {
 		{ name: 'frontmatter.description', weight: 2 },
 		{ name: 'frontmatter.metadata.author', weight: 1 },
 		{ name: 'owner', weight: 1 },
-		{ name: 'repo', weight: 1 }
+		{ name: 'repo', weight: 1 },
 	],
 	threshold: 0.3,
-	includeScore: true
+	includeScore: true,
 };
 
 export function createSearchIndex(skills: FlatSkillEntry[]): Fuse<FlatSkillEntry> {

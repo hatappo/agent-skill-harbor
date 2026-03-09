@@ -22,15 +22,23 @@
 			{$t('header.title')}
 		</a>
 		<nav class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-			<a href="{base}/" class="transition-colors hover:text-gray-900 dark:hover:text-gray-100">{$t('header.catalog')}</a>
+			<a href="{base}/" class="transition-colors hover:text-gray-900 dark:hover:text-gray-100">{$t('header.catalog')}</a
+			>
 			<a href="{base}/graph/" class="transition-colors hover:text-gray-900 dark:hover:text-gray-100">Graph</a>
 			<a href="{base}/docs/" class="transition-colors hover:text-gray-900 dark:hover:text-gray-100">{$t('docs.nav')}</a>
 			{#if orgName}
 				<span class="font-bold text-gray-900 dark:text-gray-100">
-					<a href="https://github.com/{orgName}" target="_blank" rel="noopener noreferrer" class="hover:underline">{orgName}</a>
+					<a href="https://github.com/{orgName}" target="_blank" rel="noopener noreferrer" class="hover:underline"
+						>{orgName}</a
+					>
 					{#if repoName}
 						<span class="mx-0.5">/</span>
-						<a href="https://github.com/{orgName}/{repoName}" target="_blank" rel="noopener noreferrer" class="hover:underline">{repoName}</a>
+						<a
+							href="https://github.com/{orgName}/{repoName}"
+							target="_blank"
+							rel="noopener noreferrer"
+							class="hover:underline">{repoName}</a
+						>
 					{/if}
 				</span>
 			{/if}

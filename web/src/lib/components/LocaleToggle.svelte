@@ -3,7 +3,7 @@
 
 	const locales: { value: Locale; label: string }[] = [
 		{ value: 'en', label: 'EN' },
-		{ value: 'ja', label: 'JA' }
+		{ value: 'ja', label: 'JA' },
 	];
 
 	let expanded = $state(false);

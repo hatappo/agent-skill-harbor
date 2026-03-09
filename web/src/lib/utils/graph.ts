@@ -29,14 +29,14 @@ const COLORS = {
 	skill: '#3b82f6', // blue-500
 	repo: '#10b981', // emerald-500
 	edgeDerivedFrom: '#f59e0b', // amber-500
-	edgeLivesIn: '#cbd5e1' // slate-300
+	edgeLivesIn: '#cbd5e1', // slate-300
 };
 
 const COLORS_DARK = {
 	skill: '#60a5fa', // blue-400
 	repo: '#34d399', // emerald-400
 	edgeDerivedFrom: '#fbbf24', // amber-400
-	edgeLivesIn: '#475569' // slate-600
+	edgeLivesIn: '#475569', // slate-600
 };
 
 export function getColors(dark: boolean) {
@@ -98,7 +98,7 @@ export function buildSkillGraph(skills: FlatSkillEntry[], dark = false): Graph {
 			repo: parts[1],
 			url: `https://github.com/${parts[0]}/${parts[1]}`,
 			x: hashToFloat(id, 1) * 100,
-			y: hashToFloat(id, 2) * 100
+			y: hashToFloat(id, 2) * 100,
 		});
 	}
 
@@ -118,7 +118,7 @@ export function buildSkillGraph(skills: FlatSkillEntry[], dark = false): Graph {
 			repo: skill.repo,
 			usagePolicy: skill.usage_policy,
 			x: hashToFloat(sId, 1) * 100,
-			y: hashToFloat(sId, 2) * 100
+			y: hashToFloat(sId, 2) * 100,
 		});
 
 		// lives_in edge: skill ↔ catalog repo (undirected)
@@ -127,7 +127,7 @@ export function buildSkillGraph(skills: FlatSkillEntry[], dark = false): Graph {
 			graph.addUndirectedEdge(sId, catalogRepo, {
 				edgeType: 'lives_in',
 				color: colors.edgeLivesIn,
-				size: 1
+				size: 1,
 			});
 		}
 
@@ -140,7 +140,7 @@ export function buildSkillGraph(skills: FlatSkillEntry[], dark = false): Graph {
 					edgeType: 'derived_from',
 					type: 'arrow',
 					color: colors.edgeDerivedFrom,
-					size: 2
+					size: 2,
 				});
 			}
 		}

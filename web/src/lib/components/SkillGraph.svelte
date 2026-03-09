@@ -106,21 +106,17 @@
 	let darkModeObserver: MutationObserver | null = null;
 
 	onMount(async () => {
-		const [
-			{ default: Sigma },
-			{ default: Graph },
-			{ default: forceAtlas2 },
-			{ createEdgeArrowProgram }
-		] = await Promise.all([
-			import('sigma'),
-			import('graphology'),
-			import('graphology-layout-forceatlas2'),
-			import('sigma/rendering')
-		]);
+		const [{ default: Sigma }, { default: Graph }, { default: forceAtlas2 }, { createEdgeArrowProgram }] =
+			await Promise.all([
+				import('sigma'),
+				import('graphology'),
+				import('graphology-layout-forceatlas2'),
+				import('sigma/rendering'),
+			]);
 
 		const LargeArrowProgram = createEdgeArrowProgram({
 			lengthToThicknessRatio: 5,
-			widenessToThicknessRatio: 4
+			widenessToThicknessRatio: 4,
 		});
 
 		dark = checkDark();
@@ -134,8 +130,8 @@
 				gravity: 1,
 				scalingRatio: 10,
 				barnesHutOptimize: graph.order > 100,
-				strongGravityMode: true
-			}
+				strongGravityMode: true,
+			},
 		});
 
 		const sigma = new Sigma(graph, container, {
@@ -146,15 +142,13 @@
 			defaultEdgeColor: getColors(dark).edgeLivesIn,
 			defaultNodeColor: getColors(dark).skill,
 			edgeProgramClasses: {
-				arrow: LargeArrowProgram
+				arrow: LargeArrowProgram,
 			},
 			defaultDrawNodeHover: drawHover,
 			zIndex: true,
 			nodeReducer: (node: string, data: any) => {
 				const res = { ...data };
-				const neighborSet = hoveredNode
-					? new Set(graph.neighbors(hoveredNode))
-					: null;
+				const neighborSet = hoveredNode ? new Set(graph.neighbors(hoveredNode)) : null;
 
 				// Hover highlight (takes priority)
 				if (hoveredNode) {
@@ -211,7 +205,7 @@
 				}
 
 				return res;
-			}
+			},
 		});
 
 		sigmaInstance = sigma;
@@ -278,17 +272,13 @@
 			});
 			graph.forEachEdge((edge: string) => {
 				const et = graph.getEdgeAttribute(edge, 'edgeType');
-				graph.setEdgeAttribute(
-					edge,
-					'color',
-					et === 'derived_from' ? c.edgeDerivedFrom : c.edgeLivesIn
-				);
+				graph.setEdgeAttribute(edge, 'color', et === 'derived_from' ? c.edgeDerivedFrom : c.edgeLivesIn);
 			});
 		});
 
 		darkModeObserver.observe(document.documentElement, {
 			attributes: true,
-			attributeFilter: ['class']
+			attributeFilter: ['class'],
 		});
 	});
 

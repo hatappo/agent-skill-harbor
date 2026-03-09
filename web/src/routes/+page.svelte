@@ -31,7 +31,7 @@
 			filters = {
 				statuses: (params.get('status')?.split(',').filter(Boolean) ?? []) as UsagePolicy[],
 				visibilities: (params.get('visibility')?.split(',').filter(Boolean) ?? []) as Visibility[],
-				orgOwnerships: (params.get('origin')?.split(',').filter(Boolean) ?? []) as OrgOwnership[]
+				orgOwnerships: (params.get('origin')?.split(',').filter(Boolean) ?? []) as OrgOwnership[],
 			};
 		}
 	});
@@ -64,7 +64,9 @@
 		updateUrl(query, newFilters);
 	}
 
-	let hasFilters = $derived(query !== '' || filters.statuses.length > 0 || filters.visibilities.length > 0 || filters.orgOwnerships.length > 0);
+	let hasFilters = $derived(
+		query !== '' || filters.statuses.length > 0 || filters.visibilities.length > 0 || filters.orgOwnerships.length > 0,
+	);
 </script>
 
 <svelte:head>

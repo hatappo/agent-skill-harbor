@@ -6,9 +6,7 @@
 
 	let { data } = $props();
 
-	let html = $derived(
-		DOMPurify.sanitize(marked(data.content[$locale] ?? data.content.en) as string)
-	);
+	let html = $derived(DOMPurify.sanitize(marked(data.content[$locale] ?? data.content.en) as string));
 	let title = $derived(data.title[$locale] ?? data.title.en);
 </script>
 

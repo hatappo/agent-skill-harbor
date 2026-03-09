@@ -13,8 +13,7 @@
 	let { data }: Props = $props();
 
 	let searchQuery = $state('');
-	let graphRef: { zoomIn: () => void; zoomOut: () => void; zoomReset: () => void } | undefined =
-		$state();
+	let graphRef: { zoomIn: () => void; zoomOut: () => void; zoomReset: () => void } | undefined = $state();
 
 	let selectedNodeId = $state<string | null>(null);
 	let selectedAttrs = $state<GraphNodeAttrs | null>(null);
@@ -46,8 +45,7 @@
 		const repoLabel = selectedAttrs.label;
 		return data.skills.filter((s) => {
 			const ownerRepo = `${s.owner}/${s.repo}`;
-			const fromStr =
-				typeof s.frontmatter._from === 'string' ? s.frontmatter._from.replace(/@.*$/, '') : null;
+			const fromStr = typeof s.frontmatter._from === 'string' ? s.frontmatter._from.replace(/@.*$/, '') : null;
 			return ownerRepo === repoLabel || fromStr === repoLabel;
 		});
 	});
@@ -62,12 +60,7 @@
 	<div class="relative min-h-0 flex-1 bg-gray-50 dark:bg-gray-950">
 		{#if browser}
 			{#await import('$lib/components/SkillGraph.svelte') then module}
-				<module.default
-					bind:this={graphRef}
-					skills={data.skills}
-					{searchQuery}
-					onNodeSelect={handleNodeSelect}
-				/>
+				<module.default bind:this={graphRef} skills={data.skills} {searchQuery} onNodeSelect={handleNodeSelect} />
 			{/await}
 		{/if}
 
@@ -118,7 +111,9 @@
 					aria-label="Zoom in"
 				>
 					<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-						<path d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z" />
+						<path
+							d="M10.75 4.75a.75.75 0 00-1.5 0v4.5h-4.5a.75.75 0 000 1.5h4.5v4.5a.75.75 0 001.5 0v-4.5h4.5a.75.75 0 000-1.5h-4.5v-4.5z"
+						/>
 					</svg>
 				</button>
 				<div class="border-t border-gray-200 dark:border-gray-700"></div>
@@ -128,7 +123,11 @@
 					aria-label="Zoom out"
 				>
 					<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-						<path fill-rule="evenodd" d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z" clip-rule="evenodd" />
+						<path
+							fill-rule="evenodd"
+							d="M4 10a.75.75 0 01.75-.75h10.5a.75.75 0 010 1.5H4.75A.75.75 0 014 10z"
+							clip-rule="evenodd"
+						/>
 					</svg>
 				</button>
 				<div class="border-t border-gray-200 dark:border-gray-700"></div>
@@ -138,7 +137,11 @@
 					aria-label="Reset zoom"
 				>
 					<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-						<path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.451a.75.75 0 000-1.5H4.5a.75.75 0 00-.75.75v3.75a.75.75 0 001.5 0v-2.033l.364.363a7 7 0 0011.712-3.138.75.75 0 00-1.449-.391zm-10.624-3.85a5.5 5.5 0 019.201-2.465l.312.31H11.75a.75.75 0 000 1.5h3.75a.75.75 0 00.75-.75V2.419a.75.75 0 00-1.5 0v2.034l-.364-.364A7 7 0 002.674 7.228a.75.75 0 001.449.391z" clip-rule="evenodd" />
+						<path
+							fill-rule="evenodd"
+							d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.451a.75.75 0 000-1.5H4.5a.75.75 0 00-.75.75v3.75a.75.75 0 001.5 0v-2.033l.364.363a7 7 0 0011.712-3.138.75.75 0 00-1.449-.391zm-10.624-3.85a5.5 5.5 0 019.201-2.465l.312.31H11.75a.75.75 0 000 1.5h3.75a.75.75 0 00.75-.75V2.419a.75.75 0 00-1.5 0v2.034l-.364-.364A7 7 0 002.674 7.228a.75.75 0 001.449.391z"
+							clip-rule="evenodd"
+						/>
 					</svg>
 				</button>
 			</div>
