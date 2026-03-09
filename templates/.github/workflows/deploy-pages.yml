@@ -1,11 +1,11 @@
 name: Deploy to GitHub Pages
 
 on:
-  workflow_dispatch:
   # workflow_run:
   #   workflows: ['Collect Skills']
   #   types: [completed]
   #   branches: [main]
+  workflow_dispatch:
 
 permissions:
   pages: write

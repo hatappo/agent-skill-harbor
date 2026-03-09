@@ -2,9 +2,10 @@
 
 # Agent Skill Harbor
 
-> Know what your agents know.
+> Skill Governance for your company.
+> Skill Discovery for your team.
 
-Agent skill catalog and governance for organizations.
+Agent skill catalog and governance tool for organizations.
 
 ## Screenshots
 

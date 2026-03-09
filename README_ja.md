@@ -2,9 +2,10 @@
 
 # Agent Skill Harbor
 
-> Know what your agents know.
+> Skill Governance for your company.
+> Skill Discovery for your team.
 
-組織向けの Agent Skill カタログ・ガバナンスツール。
+組織とチームのための Skill 管理ツール。
 
 ## スクリーンショット
 
