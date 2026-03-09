@@ -14,6 +14,7 @@ const ADMIN_PATH = join(CONFIG_DIR, 'admin.yaml');
 interface AdminConfig {
 	collector?: {
 		exclude_forks?: boolean;
+		exclude_repos?: string[];
 	};
 }
 
@@ -269,6 +270,7 @@ async function main(): Promise<void> {
 
 	const admin = loadAdmin();
 	const excludeForks = admin.collector?.exclude_forks ?? false;
+	const excludeRepos = new Set(admin.collector?.exclude_repos ?? []);
 
 	// Fetch all repositories in the org
 	const repos: Array<{
@@ -294,6 +296,7 @@ async function main(): Promise<void> {
 		for (const repo of data) {
 			if (selfRepo && repo.name === selfRepo) continue;
 			if (excludeForks && repo.fork) continue;
+			if (excludeRepos.has(repo.name)) continue;
 			repos.push({
 				name: repo.name,
 				default_branch: repo.default_branch ?? 'main',
@@ -306,7 +309,10 @@ async function main(): Promise<void> {
 		page++;
 	}
 
-	console.log(`Found ${repos.length} repositories${excludeForks ? ' (forks excluded)' : ''}`);
+	const filters = [excludeForks && 'forks excluded', excludeRepos.size > 0 && `${excludeRepos.size} repo(s) excluded`]
+		.filter(Boolean)
+		.join(', ');
+	console.log(`Found ${repos.length} repositories${filters ? ` (${filters})` : ''}`);
 
 	let collectedCount = 0;
 	let skippedRepoCount = 0;

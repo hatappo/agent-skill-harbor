@@ -1,5 +1,7 @@
 collector:
   exclude_forks: true # skip forked repositories when collecting
+  # exclude_repos:    # repository names to skip when collecting
+  #   - some-repo-name
 
 catalog:
   skill:
