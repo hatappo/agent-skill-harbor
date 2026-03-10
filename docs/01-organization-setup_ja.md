@@ -73,9 +73,9 @@ pnpm dev
 ## ステップ 6: 初回デプロイ
 
 1. リポジトリにプッシュ
-2. **Actions > Collect Skills** を開く
+2. **Actions > CollectSkills** を開く
 3. **Run workflow** をクリックして初回収集をトリガー
-4. 収集完了後、"Deploy to GitHub Pages" ワークフローが自動実行されます
+4. 収集完了後、`DeployGitHubPages` ワークフローが自動実行されます
 
 ## ステップ 7: ガバナンスポリシーの設定
 
@@ -112,7 +112,7 @@ pnpm update agent-skill-harbor
 
 ```
 ┌──────────────────────────────┐
-│  Collect Skills (定期実行)     │
+│  CollectSkills (定期実行)      │
 │  - Org リポジトリをスキャン      │
 │  - SKILL.md をパース           │
 │  - YAML に書き出し             │
@@ -121,7 +121,7 @@ pnpm update agent-skill-harbor
          │ トリガー
          ▼
 ┌──────────────────────────────┐
-│  Deploy Pages                │
+│  DeployGitHubPages           │
 │  - SvelteKit をビルド          │
 │  - GitHub Pages にデプロイ     │
 └──────────────────────────────┘

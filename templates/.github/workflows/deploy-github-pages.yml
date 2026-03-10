@@ -1,10 +1,10 @@
-name: Deploy to GitHub Pages
+name: DeployGitHubPages
 
 on:
-  # workflow_run:
-  #   workflows: ['Collect Skills']
-  #   types: [completed]
-  #   branches: [main]
+  workflow_run:
+    workflows: ['CollectSkills']
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     steps:
       - uses: actions/checkout@v6
 

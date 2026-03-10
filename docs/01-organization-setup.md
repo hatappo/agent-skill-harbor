@@ -73,9 +73,9 @@ pnpm dev
 ## Step 6: Initial Deployment
 
 1. Push to your repository
-2. Go to **Actions > Collect Skills**
+2. Go to **Actions > CollectSkills**
 3. Click **Run workflow** to trigger the first collection
-4. The "Deploy to GitHub Pages" workflow will run automatically after collection
+4. The `DeployGitHubPages` workflow will run automatically after collection
 
 ## Step 7: Configure Governance Policies
 
@@ -112,7 +112,7 @@ Your configuration files (`config/`, `.env`) and data (`data/`) are not affected
 
 ```
 ┌─────────────────────────┐
-│  Collect Skills (cron)  │
+│  CollectSkills (cron)   │
 │  - Scan org repos       │
 │  - Parse SKILL.md       │
 │  - Write YAML           │
@@ -121,7 +121,7 @@ Your configuration files (`config/`, `.env`) and data (`data/`) are not affected
          │ triggers
          ▼
 ┌─────────────────────────┐
-│  Deploy Pages           │
+│  DeployGitHubPages      │
 │  - Build SvelteKit      │
 │  - Deploy to GH Pages   │
 └─────────────────────────┘

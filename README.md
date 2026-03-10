@@ -81,7 +81,8 @@ harbor build --base=/my-repo-name
 1. Create a new project with `npx agent-skill-harbor init`
 2. Configure GitHub repository secrets (`GH_TOKEN`)
 3. Enable GitHub Pages (Settings > Pages > Source: GitHub Actions)
-4. Trigger the "Collect Skills" workflow for initial collection
+4. Trigger the `CollectSkills` workflow for initial collection
+5. `DeployGitHubPages` will run automatically after a successful collection
 
 See [Organization Setup Guide](docs/01-organization-setup.md) for detailed instructions.
 

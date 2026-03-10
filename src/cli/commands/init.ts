@@ -43,7 +43,9 @@ console.log('  Created .gitignore');
 // .github/workflows/
 cpSync(join(templatesDir, '.github'), join(targetDir, '.github'), { recursive: true });
 console.log('  Created .github/workflows/collect-skills.yml');
-console.log('  Created .github/workflows/deploy-pages.yml');
+console.log('  Created .github/workflows/deploy-github-pages.yml');
+console.log('    - workflow name: CollectSkills');
+console.log('    - workflow name: DeployGitHubPages');
 
 // config/
 cpSync(join(templatesDir, 'config'), join(targetDir, 'config'), { recursive: true });

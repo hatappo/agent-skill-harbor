@@ -80,7 +80,8 @@ harbor build --base=/my-repo-name
 1. `npx agent-skill-harbor init` で新しいプロジェクトを作成
 2. GitHub リポジトリのシークレットを設定 (`GH_TOKEN`)
 3. GitHub Pages を有効化 (Settings > Pages > Source: GitHub Actions)
-4. "Collect Skills" ワークフローを手動トリガーして初回収集を実行
+4. `CollectSkills` ワークフローを手動トリガーして初回収集を実行
+5. 収集が成功すると `DeployGitHubPages` が自動実行されます
 
 詳細は [組織セットアップガイド](docs/01-organization-setup_ja.md) を参照してください。
 

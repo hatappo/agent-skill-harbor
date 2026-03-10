@@ -1,14 +1,9 @@
-name: Collect Skills
+name: CollectSkills
 
 on:
   # schedule:
   #   - cron: '0 */6 * * *'
   workflow_dispatch:
-    inputs:
-      force_refresh:
-        description: 'Force refresh all skills (ignores SHA cache)'
-        required: false
-        default: 'false'
 
 permissions:
   contents: write
