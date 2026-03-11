@@ -19,7 +19,7 @@ Examples:
 ## File Locations
 
 - Skill files: `data/skills/github.com/{owner}/{repo}/...SKILL.md`
-- Catalog: `data/catalog.yaml` (operational metadata + frontmatter; git-tracked)
+- Catalog: `data/skills.yaml` (operational metadata + frontmatter; git-tracked)
 - Governance: `config/governance.yaml`
 - Web JSON: `web/static/catalog.json` (auto-generated, git-ignored)
 
@@ -36,7 +36,7 @@ When the user wants to add a skill (e.g., `add owner/repo` or `add owner/repo .c
 3. Fetch the SKILL.md from the repository
 4. Add `_from` to the SKILL.md frontmatter with the source URL (e.g., `_from: ["https://github.com/{owner}/{repo}"]`). If `_from` already exists, append the URL (avoid duplicates).
 5. Save it to `data/skills/github.com/{owner}/{repo}/{skill-path}/SKILL.md`
-6. Add an entry to `data/catalog.yaml`:
+6. Add an entry to `data/skills.yaml`:
 
 ```yaml
 repositories:
@@ -58,7 +58,7 @@ repositories:
 When the user wants to remove a skill (e.g., `remove owner/repo` or `remove owner/repo .claude/skills/review/SKILL.md`):
 
 1. Delete the SKILL.md file (and its directory if empty)
-2. Remove the skill entry from `data/catalog.yaml`
+2. Remove the skill entry from `data/skills.yaml`
 3. If no skills remain for the repo, remove the entire repo entry
 4. Remove any matching entry from `config/governance.yaml`
 
@@ -66,7 +66,7 @@ When the user wants to remove a skill (e.g., `remove owner/repo` or `remove owne
 
 When the user wants to list registered skills:
 
-1. Read `data/catalog.yaml`
+1. Read `data/skills.yaml`
 2. Display a table with: key, name (from frontmatter), usage_policy (from governance)
 
 ### Update Governance Policy
@@ -90,7 +90,7 @@ Examples:
 - `github.com/example-org/code-review/.claude/skills/review/SKILL.md`
 - `github.com/anthropics/prompt-library/SKILL.md`
 
-This key is used consistently in `catalog.yaml`, `governance.yaml`, and the Web UI URL.
+This key is used consistently in `skills.yaml`, `governance.yaml`, and the Web UI URL.
 
 ## Important Notes
 

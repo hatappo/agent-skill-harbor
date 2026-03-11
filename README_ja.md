@@ -35,6 +35,7 @@ npx agent-skill-harbor init my-skill-harbor
 cd my-skill-harbor
 
 # .env を編集: GH_TOKEN と GH_ORG のコメントを外して設定
+# または gh CLI を利用: GH_TOKEN=$(gh auth token) pnpm collect
 
 # 依存関係のインストール
 pnpm install
@@ -100,7 +101,7 @@ my-skill-harbor/
 │   ├── admin.yaml          # 収集・カタログ設定
 │   └── governance.yaml     # スキル使用ポリシー
 ├── data/                   # collect で生成（Git 管理）
-│   ├── catalog.yaml        # スキルメタデータ
+│   ├── skills.yaml         # スキルメタデータ
 │   └── skills/             # キャッシュされた SKILL.md ファイル
 ├── .github/workflows/      # GitHub Actions (収集 + デプロイ)
 └── package.json            # agent-skill-harbor に依存

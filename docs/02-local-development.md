@@ -81,5 +81,5 @@ pnpm setup:dev    # Re-copy templates and fixtures
 
 - **`SKILL_HARBOR_ROOT` environment variable**: Controls where data/config/docs are read from. When using the CLI, this is automatically set to the user's project directory. For development, it falls back to the repository root.
 - **`web/vite.config.ts`**: Injects `__PROJECT_ROOT__` as a compile-time constant from `SKILL_HARBOR_ROOT`.
-- **`web/src/lib/server/catalog.ts`**: Reads `data/catalog.yaml` and `data/skills/` at build time for prerendering.
+- **`web/src/lib/server/catalog.ts`**: Reads `data/skills.yaml` and `data/skills/` at build time for prerendering.
 - **`adapter-static`**: All pages are prerendered to static HTML at build time. No server runtime needed.

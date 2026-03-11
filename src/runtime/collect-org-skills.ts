@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 const PROJECT_ROOT = process.env.SKILL_HARBOR_ROOT || join(import.meta.dirname, '..', '..');
 const DATA_DIR = join(PROJECT_ROOT, 'data');
 const SKILLS_DIR = join(DATA_DIR, 'skills');
-const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
+const SKILLS_YAML_PATH = join(DATA_DIR, 'skills.yaml');
 const CONFIG_DIR = join(PROJECT_ROOT, 'config');
 const ADMIN_PATH = join(CONFIG_DIR, 'admin.yaml');
 
@@ -48,7 +48,16 @@ interface RepositoryEntry {
 	skills: Record<string, SkillEntry>;
 }
 
+interface CollectMeta {
+	collected_at: string;
+	duration_sec: number;
+	repos: { total: number; collected: number; unchanged: number; from: number };
+	skills: { total: number; collected: number; unchanged: number };
+	files: { collected: number };
+}
+
 interface CatalogYaml {
+	meta?: CollectMeta;
 	repositories: Record<string, RepositoryEntry>;
 }
 
@@ -85,11 +94,11 @@ interface ParsedFromRef {
 }
 
 function loadCatalog(): CatalogYaml {
-	if (!existsSync(CATALOG_YAML_PATH)) {
+	if (!existsSync(SKILLS_YAML_PATH)) {
 		return { repositories: {} };
 	}
 	try {
-		const raw = yamlLoad(readFileSync(CATALOG_YAML_PATH, 'utf-8')) as CatalogYaml;
+		const raw = yamlLoad(readFileSync(SKILLS_YAML_PATH, 'utf-8')) as CatalogYaml;
 		return raw?.repositories ? raw : { repositories: {} };
 	} catch {
 		return { repositories: {} };
@@ -97,7 +106,7 @@ function loadCatalog(): CatalogYaml {
 }
 
 function saveCatalog(catalog: CatalogYaml): void {
-	writeFileSync(CATALOG_YAML_PATH, yamlDump(catalog, { lineWidth: 120, noRefs: true }));
+	writeFileSync(SKILLS_YAML_PATH, yamlDump(catalog, { lineWidth: 120, noRefs: true }));
 }
 
 function saveFile(repoDir: string, filePath: string, content: string): void {
@@ -307,7 +316,7 @@ async function collectRepoSkills(
 	fromRefs: ParsedFromRef[],
 	seenRepoKeys: Set<string>,
 	queuedRepoKeys: Set<string>,
-	counts: { collectedCount: number; skippedRepoCount: number; skippedSkillCount: number },
+	counts: { collectedRepoCount: number; collectedCount: number; collectedFileCount: number; skippedRepoCount: number; skippedSkillCount: number },
 	collectFromRefs: boolean,
 ): Promise<void> {
 	const repoKey = normalizeRepoKey(platform, target.owner, target.repo);
@@ -350,7 +359,17 @@ async function collectRepoSkills(
 		discoveredSkills = discoverSkillsFromTree(treeData.tree as TreeEntry[]);
 	}
 
-	if (discoveredSkills.length === 0) return;
+	if (discoveredSkills.length === 0) {
+		console.log(`  [skip] ${target.owner}/${target.repo} (no skills found)`);
+		counts.collectedRepoCount++;
+		catalog.repositories[repoKey] = {
+			visibility: target.visibility,
+			repo_sha: headSha,
+			...(target.fork ? { fork: true } : {}),
+			skills: {},
+		};
+		return;
+	}
 
 	const newSkills: Record<string, SkillEntry> = {};
 
@@ -372,6 +391,7 @@ async function collectRepoSkills(
 			try {
 				const content = await fetchFileContent(octokit, target.owner, target.repo, filePath);
 				saveFile(repoDir, filePath, content);
+				counts.collectedFileCount++;
 				console.log(`  [collected:${target.source}] ${target.owner}/${target.repo} -> ${filePath}`);
 				if (filePath === skill.skillPath) {
 					collectedFrontmatter = parseFrontmatter(content);
@@ -397,6 +417,9 @@ async function collectRepoSkills(
 		};
 	}
 
+	if (Object.keys(newSkills).length > 0) {
+		counts.collectedRepoCount++;
+	}
 	catalog.repositories[repoKey] = {
 		visibility: target.visibility,
 		repo_sha: headSha,
@@ -446,6 +469,7 @@ export async function runCollectOrgSkills(): Promise<void> {
 		throw new Error('GH_ORG environment variable is not set and could not be detected from git remote URL.');
 	}
 
+	const startTime = Date.now();
 	const octokit = new Octokit({ auth: token });
 	const platform = 'github.com';
 	const catalog = loadCatalog();
@@ -500,7 +524,7 @@ export async function runCollectOrgSkills(): Promise<void> {
 		console.log(`Following public _from repositories: enabled`);
 	}
 
-	const counts = { collectedCount: 0, skippedRepoCount: 0, skippedSkillCount: 0 };
+	const counts = { collectedRepoCount: 0, collectedCount: 0, collectedFileCount: 0, skippedRepoCount: 0, skippedSkillCount: 0 };
 	const seenRepoKeys = new Set<string>();
 	const queuedExternalRepoKeys = new Set<string>();
 	const fromRefs: ParsedFromRef[] = [];
@@ -526,10 +550,12 @@ export async function runCollectOrgSkills(): Promise<void> {
 		}
 	}
 
+	let fromRepoCount = 0;
 	if (collectPublicOriginRepos) {
 		for (const fromRef of fromRefs) {
 			if (seenRepoKeys.has(fromRef.repoKey)) continue;
 			seenRepoKeys.add(fromRef.repoKey);
+			fromRepoCount++;
 			const target = await fetchRepoTarget(octokit, platform, fromRef.owner, fromRef.repo);
 			if (!target) continue;
 			try {
@@ -551,12 +577,24 @@ export async function runCollectOrgSkills(): Promise<void> {
 		}
 	}
 
+	const durationSec = Math.round((Date.now() - startTime) / 1000);
+	const totalRepos = repos.length + fromRepoCount;
+	const totalSkills = counts.collectedCount + counts.skippedSkillCount;
+
+	catalog.meta = {
+		collected_at: new Date().toISOString(),
+		duration_sec: durationSec,
+		repos: { total: totalRepos, collected: counts.collectedRepoCount, unchanged: counts.skippedRepoCount, from: fromRepoCount },
+		skills: { total: totalSkills, collected: counts.collectedCount, unchanged: counts.skippedSkillCount },
+		files: { collected: counts.collectedFileCount },
+	};
 	saveCatalog(catalog);
-	console.log(
-		`\nDone: ${counts.collectedCount} skill(s) collected, ` +
-			`${counts.skippedRepoCount} repo(s) unchanged, ` +
-			`${counts.skippedSkillCount} skill(s) unchanged (tree_sha)`,
-	);
+
+	console.log(`\n--- Summary ---`);
+	console.log(`  Repos:  ${totalRepos} total, ${counts.collectedRepoCount} collected, ${counts.skippedRepoCount} unchanged` + (fromRepoCount > 0 ? ` (incl. ${fromRepoCount} via _from)` : ''));
+	console.log(`  Skills: ${totalSkills} total, ${counts.collectedCount} collected, ${counts.skippedSkillCount} unchanged`);
+	console.log(`  Files:  ${counts.collectedFileCount} collected`);
+	console.log(`  Time:   ${durationSec}s`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -39,6 +39,7 @@ interface RepositoryEntry {
 }
 
 interface CatalogYaml {
+	meta?: Record<string, unknown>;
 	repositories: Record<string, RepositoryEntry>;
 }
 
@@ -56,7 +57,7 @@ let cached: CatalogResult | null = null;
 const PROJECT_ROOT = __PROJECT_ROOT__;
 const DATA_DIR = join(PROJECT_ROOT, 'data');
 const SKILLS_DIR = join(DATA_DIR, 'skills');
-const CATALOG_YAML_PATH = join(DATA_DIR, 'catalog.yaml');
+const SKILLS_YAML_PATH = join(DATA_DIR, 'skills.yaml');
 const CONFIG_DIR = join(PROJECT_ROOT, 'config');
 const GOVERNANCE_PATH = join(CONFIG_DIR, 'governance.yaml');
 const ADMIN_PATH = join(CONFIG_DIR, 'admin.yaml');
@@ -109,9 +110,9 @@ function loadAdmin(): AdminConfig {
 }
 
 function loadCatalogYaml(): CatalogYaml {
-	if (!existsSync(CATALOG_YAML_PATH)) return { repositories: {} };
+	if (!existsSync(SKILLS_YAML_PATH)) return { repositories: {} };
 	try {
-		const raw = yamlLoad(readFileSync(CATALOG_YAML_PATH, 'utf-8')) as CatalogYaml;
+		const raw = yamlLoad(readFileSync(SKILLS_YAML_PATH, 'utf-8')) as CatalogYaml;
 		return raw?.repositories ? raw : { repositories: {} };
 	} catch {
 		return { repositories: {} };
