@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.4.0] - 2026-03-12
 
 ### Added
 - Tab-based view switching (Card / List / Graph)
