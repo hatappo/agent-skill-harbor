@@ -38,7 +38,6 @@ interface SkillEntry {
 	updated_at?: string;
 	registered_at?: string;
 	frontmatter: Record<string, unknown>;
-	files: string[];
 }
 
 interface RepositoryEntry {
@@ -413,7 +412,6 @@ async function collectRepoSkills(
 			updated_at: now,
 			registered_at: existingSkill?.registered_at ?? now,
 			frontmatter: collectedFrontmatter,
-			files: skill.filePaths,
 		};
 	}
 

@@ -28,7 +28,6 @@ interface SkillEntry {
 	updated_at?: string;
 	registered_at?: string;
 	frontmatter: Record<string, unknown>;
-	files: string[];
 }
 
 interface RepositoryEntry {
@@ -119,10 +118,28 @@ function loadCatalogYaml(): CatalogYaml {
 	}
 }
 
-function walkForSkillMd(
+interface SkillFsEntry {
+	frontmatter: Record<string, unknown>;
+	body: string;
+	files: string[];
+}
+
+function collectFilesRecursive(baseDir: string, currentDir: string, results: string[]): void {
+	for (const entry of readdirSync(currentDir)) {
+		const fullPath = join(currentDir, entry);
+		const stat = statSync(fullPath);
+		if (stat.isFile()) {
+			results.push(relative(baseDir, fullPath));
+		} else if (stat.isDirectory()) {
+			collectFilesRecursive(baseDir, fullPath, results);
+		}
+	}
+}
+
+function walkSkillDirs(
 	baseDir: string,
 	currentDir: string,
-	results: Map<string, { frontmatter: Record<string, unknown>; body: string }>,
+	results: Map<string, SkillFsEntry>,
 ): void {
 	for (const entry of readdirSync(currentDir)) {
 		if (entry.startsWith('_')) continue;
@@ -137,12 +154,22 @@ function walkForSkillMd(
 				const parsed = matter(content);
 				const frontmatter: Record<string, unknown> = { ...parsed.data };
 				delete frontmatter._excerpt;
-				results.set(skillPath, { frontmatter, body: parsed.content.trim() });
+
+				// Collect all files in the skill directory
+				const files: string[] = [];
+				if (relDir) {
+					collectFilesRecursive(baseDir, currentDir, files);
+				} else {
+					files.push('SKILL.md');
+				}
+				files.sort();
+
+				results.set(skillPath, { frontmatter, body: parsed.content.trim(), files });
 			} catch {
 				// skip unparseable SKILL.md
 			}
 		} else if (stat.isDirectory()) {
-			walkForSkillMd(baseDir, fullPath, results);
+			walkSkillDirs(baseDir, fullPath, results);
 		}
 	}
 }
@@ -173,9 +200,9 @@ function buildCatalogData(): CatalogResult {
 
 		if (!existsSync(repoDir)) continue;
 
-		// Read all SKILL.md from filesystem
-		const skillMdMap = new Map<string, { frontmatter: Record<string, unknown>; body: string }>();
-		walkForSkillMd(repoDir, repoDir, skillMdMap);
+		// Read all SKILL.md and associated files from filesystem
+		const skillMdMap = new Map<string, SkillFsEntry>();
+		walkSkillDirs(repoDir, repoDir, skillMdMap);
 
 		for (const [skillPath, skillData] of Object.entries(repoEntry.skills)) {
 			const key = `${repoKey}/${skillPath}`;
@@ -200,7 +227,7 @@ function buildCatalogData(): CatalogResult {
 				visibility: repoEntry.visibility as Visibility,
 				isOrgOwned: orgName != null && owner === orgName,
 				frontmatter,
-				files: skillData.files,
+				files: fromFs?.files ?? [],
 				excerpt: body.slice(0, 300),
 				usage_policy: gov?.usage_policy ?? 'none',
 				...(gov?.note ? { note: gov.note } : {}),

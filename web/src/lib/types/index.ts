@@ -11,7 +11,6 @@ export interface CatalogSkillEntry {
 	updated_at?: string;
 	registered_at?: string;
 	frontmatter: Record<string, unknown>;
-	files: string[];
 }
 
 export interface RepositoryEntry {

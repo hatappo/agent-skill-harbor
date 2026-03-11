@@ -14,8 +14,6 @@ repositories:
             user asks to build web components, pages, artifacts, posters, or applications.
           license: Complete terms in LICENSE.txt
           _from: skill-mill/sk-frontend-kit@41456e9c51152090f4c65a8e06438b25fa6a9be2
-        files:
-          - skills/frontend-design/SKILL.md
       skills/mcp-builder/SKILL.md:
         tree_sha: f2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3
         updated_at: '2026-02-20T09:15:00.000Z'
@@ -27,9 +25,6 @@ repositories:
             external services through well-designed tools.
           license: Complete terms in LICENSE.txt
           _from: skill-mill/sk-mcp-toolkit@f563876de3c1b2356695b7f375c475652f3621d6
-        files:
-          - skills/mcp-builder/SKILL.md
-          - skills/mcp-builder/reference/mcp_best_practices.md
       skills/pdf/SKILL.md:
         tree_sha: f3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4
         updated_at: '2026-02-20T09:15:00.000Z'
@@ -39,10 +34,6 @@ repositories:
           description: Use this skill whenever the user wants to do anything with PDF files.
           license: Proprietary. LICENSE.txt has complete terms
           _from: skill-mill/sk-doc-tools@c6a2ea78213a7d0356e93846b73a484acc76b166
-        files:
-          - skills/pdf/SKILL.md
-          - skills/pdf/reference.md
-          - skills/pdf/scripts/convert_pdf_to_images.py
       skills/skill-creator/SKILL.md:
         tree_sha: f4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5
         updated_at: '2026-02-18T11:00:00.000Z'
@@ -54,10 +45,6 @@ repositories:
             update an existing skill) that extends Claude's capabilities.
           license: Complete terms in LICENSE.txt
           _from: skill-mill/sk-onboarding-kit@7196b39e893b5317f303447822e30ee44abfce88
-        files:
-          - skills/skill-creator/SKILL.md
-          - skills/skill-creator/references/output-patterns.md
-          - skills/skill-creator/scripts/quick_validate.py
   github.com/example-org/internal-tools:
     visibility: private
     repo_sha: b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3
@@ -76,8 +63,6 @@ repositories:
             author: platform-team
             version: 1.2.0
           _from: skill-mill/sk-code-quality@d382462ec4e7f587df04c912ab80cfedf6256add
-        files:
-          - skills/legacy-rest-client/SKILL.md
       skills/manual-db-migration/SKILL.md:
         tree_sha: f6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1
         updated_at: '2026-02-22T16:45:00.000Z'
@@ -90,8 +75,6 @@ repositories:
             author: data-team
             version: 0.9.0
           _from: skill-mill/sk-data-pipeline@9d7ac6fdaa1059c8dc3a4778d5c54a09a863e6e2
-        files:
-          - skills/manual-db-migration/SKILL.md
   github.com/hashicorp/agent-skills:
     visibility: public
     repo_sha: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
@@ -106,8 +89,6 @@ repositories:
             Build Amazon Machine Images (AMIs) with Packer using the amazon-ebs builder. Use when creating custom AMIs
             for EC2 instances.
           _from: skill-mill/sk-devops-handbook@ddf642a6cc111a2f427e31b17d75291be71dbe08
-        files:
-          - packer/builders/skills/aws-ami-builder/SKILL.md
       terraform/code-generation/skills/terraform-style-guide/SKILL.md:
         tree_sha: f8b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
         updated_at: '2026-02-24T07:30:00.000Z'
@@ -116,8 +97,6 @@ repositories:
           name: terraform-style-guide
           description: Generate Terraform HCL code following HashiCorp's official style conventions and best practices.
           _from: skill-mill/sk-infra-automation@b9be7d34027ea96c42932b5514caac3830c78681
-        files:
-          - terraform/code-generation/skills/terraform-style-guide/SKILL.md
       terraform/code-generation/skills/terraform-test/SKILL.md:
         tree_sha: f9c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3
         updated_at: '2026-02-24T07:30:00.000Z'
@@ -132,8 +111,6 @@ repositories:
             copyright: Copyright IBM Corp. 2026
             version: 0.0.1
           _from: skill-mill/sk-infra-automation@b9be7d34027ea96c42932b5514caac3830c78681
-        files:
-          - terraform/code-generation/skills/terraform-test/SKILL.md
   github.com/remotion-dev/skills:
     visibility: public
     repo_sha: d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5
@@ -149,10 +126,6 @@ repositories:
           metadata:
             tags: remotion, video, react, animation, composition
           _from: skill-mill/sk-creative-tools@d20608c5fcf813d430a2e8599eac1a2cb0d6ebb4
-        files:
-          - skills/remotion/SKILL.md
-          - skills/remotion/rules/animations.md
-          - skills/remotion/rules/compositions.md
   github.com/wshobson/agents:
     visibility: public
     repo_sha: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
@@ -168,5 +141,3 @@ repositories:
             Design a PostgreSQL-specific schema. Covers best-practices, data types, indexing, constraints, performance
             patterns, and advanced features.
           _from: skill-mill/sk-database-patterns@5cccdc6fca40e9616f7d31d5bd3f4c9c4ad08a90
-        files:
-          - plugins/database-design/skills/postgresql/SKILL.md
