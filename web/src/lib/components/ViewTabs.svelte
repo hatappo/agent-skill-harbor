@@ -8,16 +8,19 @@
 
 	interface Props {
 		activeView: ViewMode;
+		visibleTabs?: ViewMode[];
 		onchange?: (view: ViewMode) => void;
 	}
 
-	let { activeView, onchange }: Props = $props();
+	let { activeView, visibleTabs, onchange }: Props = $props();
 
-	const tabs: { key: ViewMode; icon: 'grid' | 'list' | 'graph' }[] = [
+	const allTabs: { key: ViewMode; icon: 'grid' | 'list' | 'graph' }[] = [
 		{ key: 'card', icon: 'grid' },
 		{ key: 'list', icon: 'list' },
 		{ key: 'graph', icon: 'graph' },
 	];
+
+	let tabs = $derived(visibleTabs ? allTabs.filter((t) => visibleTabs.includes(t.key)) : allTabs);
 
 	function handleTabClick(tab: ViewMode) {
 		if (tab === activeView) return;

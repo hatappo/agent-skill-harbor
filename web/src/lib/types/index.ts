@@ -23,6 +23,18 @@ export interface Catalog {
 	repositories: Record<string, RepositoryEntry>;
 }
 
+export interface RepoInfo {
+	repoKey: string;
+	platform: string;
+	owner: string;
+	repo: string;
+	visibility: Visibility;
+	isOrgOwned: boolean;
+	is_fork: boolean;
+	repo_sha?: string;
+	skillCount: number;
+}
+
 export interface FlatSkillEntry {
 	key: string;
 	repoKey: string;

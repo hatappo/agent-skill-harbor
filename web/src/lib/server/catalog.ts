@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { env } from '$env/dynamic/private';
-import type { FlatSkillEntry, Visibility } from '$lib/types';
+import type { FlatSkillEntry, RepoInfo, Visibility } from '$lib/types';
 
 declare const __PROJECT_ROOT__: string;
 
@@ -47,6 +47,7 @@ interface CatalogResult {
 	repoFullName: string | null;
 	freshPeriodDays: number;
 	skills: FlatSkillEntry[];
+	repos: RepoInfo[];
 	bodyMap: Map<string, string>;
 }
 
@@ -136,11 +137,7 @@ function collectFilesRecursive(baseDir: string, currentDir: string, results: str
 	}
 }
 
-function walkSkillDirs(
-	baseDir: string,
-	currentDir: string,
-	results: Map<string, SkillFsEntry>,
-): void {
+function walkSkillDirs(baseDir: string, currentDir: string, results: Map<string, SkillFsEntry>): void {
 	for (const entry of readdirSync(currentDir)) {
 		if (entry.startsWith('_')) continue;
 		const fullPath = join(currentDir, entry);
@@ -183,11 +180,12 @@ function buildCatalogData(): CatalogResult {
 	const catalogYaml = loadCatalogYaml();
 
 	const skills: FlatSkillEntry[] = [];
+	const repos: RepoInfo[] = [];
 	const bodyMap = new Map<string, string>();
 
 	const platformDir = join(SKILLS_DIR, 'github.com');
 	if (!existsSync(platformDir)) {
-		return { orgName, repoFullName, freshPeriodDays, skills, bodyMap };
+		return { orgName, repoFullName, freshPeriodDays, skills, repos, bodyMap };
 	}
 
 	// Scan SKILL.md files per repo
@@ -197,6 +195,18 @@ function buildCatalogData(): CatalogResult {
 		const owner = parts[1];
 		const repo = parts[2];
 		const repoDir = join(SKILLS_DIR, repoKey);
+
+		repos.push({
+			repoKey,
+			platform,
+			owner,
+			repo,
+			visibility: repoEntry.visibility as Visibility,
+			isOrgOwned: orgName != null && owner === orgName,
+			is_fork: !!repoEntry.fork,
+			...(repoEntry.repo_sha ? { repo_sha: repoEntry.repo_sha } : {}),
+			skillCount: Object.keys(repoEntry.skills).length,
+		});
 
 		if (!existsSync(repoDir)) continue;
 
@@ -256,7 +266,9 @@ function buildCatalogData(): CatalogResult {
 		return nameA.localeCompare(nameB);
 	});
 
-	return { orgName, repoFullName, freshPeriodDays, skills, bodyMap };
+	repos.sort((a, b) => `${a.owner}/${a.repo}`.localeCompare(`${b.owner}/${b.repo}`));
+
+	return { orgName, repoFullName, freshPeriodDays, skills, repos, bodyMap };
 }
 
 export function loadCatalog(): CatalogResult {
