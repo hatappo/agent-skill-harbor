@@ -2,6 +2,7 @@
 	import { browser, dev } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
+	import { onMount } from 'svelte';
 	import SkillList from '$lib/components/SkillList.svelte';
 	import SkillTable from '$lib/components/SkillTable.svelte';
 	import RepoTable from '$lib/components/RepoTable.svelte';
@@ -31,19 +32,17 @@
 	let groupByRepo = $state(false);
 
 	// Read initial state from URL on mount
-	$effect(() => {
-		if (browser) {
-			const params = new URLSearchParams(window.location.search);
-			query = params.get('q') ?? '';
-			filters = {
-				statuses: (params.get('status')?.split(',').filter(Boolean) ?? []) as UsagePolicy[],
-				visibilities: (params.get('visibility')?.split(',').filter(Boolean) ?? []) as Visibility[],
-				orgOwnerships: (params.get('origin')?.split(',').filter(Boolean) ?? []) as OrgOwnership[],
-			};
-			const v = params.get('view');
-			view = v === 'list' ? 'list' : 'card';
-			groupByRepo = params.get('group') === 'repo';
-		}
+	onMount(() => {
+		const params = new URLSearchParams(window.location.search);
+		query = params.get('q') ?? '';
+		filters = {
+			statuses: (params.get('status')?.split(',').filter(Boolean) ?? []) as UsagePolicy[],
+			visibilities: (params.get('visibility')?.split(',').filter(Boolean) ?? []) as Visibility[],
+			orgOwnerships: (params.get('origin')?.split(',').filter(Boolean) ?? []) as OrgOwnership[],
+		};
+		const v = params.get('view');
+		view = v === 'list' ? 'list' : 'card';
+		groupByRepo = view === 'list' ? params.get('group') !== 'flat' : false;
 	});
 
 	// Compute displayed skills
@@ -74,7 +73,7 @@
 		if (newFilters.visibilities.length) params.set('visibility', newFilters.visibilities.join(','));
 		if (newFilters.orgOwnerships.length) params.set('origin', newFilters.orgOwnerships.join(','));
 		if (newView === 'list') params.set('view', 'list');
-		if (newGroupByRepo) params.set('group', 'repo');
+		if (newView === 'list' && !newGroupByRepo) params.set('group', 'flat');
 		const search = params.toString();
 		const pathname = window.location.pathname;
 		goto(`${pathname}${search ? '?' + search : ''}`, { replaceState: true, keepFocus: true, noScroll: true });
@@ -93,7 +92,7 @@
 	function handleViewChange(newView: ViewMode) {
 		if (newView === 'graph') return;
 		view = newView;
-		const newGroupByRepo = newView === 'card' ? false : groupByRepo;
+		const newGroupByRepo = newView === 'card' ? false : true;
 		groupByRepo = newGroupByRepo;
 		updateUrl(query, filters, newView, newGroupByRepo);
 	}
@@ -119,7 +118,7 @@
 	<div class="mb-6 flex items-center justify-between">
 		<ViewTabs activeView={view} onchange={handleViewChange} />
 		<div class="flex items-center gap-2">
-			<span class="text-sm font-medium text-gray-700 dark:text-gray-300">{$t('grouping.label')}</span>
+			<span class="text-sm font-medium {view === 'card' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-700 dark:text-gray-300'}">{$t('grouping.label')}</span>
 			<button
 				onclick={toggleGroupByRepo}
 				disabled={view === 'card'}
