@@ -157,7 +157,7 @@
 									<td class="px-4 py-2">
 										<div class="flex items-center gap-1.5 pl-4">
 											<a
-												href="{base}/skills/{skill.key}/"
+												href="{base}/skills/{skill.key}"
 												class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
 												onclick={(e) => e.stopPropagation()}
 											>

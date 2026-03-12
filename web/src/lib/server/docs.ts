@@ -76,11 +76,17 @@ function resolveDocPath(slug: string, locale: string): string | null {
 	return existsSync(fallback) ? fallback : null;
 }
 
-function stripReadmePreamble(content: string): string {
+function stripPreamble(content: string): string {
 	// Strip language switcher line (e.g. `<p align="center"><a ...>en</a> | ...</p>`)
 	content = content.replace(/^<p[^>]*>.*?<\/p>\s*\n*/s, '');
 	// Strip the first `# heading` line — title is rendered separately
 	return content.replace(/^#\s+.+\n+/, '');
+}
+
+/** Rewrite relative doc links (e.g. `docs/01-foo.md`) to app routes (`/docs/01-foo`). */
+function rewriteDocLinks(content: string): string {
+	// Matches: (docs/slug.md) or (docs/slug_ja.md)
+	return content.replace(/\(docs\/([^)]+?)(?:_[a-z]{2})?\.md\)/g, '(/docs/$1)');
 }
 
 /**
@@ -91,6 +97,8 @@ export function loadDocContent(slug: string, locale: string): string | null {
 	const filePath = resolveDocPath(slug, locale);
 	if (!filePath) return null;
 
-	const content = readFileSync(filePath, 'utf-8');
-	return stripReadmePreamble(content);
+	let content = readFileSync(filePath, 'utf-8');
+	content = stripPreamble(content);
+	content = rewriteDocLinks(content);
+	return content;
 }

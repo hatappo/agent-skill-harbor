@@ -16,9 +16,9 @@
 	let repoName = $derived(repoFullName?.split('/')[1] ?? null);
 
 	const navItems = [
-		{ href: '/skills/', label: 'header.catalog', match: '/skills/' },
-		{ href: '/config/', label: 'header.config', match: '/config/' },
-		{ href: '/docs/', label: 'docs.nav', match: '/docs/' },
+		{ href: '/skills', label: 'header.catalog', match: '/skills' },
+		{ href: '/config', label: 'header.config', match: '/config' },
+		{ href: '/docs', label: 'docs.nav', match: '/docs' },
 	] as const;
 
 	function isActive(path: string, match: string): boolean {
@@ -29,7 +29,7 @@
 
 <header class="border-b border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900">
 	<div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-		<a href="{base}/skills/" class="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100">
+		<a href="{base}/skills" class="flex items-center gap-2 text-xl font-bold text-gray-900 dark:text-gray-100">
 			{#if dev}<span class="text-orange-500">(Dev)</span>{/if}
 			{$t('header.title')}
 		</a>

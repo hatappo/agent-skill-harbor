@@ -109,7 +109,7 @@
 
 	let skillDetailPath = $derived.by(() => {
 		if (!selectedAttrs || selectedAttrs.nodeType !== 'skill') return null;
-		return `${base}/skills/${(selectedAttrs as SkillNodeAttrs).skillKey}/`;
+		return `${base}/skills/${(selectedAttrs as SkillNodeAttrs).skillKey}`;
 	});
 
 	let repoUrl = $derived.by(() => {
@@ -380,7 +380,7 @@
 								{#each relatedSkills as skill}
 									<li>
 										<a
-											href="{base}/skills/{skill.key}/"
+											href="{base}/skills/{skill.key}"
 											class="text-blue-600 hover:text-blue-800 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
 										>
 											{skill.frontmatter.name ?? skill.repo}

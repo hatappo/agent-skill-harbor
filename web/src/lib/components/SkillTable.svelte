@@ -133,7 +133,7 @@
 						<td class="max-w-[20rem] px-4 py-3">
 							<div class="flex items-center gap-1.5">
 								<a
-									href="{base}/skills/{skill.key}/"
+									href="{base}/skills/{skill.key}"
 									class="truncate font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
 									title={skillName}
 								>

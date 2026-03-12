@@ -131,7 +131,7 @@
 									<div class="flex items-center gap-1.5 pl-4">
 										{#if row.origin}
 											<a
-												href="{base}/skills/{row.origin.key}/"
+												href="{base}/skills/{row.origin.key}"
 												class="text-sm font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
 											>
 												{row.skillName}
@@ -165,7 +165,7 @@
 										<div class="flex items-center gap-1.5 pl-10">
 											<span class="text-gray-300 dark:text-gray-600">&#x2514;</span>
 											<a
-												href="{base}/skills/{derivative.key}/"
+												href="{base}/skills/{derivative.key}"
 												class="text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
 											>
 												{derivative.owner}/{derivative.repo}

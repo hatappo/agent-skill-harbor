@@ -31,7 +31,7 @@
 </script>
 
 <a
-	href="{base}/skills/{skill.key}/"
+	href="{base}/skills/{skill.key}"
 	class="block rounded-lg border border-l-4 border-gray-200 bg-white p-5 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900 dark:shadow-gray-900/50 dark:hover:shadow-gray-900/80 {skill.isOrgOwned
 		? 'border-l-blue-500 dark:border-l-blue-400'
 		: 'border-l-transparent'}"

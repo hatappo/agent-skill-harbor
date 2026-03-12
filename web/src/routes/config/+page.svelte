@@ -275,7 +275,7 @@
 								<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
 									<td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
 										<a
-											href="{base}/skills/{skillPath}/"
+											href="{base}/skills/{skillPath}"
 											class="hover:text-blue-600 hover:underline dark:hover:text-blue-400"
 										>
 											{shortSkillPath(skillPath)}
