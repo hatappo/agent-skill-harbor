@@ -2,7 +2,7 @@ name: CollectSkills
 
 on:
   # schedule:
-  #   - cron: '0 */6 * * *'
+  #   - cron: '0 12 * * 0'  # Weekly Sun 12:00 UTC / 21:00 JST / 07:00 EST / 04:00 PST / 13:00 CET
   workflow_dispatch:
 
 permissions:
