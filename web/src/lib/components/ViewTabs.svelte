@@ -43,7 +43,10 @@
 		}
 
 		if (tab === 'graph') {
-			goto(`${base}/graph/`);
+			const params = new URLSearchParams();
+			if (owner && owner !== 'all') params.set('owner', owner);
+			const search = params.toString();
+			goto(`${base}/graph/${search ? '?' + search : ''}`);
 			return;
 		}
 

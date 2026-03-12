@@ -356,6 +356,30 @@
 		});
 		resizeObserver.observe(container);
 
+		// Customize forces to avoid "dandelion" clustering on high-degree repo nodes
+		const linkForce = graph3d.d3Force('link');
+		if (linkForce) {
+			// Scale link distance by the degree of the connected repo node
+			// eslint-disable-next-line svelte/prefer-svelte-reactivity -- local to onMount, not reactive
+			const degreeCounts = new Map<string, number>();
+			for (const link of data.links) {
+				degreeCounts.set(link.target, (degreeCounts.get(link.target) ?? 0) + 1);
+				degreeCounts.set(link.source, (degreeCounts.get(link.source) ?? 0) + 1);
+			}
+			linkForce.distance((link: any) => {
+				const srcId = typeof link.source === 'object' ? link.source.id : link.source;
+				const tgtId = typeof link.target === 'object' ? link.target.id : link.target;
+				const maxDegree = Math.max(degreeCounts.get(srcId) ?? 1, degreeCounts.get(tgtId) ?? 1);
+				// Base 30, scale up with sqrt of degree for high-degree nodes
+				return 30 + Math.sqrt(maxDegree) * 12;
+			});
+		}
+
+		const chargeForce = graph3d.d3Force('charge');
+		if (chargeForce) {
+			chargeForce.strength(-80).distanceMax(300);
+		}
+
 		const controls = graph3d.controls();
 		controls.autoRotate = false;
 		controls.enableDamping = true;

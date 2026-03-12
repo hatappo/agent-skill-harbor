@@ -4,7 +4,9 @@
 	import { goto } from '$app/navigation';
 	import { base } from '$app/paths';
 	import GovernanceBadge from '$lib/components/GovernanceBadge.svelte';
+	import * as Select from '$lib/components/ui/select';
 	import ViewTabs from '$lib/components/ViewTabs.svelte';
+	import { t } from '$lib/i18n';
 	import type { FlatSkillEntry, UsagePolicy } from '$lib/types';
 	import type { GraphNodeAttrs, SkillNodeAttrs, RepoNodeAttrs } from '$lib/utils/graph';
 
@@ -15,6 +17,7 @@
 	let { data }: Props = $props();
 
 	let searchQuery = $state('');
+	let ownerFilterValue = $state('__all__');
 	let graphRef:
 		| { zoomIn: () => void; zoomOut: () => void; zoomReset: () => void; getCanvasDataURL: () => string | null }
 		| undefined = $state();
@@ -23,14 +26,31 @@
 		if (!browser) return;
 		const params = new URLSearchParams(window.location.search);
 		searchQuery = params.get('q') ?? '';
+		const owner = params.get('owner');
+		if (owner === 'org') ownerFilterValue = 'org';
+		else if (owner === 'community') ownerFilterValue = 'community';
+		else ownerFilterValue = '__all__';
+	});
+
+	let ownerFilter = $derived(ownerFilterValue !== '__all__' ? ownerFilterValue : null);
+
+	let filteredSkills = $derived.by(() => {
+		if (!ownerFilter) return data.skills;
+		return data.skills.filter((s) => (ownerFilter === 'org' ? s.isOrgOwned : !s.isOrgOwned));
 	});
 
 	function updateUrl(newQuery: string) {
 		if (!browser) return;
 		const params = new URLSearchParams();
 		if (newQuery) params.set('q', newQuery);
+		if (ownerFilterValue !== '__all__') params.set('owner', ownerFilterValue);
 		const search = params.toString();
 		goto(`${base}/graph/${search ? `?${search}` : ''}`, { replaceState: true, keepFocus: true, noScroll: true });
+	}
+
+	function onOwnerFilterChange(value: string | undefined) {
+		ownerFilterValue = value ?? '__all__';
+		updateUrl(searchQuery);
 	}
 
 	function handlePrint() {
@@ -125,48 +145,65 @@
 	<div class="relative min-h-0 flex-1 bg-gray-50 dark:bg-gray-950">
 		{#if browser}
 			{#await import('$lib/components/SkillGraph.svelte') then module}
-				<module.default bind:this={graphRef} skills={data.skills} {searchQuery} onNodeSelect={handleNodeSelect} />
+				<module.default bind:this={graphRef} skills={filteredSkills} {searchQuery} onNodeSelect={handleNodeSelect} />
 			{/await}
 		{/if}
 
 		<!-- Top bar overlay -->
 		<div class="pointer-events-none absolute left-3 right-3 top-3 z-10 flex items-start justify-between">
-			<!-- Search (left) -->
-			<div class="pointer-events-auto relative">
-				<svg
-					class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
-					viewBox="0 0 20 20"
-					fill="currentColor"
-				>
-					<path
-						fill-rule="evenodd"
-						d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-						clip-rule="evenodd"
-					/>
-				</svg>
-				<input
-					type="text"
-					bind:value={searchQuery}
-					oninput={() => updateUrl(searchQuery)}
-					placeholder="Search nodes..."
-					class="w-56 rounded-lg border border-gray-200 bg-white/80 py-1.5 pl-8 pr-8 text-sm text-gray-900 shadow-sm backdrop-blur-sm placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-blue-500 dark:focus:ring-blue-500"
-				/>
-				{#if searchQuery}
-					<button
-						onclick={() => {
-							searchQuery = '';
-							updateUrl('');
-						}}
-						class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-						aria-label="Clear search"
+			<!-- Search + Filter (left) -->
+			<div class="pointer-events-auto flex items-center gap-2">
+				<div class="relative">
+					<svg
+						class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+						viewBox="0 0 20 20"
+						fill="currentColor"
 					>
-						<svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
-							<path
-								d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
-							/>
-						</svg>
-					</button>
-				{/if}
+						<path
+							fill-rule="evenodd"
+							d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
+							clip-rule="evenodd"
+						/>
+					</svg>
+					<input
+						type="text"
+						bind:value={searchQuery}
+						oninput={() => updateUrl(searchQuery)}
+						placeholder="Search nodes..."
+						class="w-56 rounded-lg border border-gray-200 bg-white/80 py-1.5 pl-8 pr-8 text-sm text-gray-900 shadow-sm backdrop-blur-sm placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+					/>
+					{#if searchQuery}
+						<button
+							onclick={() => {
+								searchQuery = '';
+								updateUrl('');
+							}}
+							class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
+							aria-label="Clear search"
+						>
+							<svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+								<path
+									d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
+								/>
+							</svg>
+						</button>
+					{/if}
+				</div>
+				<Select.Root type="single" value={ownerFilterValue} onValueChange={onOwnerFilterChange}>
+					<Select.Trigger
+						size="sm"
+						class="h-8 rounded-lg border px-3 py-1.5 text-xs font-medium shadow-sm backdrop-blur-sm {ownerFilter
+							? 'border-blue-300 bg-blue-100/90 text-blue-800 dark:border-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
+							: 'border-gray-200 bg-white/80 text-gray-600 dark:border-gray-700 dark:bg-gray-900/80 dark:text-gray-400'}"
+					>
+						{ownerFilter ? $t(`common.orgOwnership.${ownerFilter}`) : $t('filter.allOwner')}
+					</Select.Trigger>
+					<Select.Content>
+						<Select.Item value="__all__" label={$t('filter.all')} />
+						<Select.Item value="org" label={$t('common.orgOwnership.org')} />
+						<Select.Item value="community" label={$t('common.orgOwnership.community')} />
+					</Select.Content>
+				</Select.Root>
 			</div>
 
 			<!-- Tabs (center) -->
