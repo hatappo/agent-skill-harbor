@@ -23,16 +23,12 @@
 
 	// Filters
 	let ownerFilterValue = $state('__all__');
-	let visibilityFilterValue = $state('__all__');
-
 	onMount(() => {
 		const params = new URLSearchParams(window.location.search);
 		const owner = params.get('owner');
 		if (owner === 'org') ownerFilterValue = 'org';
 		else if (owner === 'community') ownerFilterValue = 'community';
 		else ownerFilterValue = '__all__';
-		const vis = params.get('visibility');
-		if (vis === 'public' || vis === 'private' || vis === 'internal') visibilityFilterValue = vis;
 	});
 
 	function updateUrl() {
@@ -40,7 +36,6 @@
 		const params = new URLSearchParams();
 		if (ownerFilterValue === 'org') params.set('owner', 'org');
 		else if (ownerFilterValue === 'community') params.set('owner', 'community');
-		if (visibilityFilterValue !== '__all__') params.set('visibility', visibilityFilterValue);
 		const search = params.toString();
 		const pathname = window.location.pathname;
 		goto(`${pathname}${search ? '?' + search : ''}`, { replaceState: true, keepFocus: true, noScroll: true });
@@ -51,36 +46,17 @@
 		updateUrl();
 	}
 
-	function onVisibilityFilterChange(value: string | undefined) {
-		visibilityFilterValue = value ?? '__all__';
-		updateUrl();
-	}
-
 	let ownerFilter = $derived(ownerFilterValue !== '__all__' ? ownerFilterValue : null);
-	let visibilityFilter = $derived(visibilityFilterValue !== '__all__' ? visibilityFilterValue : null);
-	let isFiltered = $derived(ownerFilter !== null || visibilityFilter !== null);
 
 	// Filtered data
 	let filteredSkills = $derived.by(() => {
-		let result = data.skills;
-		if (ownerFilter) {
-			result = result.filter((s) => (ownerFilter === 'org' ? s.isOrgOwned : !s.isOrgOwned));
-		}
-		if (visibilityFilter) {
-			result = result.filter((s) => s.visibility === visibilityFilter);
-		}
-		return result;
+		if (!ownerFilter) return data.skills;
+		return data.skills.filter((s) => (ownerFilter === 'org' ? s.isOrgOwned : !s.isOrgOwned));
 	});
 
 	let filteredRepos = $derived.by(() => {
-		let result = data.repos;
-		if (ownerFilter) {
-			result = result.filter((r) => (ownerFilter === 'org' ? r.isOrgOwned : !r.isOrgOwned));
-		}
-		if (visibilityFilter) {
-			result = result.filter((r) => r.visibility === visibilityFilter);
-		}
-		return result;
+		if (!ownerFilter) return data.repos;
+		return data.repos.filter((r) => (ownerFilter === 'org' ? r.isOrgOwned : !r.isOrgOwned));
 	});
 
 	let latest = $derived(data.collections[0] ?? null);
@@ -89,27 +65,52 @@
 	// KPI values
 	let totalSkills = $derived(filteredSkills.length);
 	let totalRepos = $derived(filteredRepos.length);
-	let totalFiles = $derived(!isFiltered ? (latest?.files.collected ?? 0) : filteredSkills.reduce((sum, s) => sum + s.files.length, 0));
+	let totalFiles = $derived.by(() => {
+		if (!latest) return 0;
+		if (ownerFilter === 'org') return latest.statistics.org.files;
+		if (ownerFilter === 'community') return latest.statistics.community.files;
+		return latest.statistics.org.files + latest.statistics.community.files;
+	});
 	let reposWithSkills = $derived(filteredRepos.filter((r) => r.skillCount > 0).length);
-	let skillChange = $derived(!isFiltered && previous ? totalSkills - previous.skills.total : undefined);
-	let repoChange = $derived(!isFiltered && previous ? totalRepos - previous.repos.total : undefined);
+	let skillChange = $derived.by(() => {
+		if (!previous) return undefined;
+		const prevSkills =
+			ownerFilter === 'org'
+				? previous.statistics.org.skills
+				: ownerFilter === 'community'
+					? previous.statistics.community.skills
+					: previous.statistics.org.skills + previous.statistics.community.skills;
+		return totalSkills - prevSkills;
+	});
+	let repoChange = $derived.by(() => {
+		if (!previous) return undefined;
+		const prevRepos =
+			ownerFilter === 'org'
+				? previous.statistics.org.repos
+				: ownerFilter === 'community'
+					? previous.statistics.community.repos
+					: previous.statistics.org.repos + previous.statistics.community.repos;
+		return totalRepos - prevRepos;
+	});
 
 	let lastCollectedFormatted = $derived.by(() => {
 		if (!latest) return '—';
-		const d = new Date(latest.collected_at);
+		const d = new Date(latest.collecting.collected_at);
 		return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
 	});
 
-	// Trend chart data (oldest first) — only shown when unfiltered
+	// Trend chart data (oldest first)
 	let trendData = $derived.by(() => {
-		if (isFiltered) return [];
 		const reversed = [...data.collections].reverse();
 		return reversed.map((c) => {
-			const d = new Date(c.collected_at);
-			return {
-				label: `${d.getMonth() + 1}/${d.getDate()}`,
-				value: c.skills.total,
-			};
+			const d = new Date(c.collecting.collected_at);
+			const value =
+				ownerFilter === 'org'
+					? c.statistics.org.skills
+					: ownerFilter === 'community'
+						? c.statistics.community.skills
+						: c.statistics.org.skills + c.statistics.community.skills;
+			return { label: `${d.getMonth() + 1}/${d.getDate()}`, value };
 		});
 	});
 
@@ -186,25 +187,6 @@
 			</Select.Content>
 		</Select.Root>
 
-		<!-- Visibility select -->
-		<Select.Root type="single" value={visibilityFilterValue} onValueChange={onVisibilityFilterChange}>
-			<Select.Trigger
-				size="sm"
-				class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {visibilityFilter
-					? 'border-indigo-300 bg-indigo-100 text-indigo-800 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'
-					: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
-			>
-				{visibilityFilter
-					? $t(`common.visibility.${visibilityFilter}`)
-					: $t('filter.allVisibility')}
-			</Select.Trigger>
-			<Select.Content>
-				<Select.Item value="__all__" label={$t('filter.all')} />
-				<Select.Item value="public" label={$t('common.visibility.public')} />
-				<Select.Item value="private" label={$t('common.visibility.private')} />
-				<Select.Item value="internal" label={$t('common.visibility.internal')} />
-			</Select.Content>
-		</Select.Root>
 	</div>
 
 	<!-- KPI Cards -->
@@ -312,14 +294,14 @@
 								{$t('stats.date')}
 							</th>
 							<th
-								class="hidden px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:table-cell"
-							>
-								{$t('stats.repos')}
-							</th>
-							<th
 								class="px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
 							>
 								{$t('stats.skills')}
+							</th>
+							<th
+								class="hidden px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 sm:table-cell"
+							>
+								{$t('stats.repos')}
 							</th>
 							<th
 								class="hidden px-5 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 md:table-cell"
@@ -334,21 +316,18 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
-						{#each displayedHistory as entry, i (entry.collected_at)}
+						{#each displayedHistory as entry, i (entry.collecting.collected_at)}
 							{@const prev = data.collections[i + 1]}
-							{@const skillDiff = prev ? entry.skills.total - prev.skills.total : 0}
+							{@const s = ownerFilter === 'org' ? entry.statistics.org : ownerFilter === 'community' ? entry.statistics.community : { repos: entry.statistics.org.repos + entry.statistics.community.repos, skills: entry.statistics.org.skills + entry.statistics.community.skills, files: entry.statistics.org.files + entry.statistics.community.files }}
+							{@const ps = prev ? (ownerFilter === 'org' ? prev.statistics.org : ownerFilter === 'community' ? prev.statistics.community : { skills: prev.statistics.org.skills + prev.statistics.community.skills }) : null}
+							{@const skillDiff = ps ? s.skills - ps.skills : 0}
 							<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
 								<td class="whitespace-nowrap px-5 py-3 text-sm text-gray-900 dark:text-gray-100">
-									{formatDate(entry.collected_at)}
-								</td>
-								<td
-									class="hidden whitespace-nowrap px-5 py-3 text-right tabular-nums text-sm text-gray-500 dark:text-gray-400 sm:table-cell"
-								>
-									{entry.repos.total}
+									{formatDate(entry.collecting.collected_at)}
 								</td>
 								<td class="whitespace-nowrap px-5 py-3 text-right text-sm">
 									<span class="tabular-nums font-medium text-gray-900 dark:text-gray-100">
-										{entry.skills.total}
+										{s.skills}
 									</span>
 									{#if skillDiff !== 0}
 										<span
@@ -361,14 +340,19 @@
 									{/if}
 								</td>
 								<td
-									class="hidden whitespace-nowrap px-5 py-3 text-right tabular-nums text-sm text-gray-500 dark:text-gray-400 md:table-cell"
+									class="hidden whitespace-nowrap px-5 py-3 text-right tabular-nums text-sm text-gray-500 dark:text-gray-400 sm:table-cell"
 								>
-									{entry.files.collected}
+									{s.repos}
 								</td>
 								<td
 									class="hidden whitespace-nowrap px-5 py-3 text-right tabular-nums text-sm text-gray-500 dark:text-gray-400 md:table-cell"
 								>
-									{entry.duration_sec}s
+									{s.files}
+								</td>
+								<td
+									class="hidden whitespace-nowrap px-5 py-3 text-right tabular-nums text-sm text-gray-500 dark:text-gray-400 md:table-cell"
+								>
+									{entry.collecting.duration_sec}s
 								</td>
 							</tr>
 						{/each}

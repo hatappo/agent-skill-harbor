@@ -35,12 +35,21 @@ export interface RepoInfo {
 	skillCount: number;
 }
 
+export interface CategoryStats {
+	repos: number;
+	skills: number;
+	files: number;
+}
+
 export interface CollectionEntry {
-	collected_at: string;
-	duration_sec: number;
-	repos: { total: number; collected: number; unchanged: number; from: number; extra?: number };
-	skills: { total: number; collected: number; unchanged: number };
-	files: { collected: number };
+	collecting: {
+		collected_at: string;
+		duration_sec: number;
+	};
+	statistics: {
+		org: CategoryStats;
+		community: CategoryStats;
+	};
 }
 
 export interface FlatSkillEntry {

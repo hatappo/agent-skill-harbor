@@ -1,7 +1,7 @@
 import { Octokit } from '@octokit/rest';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { execSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -50,12 +50,21 @@ interface RepositoryEntry {
 	skills: Record<string, SkillEntry>;
 }
 
+interface CategoryStats {
+	repos: number;
+	skills: number;
+	files: number;
+}
+
 interface CollectMeta {
-	collected_at: string;
-	duration_sec: number;
-	repos: { total: number; collected: number; unchanged: number; from: number; extra: number };
-	skills: { total: number; collected: number; unchanged: number };
-	files: { collected: number };
+	collecting: {
+		collected_at: string;
+		duration_sec: number;
+	};
+	statistics: {
+		org: CategoryStats;
+		community: CategoryStats;
+	};
 }
 
 interface CatalogYaml {
@@ -110,6 +119,38 @@ function saveCatalog(catalog: CatalogYaml & { meta?: unknown }): void {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	const { meta: _meta, ...rest } = catalog;
 	writeFileSync(SKILLS_YAML_PATH, yamlDump(rest, { lineWidth: 120, noRefs: true }));
+}
+
+function countFilesRecursive(dir: string): number {
+	let count = 0;
+	for (const entry of readdirSync(dir)) {
+		const fullPath = join(dir, entry);
+		const stat = statSync(fullPath);
+		if (stat.isFile()) count++;
+		else if (stat.isDirectory()) count += countFilesRecursive(fullPath);
+	}
+	return count;
+}
+
+function computeStatistics(
+	catalog: CatalogYaml,
+	org: string,
+): { org: CategoryStats; community: CategoryStats } {
+	const stats = {
+		org: { repos: 0, skills: 0, files: 0 },
+		community: { repos: 0, skills: 0, files: 0 },
+	};
+	for (const [repoKey, repoEntry] of Object.entries(catalog.repositories)) {
+		const owner = repoKey.split('/')[1];
+		const category = owner === org ? 'org' : 'community';
+		stats[category].repos++;
+		stats[category].skills += Object.keys(repoEntry.skills).length;
+		const repoDir = join(SKILLS_DIR, repoKey);
+		if (existsSync(repoDir)) {
+			stats[category].files += countFilesRecursive(repoDir);
+		}
+	}
+	return stats;
 }
 
 function loadCollectHistory(): CollectMeta[] {
@@ -662,20 +703,16 @@ export async function runCollectOrgSkills(): Promise<void> {
 	const totalRepos = repos.length + extraRepoCount + fromRepoCount;
 	const totalSkills = counts.collectedCount + counts.skippedSkillCount;
 
-	const historyEntry: CollectMeta = {
-		collected_at: new Date().toISOString(),
-		duration_sec: durationSec,
-		repos: {
-			total: totalRepos,
-			collected: counts.collectedRepoCount,
-			unchanged: counts.skippedRepoCount,
-			from: fromRepoCount,
-			extra: extraRepoCount,
-		},
-		skills: { total: totalSkills, collected: counts.collectedCount, unchanged: counts.skippedSkillCount },
-		files: { collected: counts.collectedFileCount },
-	};
 	saveCatalog(catalog);
+
+	const statistics = computeStatistics(catalog, org);
+	const historyEntry: CollectMeta = {
+		collecting: {
+			collected_at: new Date().toISOString(),
+			duration_sec: durationSec,
+		},
+		statistics,
+	};
 	const historyLimit = settings.collector?.history_limit ?? 50;
 	saveCollectHistory(historyEntry, historyLimit);
 
@@ -690,6 +727,14 @@ export async function runCollectOrgSkills(): Promise<void> {
 	);
 	console.log(`  Files:  ${counts.collectedFileCount} collected`);
 	console.log(`  Time:   ${durationSec}s`);
+
+	console.log(`\n--- Statistics ---`);
+	console.log(
+		`  Org:       ${statistics.org.repos} repos, ${statistics.org.skills} skills, ${statistics.org.files} files`,
+	);
+	console.log(
+		`  Community: ${statistics.community.repos} repos, ${statistics.community.skills} skills, ${statistics.community.files} files`,
+	);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

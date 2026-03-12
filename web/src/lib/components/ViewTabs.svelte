@@ -14,9 +14,9 @@
 	let { activeView, onchange }: Props = $props();
 
 	const tabs: { key: ViewMode; icon: 'grid' | 'list' | 'graph' | 'stats' }[] = [
+		{ key: 'stats', icon: 'stats' },
 		{ key: 'card', icon: 'grid' },
 		{ key: 'list', icon: 'list' },
-		{ key: 'stats', icon: 'stats' },
 		{ key: 'graph', icon: 'graph' },
 	];
 
@@ -37,7 +37,6 @@
 		if (tab === 'stats') {
 			const params = new URLSearchParams();
 			if (owner && owner !== 'all') params.set('owner', owner);
-			if (visibility) params.set('visibility', visibility);
 			const search = params.toString();
 			goto(`${base}/stats/${search ? '?' + search : ''}`);
 			return;
