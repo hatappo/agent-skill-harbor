@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.7.0] - 2026-03-12
+
+### Added
+
+- "By Origin" grouping in List view — resolves true origin by recursively following `_from` chains
+- Origin table with tree-structured display (origin skill + derivative copies)
+- `originTable` i18n keys (EN/JA)
+
+### Changed
+
+- Grouping toggle refactored from single boolean to exclusive mode (`repo` / `origin` / flat)
+- Collect cron schedule changed from every 6 hours to weekly (Sunday 12:00 UTC)
+- Japanese `repoTable.skills` label changed to "スキル数"
+- `prepack` script added to auto-build CLI before publish/pack
+
 ## [0.6.0] - 2026-03-12
 
 ### Added

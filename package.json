@@ -1,8 +1,19 @@
 {
 	"name": "agent-skill-harbor",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"type": "module",
 	"description": "Skill governance for companies. Skill discovery for teams.",
+	"keywords": [
+		"agent",
+		"skill",
+		"agent-skills",
+		"skill-management",
+		"governance",
+		"claude",
+		"skill-md",
+		"github",
+		"cli"
+	],
 	"license": "MIT",
 	"packageManager": "pnpm@10.30.2",
 	"engines": {
