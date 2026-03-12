@@ -17,6 +17,7 @@
 
 	let chartWidth = $state(600);
 	let containerEl: HTMLDivElement | undefined = $state();
+	let hoveredIndex: number | null = $state(null);
 
 	$effect(() => {
 		if (!containerEl) return;
@@ -96,7 +97,7 @@
 	});
 </script>
 
-<div bind:this={containerEl} class="w-full">
+<div bind:this={containerEl} class="relative w-full">
 	{#if computed && data.length > 1}
 		<svg width={chartWidth} {height} class="overflow-visible">
 			<!-- Y-axis grid lines -->
@@ -156,7 +157,7 @@
 					stroke-dasharray="6 3"
 				/>
 				{#each computed.secondary.points as point}
-					<circle cx={point.x} cy={point.y} r="3" class="fill-amber-500 dark:fill-amber-400" />
+					<circle cx={point.x} cy={point.y} r="3" class="fill-white stroke-amber-500 dark:fill-gray-900 dark:stroke-amber-400" stroke-width="1.5" />
 				{/each}
 			{/if}
 
@@ -171,7 +172,64 @@
 					{point.label}
 				</text>
 			{/each}
+
+			<!-- Hover guide line -->
+			{#if hoveredIndex != null}
+				{@const hp = computed.points[hoveredIndex]}
+				<line
+					x1={hp.x}
+					y1={padding.top}
+					x2={hp.x}
+					y2={padding.top + computed.innerHeight}
+					class="stroke-gray-300 dark:stroke-gray-600"
+					stroke-width="1"
+					stroke-dasharray="4 2"
+				/>
+				<!-- Highlighted primary point -->
+				<circle cx={hp.x} cy={hp.y} r="5" class="fill-blue-500 dark:fill-blue-400" opacity="0.8" />
+				{#if computed.secondary}
+					{@const sp = computed.secondary.points[hoveredIndex]}
+					<circle cx={sp.x} cy={sp.y} r="5" class="fill-white stroke-amber-500 dark:fill-gray-900 dark:stroke-amber-400" stroke-width="2" />
+				{/if}
+			{/if}
+
+			<!-- Invisible hit areas -->
+			{#each computed.points as point, i}
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<circle
+					cx={point.x}
+					cy={height / 2}
+					r={Math.max(12, chartWidth / data.length / 2)}
+					fill="transparent"
+					onpointerenter={() => (hoveredIndex = i)}
+					onpointerleave={() => (hoveredIndex = null)}
+				/>
+			{/each}
 		</svg>
+
+		<!-- HTML Tooltip -->
+		{#if hoveredIndex != null && computed}
+			{@const hp = computed.points[hoveredIndex]}
+			{@const tooltipLeft = hp.x}
+			{@const tooltipOnRight = tooltipLeft < chartWidth / 2}
+			<div
+				class="pointer-events-none absolute z-10 rounded border border-gray-200 bg-white px-2.5 py-1.5 text-xs shadow-md dark:border-gray-600 dark:bg-gray-800"
+				style="top: {padding.top - 4}px; {tooltipOnRight ? `left: ${tooltipLeft + 12}px` : `right: ${chartWidth - tooltipLeft + 12}px`};"
+			>
+				<div class="mb-1 font-medium text-gray-600 dark:text-gray-300">{hp.label}</div>
+				<div class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+					<span class="inline-block h-2 w-2 rounded-full bg-blue-500"></span>
+					{hp.value}
+				</div>
+				{#if computed.secondary}
+					{@const sp = computed.secondary.points[hoveredIndex]}
+					<div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400">
+						<span class="inline-block h-2 w-2 rounded-full border border-amber-500 bg-white dark:bg-gray-800"></span>
+						{sp.value}{secondaryLabel}
+					</div>
+				{/if}
+			</div>
+		{/if}
 	{:else if data.length === 1}
 		<div class="flex items-center justify-center" style="height: {height}px">
 			<span class="text-3xl font-semibold tabular-nums text-gray-900 dark:text-gray-100">{data[0].value}</span>
