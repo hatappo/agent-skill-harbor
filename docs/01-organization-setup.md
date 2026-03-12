@@ -98,6 +98,30 @@ Use the Claude Code slash command to add public skills:
 /manage-skill add owner/repo
 ```
 
+## Deploying to Cloudflare Pages (Alternative)
+
+Instead of GitHub Pages, you can deploy to Cloudflare Pages. This is useful when you need Basic Auth without GitHub Enterprise Cloud.
+
+### 1. Configure Secrets
+
+Add the following secrets to your GitHub repository (**Settings > Secrets and variables > Actions**):
+
+| Secret                            | Required | Description                          |
+| --------------------------------- | -------- | ------------------------------------ |
+| `CLOUDFLARE_API_TOKEN`            | Yes      | Cloudflare API token with Pages edit |
+| `CLOUDFLARE_ACCOUNT_ID`          | Yes      | Your Cloudflare account ID           |
+| `CLOUDFLARE_PAGES_PROJECT_NAME`  | Yes      | Cloudflare Pages project name        |
+
+### 2. Enable Basic Auth (Optional)
+
+Set one or more `CLOUDFLARE_PW_<USERNAME>` environment variables in your Cloudflare Pages project settings to protect the catalog with Basic Auth.
+
+### 3. Switch Deploy Workflow
+
+In `.github/workflows/`, enable `workflow_run` in `DeployCloudflarePages` and disable it in `DeployGitHubPages`. Only one deploy workflow should be active at a time.
+
+> **Note:** `DeployCloudflarePages` deploys production only and accepts manual runs from `main` only.
+
 ## Version Upgrades
 
 Since Agent Skill Harbor is installed as an npm dependency, upgrades are simple:

@@ -23,12 +23,13 @@ Agent skill catalog and governance tool for organizations.
 
 ## Overview
 
-Agent Skill Harbor collects Agent Skills (SKILL.md) from your GitHub Organization's repositories, provides governance controls, and serves a browsable catalog via GitHub Pages or Cloudflare Pages.
+Agent Skill Harbor catalogs every Agent Skill (SKILL.md) across your GitHub Organization and serves a browsable catalog within your organization via GitHub Pages or Cloudflare Pages.
 
+- Governance — Flag prohibited skills and promote recommended ones to your team
+- Skill Traceability — Track the origin and provenance of every skill, including externally installed ones
 - No database — Data stored as YAML/JSON in Git
 - No backend — Frontend-only web app (SvelteKit, prerendered)
 - GitHub-native — GitHub Actions for collection, GitHub Pages or Cloudflare Pages for hosting
-- Traceable — Track the origin and provenance of every skill
 
 ## Quick Start
 
@@ -52,17 +53,9 @@ pnpm collect
 pnpm dev
 ```
 
-### From source (for development)
-
-```bash
-git clone https://github.com/anthropics/agent-skill-harbor.git
-cd agent-skill-harbor
-pnpm install
-pnpm setup:dev    # Copy templates and fixtures
-pnpm dev
-```
-
 ## CLI Commands
+
+The application is managed via a CLI that supports scaffolding, data collection, building, and deployment. In production, all CLI commands are executed via GitHub Actions.
 
 When installed as a dependency, the CLI is available as `harbor` or `agent-skill-harbor`:
 
@@ -86,14 +79,10 @@ harbor build --base=/my-repo-name
 
 1. Create a new project with `npx agent-skill-harbor init`
 2. Configure GitHub repository secrets (`GH_TOKEN`)
-3. Configure your hosting target:
-4. GitHub Pages: enable Pages (Settings > Pages > Source: GitHub Actions)
-5. Cloudflare Pages (optional): set `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `CLOUDFLARE_PAGES_PROJECT_NAME` in GitHub
-6. Cloudflare Pages Basic Auth: set one or more `CLOUDFLARE_PW_<USERNAME>` secrets in the Cloudflare Pages project settings
-7. Enable `workflow_run` in exactly one deploy workflow: `DeployGitHubPages` or `DeployCloudflarePages`
-8. Trigger the `CollectSkills` workflow for initial collection
-9. The enabled deploy workflow will run automatically after a successful collection
-10. `DeployCloudflarePages` deploys production only and accepts manual runs from `main` only
+3. Enable GitHub Pages (Settings > Pages > Source: GitHub Actions)
+4. **Important:** Set Pages visibility to **Private** to restrict access to organization members only (requires GitHub Enterprise Cloud)
+5. Trigger the `CollectSkills` workflow for initial collection
+6. The `DeployGitHubPages` workflow will run automatically after collection
 
 See [Organization Setup Guide](docs/01-organization-setup.md) for detailed instructions.
 
