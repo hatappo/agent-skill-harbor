@@ -81,7 +81,8 @@
 	},
 	"grouping": {
 		"label": "グルーピング:",
-		"byRepo": "リポジトリ別"
+		"byRepo": "リポジトリ別",
+		"byOrigin": "オリジン別"
 	},
 	"repos": {
 		"empty": "リポジトリが見つかりません。",
@@ -89,8 +90,14 @@
 	},
 	"repoTable": {
 		"repository": "リポジトリ",
-		"skills": "スキル",
+		"skills": "スキル数",
 		"visibility": "公開範囲",
+		"owner": "オーナー"
+	},
+	"originTable": {
+		"origin": "オリジン",
+		"skills": "スキル数",
+		"unique": "ユニーク数",
 		"owner": "オーナー"
 	},
 	"stats": {

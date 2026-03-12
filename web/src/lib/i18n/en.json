@@ -81,7 +81,8 @@
 	},
 	"grouping": {
 		"label": "Group:",
-		"byRepo": "By Repository"
+		"byRepo": "By Repository",
+		"byOrigin": "By Origin"
 	},
 	"repos": {
 		"empty": "No repositories found.",
@@ -91,6 +92,12 @@
 		"repository": "Repository",
 		"skills": "Skills",
 		"visibility": "Visibility",
+		"owner": "Owner"
+	},
+	"originTable": {
+		"origin": "Origin",
+		"skills": "Skills",
+		"unique": "Unique",
 		"owner": "Owner"
 	},
 	"stats": {

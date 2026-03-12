@@ -6,6 +6,7 @@
 	import SkillList from '$lib/components/SkillList.svelte';
 	import SkillTable from '$lib/components/SkillTable.svelte';
 	import RepoTable from '$lib/components/RepoTable.svelte';
+	import OriginTable from '$lib/components/OriginTable.svelte';
 	import SearchBar from '$lib/components/SearchBar.svelte';
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
 	import ViewTabs from '$lib/components/ViewTabs.svelte';
@@ -13,23 +14,27 @@
 	import type { FlatSkillEntry, RepoInfo, UsagePolicy, Visibility } from '$lib/types';
 	import { createSearchIndex, searchSkills } from '$lib/utils/search';
 	import { filterSkills, type FilterState, type OrgOwnership } from '$lib/utils/filter';
+	import { groupByOrigin } from '$lib/utils/origin';
 	import { t } from '$lib/i18n';
 
+	type GroupMode = 'none' | 'repo' | 'origin';
+
 	interface Props {
-		data: { skills: FlatSkillEntry[]; repos: RepoInfo[]; freshPeriodDays: number };
+		data: { skills: FlatSkillEntry[]; repos: RepoInfo[]; freshPeriodDays: number; orgName: string };
 	}
 
 	let { data }: Props = $props();
 	let allSkills = $derived(data.skills);
 	let allRepos = $derived(data.repos);
 	let freshPeriodDays = $derived(data.freshPeriodDays);
+	let orgName = $derived(data.orgName);
 	let searchIndex = $derived(createSearchIndex(allSkills));
 
 	// Client-side state
 	let query = $state('');
 	let filters = $state<FilterState>({ statuses: [], visibilities: [], orgOwnerships: [] });
 	let view = $state<'card' | 'list'>('card');
-	let groupByRepo = $state(false);
+	let groupMode = $state<GroupMode>('none');
 
 	// Read initial state from URL on mount
 	onMount(() => {
@@ -42,7 +47,10 @@
 		};
 		const v = params.get('view');
 		view = v === 'list' ? 'list' : 'card';
-		groupByRepo = view === 'list' ? params.get('group') !== 'flat' : false;
+		if (view === 'list') {
+			const g = params.get('group');
+			groupMode = g === 'origin' ? 'origin' : g === 'flat' ? 'none' : 'repo';
+		}
 	});
 
 	// Compute displayed skills
@@ -64,7 +72,7 @@
 		newQuery: string,
 		newFilters: FilterState,
 		newView: 'card' | 'list' = view,
-		newGroupByRepo: boolean = groupByRepo,
+		newGroupMode: GroupMode = groupMode,
 	) {
 		if (!browser) return;
 		const params = new URLSearchParams();
@@ -73,7 +81,8 @@
 		if (newFilters.visibilities.length) params.set('visibility', newFilters.visibilities.join(','));
 		if (newFilters.orgOwnerships.length) params.set('origin', newFilters.orgOwnerships.join(','));
 		if (newView === 'list') params.set('view', 'list');
-		if (newView === 'list' && !newGroupByRepo) params.set('group', 'flat');
+		if (newView === 'list' && newGroupMode === 'none') params.set('group', 'flat');
+		if (newView === 'list' && newGroupMode === 'origin') params.set('group', 'origin');
 		const search = params.toString();
 		const pathname = window.location.pathname;
 		goto(`${pathname}${search ? '?' + search : ''}`, { replaceState: true, keepFocus: true, noScroll: true });
@@ -92,21 +101,24 @@
 	function handleViewChange(newView: ViewMode) {
 		if (newView === 'graph' || newView === 'stats') return;
 		view = newView;
-		const newGroupByRepo = newView === 'card' ? false : true;
-		groupByRepo = newGroupByRepo;
-		updateUrl(query, filters, newView, newGroupByRepo);
+		const newGroupMode: GroupMode = newView === 'card' ? 'none' : 'repo';
+		groupMode = newGroupMode;
+		updateUrl(query, filters, newView, newGroupMode);
 	}
 
-	function toggleGroupByRepo() {
-		groupByRepo = !groupByRepo;
-		updateUrl(query, filters, view, groupByRepo);
+	function setGroupMode(mode: GroupMode) {
+		groupMode = groupMode === mode ? 'none' : mode;
+		updateUrl(query, filters, view, groupMode);
 	}
 
 	let hasFilters = $derived(
 		query !== '' || filters.statuses.length > 0 || filters.visibilities.length > 0 || filters.orgOwnerships.length > 0,
 	);
 
-	let isGrouped = $derived(view === 'list' && groupByRepo);
+	let originGroups = $derived.by(() => {
+		if (view !== 'list' || groupMode !== 'origin') return [];
+		return groupByOrigin(displayedSkills, allSkills, orgName);
+	});
 </script>
 
 <svelte:head>
@@ -123,17 +135,20 @@
 					? 'text-gray-400 dark:text-gray-600'
 					: 'text-gray-700 dark:text-gray-300'}">{$t('grouping.label')}</span
 			>
-			<button
-				onclick={toggleGroupByRepo}
-				disabled={view === 'card'}
-				class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {groupByRepo && view === 'list'
-					? 'border-blue-300 bg-blue-100 text-blue-800 ring-1 ring-offset-1 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-offset-gray-950'
-					: view === 'card'
-						? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-600'
-						: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
-			>
-				{$t('grouping.byRepo')}
-			</button>
+			{#each [{ mode: 'repo' as GroupMode, label: $t('grouping.byRepo') }, { mode: 'origin' as GroupMode, label: $t('grouping.byOrigin') }] as { mode, label }}
+				<button
+					onclick={() => setGroupMode(mode)}
+					disabled={view === 'card'}
+					class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {groupMode === mode &&
+					view === 'list'
+						? 'border-blue-300 bg-blue-100 text-blue-800 ring-1 ring-offset-1 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300 dark:ring-offset-gray-950'
+						: view === 'card'
+							? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-600'
+							: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
+				>
+					{label}
+				</button>
+			{/each}
 		</div>
 	</div>
 
@@ -152,7 +167,9 @@
 		</div>
 	</div>
 
-	{#if isGrouped}
+	{#if view === 'list' && groupMode === 'origin'}
+		<OriginTable groups={originGroups} {freshPeriodDays} />
+	{:else if view === 'list' && groupMode === 'repo'}
 		<RepoTable repos={displayedRepos} skills={displayedSkills} {freshPeriodDays} />
 	{:else if view === 'list'}
 		<SkillTable skills={displayedSkills} {freshPeriodDays} />
