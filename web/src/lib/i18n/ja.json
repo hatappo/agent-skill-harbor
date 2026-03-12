@@ -70,7 +70,8 @@
 	"viewTabs": {
 		"card": "カード",
 		"list": "リスト",
-		"graph": "グラフ"
+		"graph": "グラフ",
+		"stats": "統計"
 	},
 	"skillTable": {
 		"name": "名前",
@@ -94,6 +95,27 @@
 		"skills": "スキル",
 		"visibility": "公開範囲",
 		"owner": "オーナー"
+	},
+	"stats": {
+		"pageTitle": "統計 - Agent Skill Harbor",
+		"totalSkills": "スキル総数",
+		"totalRepos": "リポジトリ総数",
+		"totalFiles": "ファイル総数",
+		"lastCollected": "最終収集",
+		"skillTrend": "スキル数の推移",
+		"breakdown": "内訳",
+		"byStatus": "ステータス別",
+		"byVisibility": "公開範囲別",
+		"byOwnership": "オーナー別",
+		"collectHistory": "収集履歴",
+		"date": "日時",
+		"duration": "所要時間",
+		"skills": "スキル",
+		"repos": "リポジトリ",
+		"files": "ファイル",
+		"noHistory": "収集履歴がありません。",
+		"seconds": "{value}秒",
+		"reposWithSkills": "{count} リポにスキルあり"
 	},
 	"docs": {
 		"nav": "Docs"

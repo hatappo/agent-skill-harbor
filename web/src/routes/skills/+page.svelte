@@ -90,7 +90,7 @@
 	}
 
 	function handleViewChange(newView: ViewMode) {
-		if (newView === 'graph') return;
+		if (newView === 'graph' || newView === 'stats') return;
 		view = newView;
 		const newGroupByRepo = newView === 'card' ? false : true;
 		groupByRepo = newGroupByRepo;
@@ -136,14 +136,14 @@
 	<div class="mb-6 space-y-4">
 		<SearchBar value={query} onchange={handleSearch} />
 		<div class="flex items-center gap-3">
-			<span class="w-24 shrink-0 tabular-nums text-sm text-gray-500 dark:text-gray-400">
+			<FilterPanel {filters} onchange={handleFilterChange} />
+			<span class="ml-auto shrink-0 tabular-nums text-sm text-gray-500 dark:text-gray-400">
 				{#if hasFilters}
-					{displayedSkills.length} / {allSkills.length}
+					<span class="font-semibold text-gray-900 dark:text-gray-100">{displayedSkills.length}</span> / {allSkills.length} skills
 				{:else}
-					{allSkills.length} skills
+					<span class="font-semibold text-gray-900 dark:text-gray-100">{allSkills.length}</span> skills
 				{/if}
 			</span>
-			<FilterPanel {filters} onchange={handleFilterChange} />
 		</div>
 	</div>
 

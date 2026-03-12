@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { env } from '$env/dynamic/private';
-import type { FlatSkillEntry, RepoInfo, Visibility } from '$lib/types';
+import type { CollectionEntry, FlatSkillEntry, RepoInfo, Visibility } from '$lib/types';
 
 declare const __PROJECT_ROOT__: string;
 
@@ -38,7 +38,6 @@ interface RepositoryEntry {
 }
 
 interface CatalogYaml {
-	meta?: Record<string, unknown>;
 	repositories: Record<string, RepositoryEntry>;
 }
 
@@ -58,6 +57,7 @@ const PROJECT_ROOT = __PROJECT_ROOT__;
 const DATA_DIR = join(PROJECT_ROOT, 'data');
 const SKILLS_DIR = join(DATA_DIR, 'skills');
 const SKILLS_YAML_PATH = join(DATA_DIR, 'skills.yaml');
+const HISTORY_YAML_PATH = join(DATA_DIR, 'collect-history.yaml');
 const CONFIG_DIR = join(PROJECT_ROOT, 'config');
 const GOVERNANCE_PATH = join(CONFIG_DIR, 'governance.yaml');
 const ADMIN_PATH = join(CONFIG_DIR, 'admin.yaml');
@@ -281,4 +281,21 @@ export function loadCatalog(): CatalogResult {
 export function getSkillBody(key: string): string {
 	const { bodyMap } = loadCatalog();
 	return bodyMap.get(key) ?? '';
+}
+
+let cachedHistory: CollectionEntry[] | null = null;
+
+export function loadCollectHistory(): CollectionEntry[] {
+	if (cachedHistory) return cachedHistory;
+	if (!existsSync(HISTORY_YAML_PATH)) {
+		cachedHistory = [];
+		return cachedHistory;
+	}
+	try {
+		const raw = yamlLoad(readFileSync(HISTORY_YAML_PATH, 'utf-8'));
+		cachedHistory = Array.isArray(raw) ? raw : [];
+	} catch {
+		cachedHistory = [];
+	}
+	return cachedHistory;
 }

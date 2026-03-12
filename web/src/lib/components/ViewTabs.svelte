@@ -4,7 +4,7 @@
 	import { base } from '$app/paths';
 	import { t } from '$lib/i18n';
 
-	export type ViewMode = 'card' | 'list' | 'graph';
+	export type ViewMode = 'card' | 'list' | 'graph' | 'stats';
 
 	interface Props {
 		activeView: ViewMode;
@@ -13,26 +13,49 @@
 
 	let { activeView, onchange }: Props = $props();
 
-	const tabs: { key: ViewMode; icon: 'grid' | 'list' | 'graph' }[] = [
+	const tabs: { key: ViewMode; icon: 'grid' | 'list' | 'graph' | 'stats' }[] = [
 		{ key: 'card', icon: 'grid' },
 		{ key: 'list', icon: 'list' },
+		{ key: 'stats', icon: 'stats' },
 		{ key: 'graph', icon: 'graph' },
 	];
+
+	function getFilterParams(): { owner?: string; visibility?: string } {
+		const cur = new URLSearchParams(window.location.search);
+		// skills page uses 'origin', stats page uses 'owner'
+		const owner = cur.get('origin') ?? cur.get('owner') ?? undefined;
+		const visibility = cur.get('visibility') ?? undefined;
+		return { owner, visibility };
+	}
 
 	function handleTabClick(tab: ViewMode) {
 		if (tab === activeView) return;
 		if (!browser) return;
+
+		const { owner, visibility } = getFilterParams();
+
+		if (tab === 'stats') {
+			const params = new URLSearchParams();
+			if (owner && owner !== 'all') params.set('owner', owner);
+			if (visibility) params.set('visibility', visibility);
+			const search = params.toString();
+			goto(`${base}/stats/${search ? '?' + search : ''}`);
+			return;
+		}
 
 		if (tab === 'graph') {
 			goto(`${base}/graph/`);
 			return;
 		}
 
-		if (activeView === 'graph') {
-			// Navigating from Graph page back to catalog
-			const params = new URLSearchParams();
-			if (tab === 'list') params.set('view', 'list');
-			const search = params.toString();
+		// Navigating to card or list
+		const params = new URLSearchParams();
+		if (tab === 'list') params.set('view', 'list');
+		if (owner && owner !== 'all') params.set('origin', owner);
+		if (visibility) params.set('visibility', visibility);
+		const search = params.toString();
+
+		if (activeView === 'graph' || activeView === 'stats') {
 			goto(`${base}/skills/${search ? '?' + search : ''}`);
 		} else {
 			onchange?.(tab);
@@ -67,10 +90,16 @@
 						clip-rule="evenodd"
 					/>
 				</svg>
-			{:else}
+			{:else if tab.icon === 'graph'}
 				<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
 					<path
 						d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 17v1h-3zM4.75 14.094A5.973 5.973 0 004 17v1H1v-1a3 3 0 013.75-2.906z"
+					/>
+				</svg>
+			{:else}
+				<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+					<path
+						d="M12 2a1 1 0 011 1v14a1 1 0 11-2 0V3a1 1 0 011-1zM6 8a1 1 0 011 1v8a1 1 0 11-2 0V9a1 1 0 011-1zM18 6a1 1 0 011 1v10a1 1 0 11-2 0V7a1 1 0 011-1z"
 					/>
 				</svg>
 			{/if}

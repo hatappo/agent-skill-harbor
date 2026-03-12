@@ -84,29 +84,25 @@
 <div class="flex flex-wrap items-center gap-3">
 	<span class="text-sm font-medium text-gray-700 dark:text-gray-300">{$t('filter.label')}</span>
 
-	<!-- Usage policy filters -->
-	{#each policyOptions as opt}
-		<Tooltip.Root>
-			<Tooltip.Trigger>
-				{#snippet child({ props })}
-					<button
-						{...props}
-						onclick={() => toggleStatus(opt.value)}
-						class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.statuses.includes(
-							opt.value,
-						)
-							? opt.color + ' ring-1 ring-offset-1 dark:ring-offset-gray-950'
-							: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
-					>
-						{$t(opt.labelKey)}
-					</button>
-				{/snippet}
-			</Tooltip.Trigger>
-			<Tooltip.Content>{$t(opt.tooltipKey)}</Tooltip.Content>
-		</Tooltip.Root>
-	{/each}
-
-	<span class="mx-1 text-gray-300 dark:text-gray-600">|</span>
+	<!-- Org ownership select -->
+	<Select.Root type="single" value={orgOwnershipValue} onValueChange={onOrgOwnershipChange}>
+		<Select.Trigger
+			size="sm"
+			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.orgOwnerships.length > 0
+				? 'border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+				: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
+		>
+			{filters.orgOwnerships.length > 0
+				? $t(orgOwnershipOptions.find((o) => o.value === filters.orgOwnerships[0])?.labelKey ?? '')
+				: $t('filter.allOwner')}
+		</Select.Trigger>
+		<Select.Content>
+			<Select.Item value="__all__" label={$t('filter.all')} />
+			{#each orgOwnershipOptions as opt}
+				<Select.Item value={opt.value} label={$t(opt.labelKey)} />
+			{/each}
+		</Select.Content>
+	</Select.Root>
 
 	<!-- Visibility select -->
 	<Select.Root type="single" value={visibilityValue} onValueChange={onVisibilityChange}>
@@ -128,25 +124,29 @@
 		</Select.Content>
 	</Select.Root>
 
-	<!-- Org ownership select -->
-	<Select.Root type="single" value={orgOwnershipValue} onValueChange={onOrgOwnershipChange}>
-		<Select.Trigger
-			size="sm"
-			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.orgOwnerships.length > 0
-				? 'border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-				: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
-		>
-			{filters.orgOwnerships.length > 0
-				? $t(orgOwnershipOptions.find((o) => o.value === filters.orgOwnerships[0])?.labelKey ?? '')
-				: $t('filter.allOwner')}
-		</Select.Trigger>
-		<Select.Content>
-			<Select.Item value="__all__" label={$t('filter.all')} />
-			{#each orgOwnershipOptions as opt}
-				<Select.Item value={opt.value} label={$t(opt.labelKey)} />
-			{/each}
-		</Select.Content>
-	</Select.Root>
+	<span class="mx-1 text-gray-300 dark:text-gray-600">|</span>
+
+	<!-- Usage policy filters -->
+	{#each policyOptions as opt}
+		<Tooltip.Root>
+			<Tooltip.Trigger>
+				{#snippet child({ props })}
+					<button
+						{...props}
+						onclick={() => toggleStatus(opt.value)}
+						class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.statuses.includes(
+							opt.value,
+						)
+							? opt.color + ' ring-1 ring-offset-1 dark:ring-offset-gray-950'
+							: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
+					>
+						{$t(opt.labelKey)}
+					</button>
+				{/snippet}
+			</Tooltip.Trigger>
+			<Tooltip.Content>{$t(opt.tooltipKey)}</Tooltip.Content>
+		</Tooltip.Root>
+	{/each}
 
 	{#if hasActiveFilters}
 		<button

@@ -70,7 +70,8 @@
 	"viewTabs": {
 		"card": "Card",
 		"list": "List",
-		"graph": "Graph"
+		"graph": "Graph",
+		"stats": "Stats"
 	},
 	"skillTable": {
 		"name": "Name",
@@ -94,6 +95,27 @@
 		"skills": "Skills",
 		"visibility": "Visibility",
 		"owner": "Owner"
+	},
+	"stats": {
+		"pageTitle": "Stats - Agent Skill Harbor",
+		"totalSkills": "Total Skills",
+		"totalRepos": "Total Repos",
+		"totalFiles": "Total Files",
+		"lastCollected": "Last Collected",
+		"skillTrend": "Skill Trend",
+		"breakdown": "Breakdown",
+		"byStatus": "By Status",
+		"byVisibility": "By Visibility",
+		"byOwnership": "By Ownership",
+		"collectHistory": "Collection History",
+		"date": "Date",
+		"duration": "Duration",
+		"skills": "Skills",
+		"repos": "Repos",
+		"files": "Files",
+		"noHistory": "No collection history available.",
+		"seconds": "{value}s",
+		"reposWithSkills": "{count} with skills"
 	},
 	"docs": {
 		"nav": "Docs"
