@@ -1,5 +1,27 @@
 # 変更履歴
 
+## [0.8.0] - 2026-03-12
+
+### 追加
+
+- **Config ページ**: Harbor 設定とガバナンスのタブ表示（Zod スキーマベース）
+- README（EN/JA）を `/docs/` でサイドバー先頭エントリとして表示
+- `manage-governance` と `manage-harbor-config` の CLI スキルを追加（Zod スキーマ参照付き）
+
+### 変更
+
+- `settings.yaml` を `harbor.yaml` にリネーム
+- 統合スキル `manage-skill` を `manage-governance` と `manage-harbor-config` に分割
+- ドキュメントの番号を変更: ガバナンスガイド → `02`、ローカル開発 → `03`
+- 全ルートから末尾スラッシュを除去 (`trailingSlash: 'never'`)
+- README の概要を改善、Organization Setup ガイドを簡素化
+- agent-command-sync の参照を agent-skill-porter に更新
+
+### 削除
+
+- `docs/` の旧スクリーンショットファイル
+- `manage-skill` スキル（スキルは collect フェーズで管理し、手動操作は不要）
+
 ## [0.7.1] - 2026-03-12
 
 ### 修正

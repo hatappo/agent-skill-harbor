@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.8.0] - 2026-03-12
+
+### Added
+
+- **Config page** with Harbor settings and Governance tabs, powered by Zod schemas
+- README (EN/JA) displayed at `/docs/` as the first sidebar entry
+- `manage-governance` and `manage-harbor-config` CLI skills with Zod schema references
+
+### Changed
+
+- Renamed `settings.yaml` to `harbor.yaml` for clarity
+- Replaced monolithic `manage-skill` skill with focused `manage-governance` and `manage-harbor-config`
+- Renumbered docs: governance guide → `02`, local development → `03`
+- Removed trailing slashes from all routes (`trailingSlash: 'never'`)
+- Improved README overview and simplified Organization Setup guide
+- Updated agent-command-sync references to agent-skill-porter
+
+### Removed
+
+- Old screenshot files from `docs/`
+- `manage-skill` skill (skills are managed by collect phase, not manually)
+
 ## [0.7.1] - 2026-03-12
 
 ### Fixed
