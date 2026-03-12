@@ -11,7 +11,7 @@ const SKILLS_DIR = join(DATA_DIR, 'skills');
 const SKILLS_YAML_PATH = join(DATA_DIR, 'skills.yaml');
 const HISTORY_YAML_PATH = join(DATA_DIR, 'collect-history.yaml');
 const CONFIG_DIR = join(PROJECT_ROOT, 'config');
-const SETTINGS_PATH = join(CONFIG_DIR, 'settings.yaml');
+const SETTINGS_PATH = join(CONFIG_DIR, 'harbor.yaml');
 
 interface SettingsConfig {
 	collector?: {

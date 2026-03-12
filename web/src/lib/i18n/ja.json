@@ -1,7 +1,8 @@
 {
 	"header": {
 		"title": "Agent Skill Harbor",
-		"catalog": "Skills"
+		"catalog": "Skills",
+		"config": "Config"
 	},
 	"search": {
 		"placeholder": "スキルを検索..."
@@ -120,6 +121,30 @@
 		"noHistory": "収集履歴がありません。",
 		"seconds": "{value}秒",
 		"reposWithSkills": "{count} リポにスキルあり"
+	},
+	"settings": {
+		"collector": {
+			"title": "コレクター",
+			"exclude_forks": "フォークリポジトリを除外",
+			"excluded_repos": "除外リポジトリ",
+			"include_origin_repos": "スキルのコピー元リポジトリも収集",
+			"included_extra_repos": "追加リポジトリ",
+			"history_limit": "収集履歴の保持数"
+		},
+		"catalog": {
+			"title": "カタログ",
+			"fresh_period_days": "「New」バッジの表示期間（日数）"
+		},
+		"governance": {
+			"title": "ガバナンスポリシー",
+			"skill_path": "スキル",
+			"policy": "ポリシー",
+			"note": "備考",
+			"empty": "ポリシーが定義されていません。"
+		},
+		"empty_list": "未設定",
+		"enabled": "有効",
+		"disabled": "無効"
 	},
 	"docs": {
 		"nav": "Docs"

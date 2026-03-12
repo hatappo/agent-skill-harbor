@@ -1,7 +1,8 @@
 {
 	"header": {
 		"title": "Agent Skill Harbor",
-		"catalog": "Skills"
+		"catalog": "Skills",
+		"config": "Config"
 	},
 	"search": {
 		"placeholder": "Search skills..."
@@ -120,6 +121,30 @@
 		"noHistory": "No collection history available.",
 		"seconds": "{value}s",
 		"reposWithSkills": "{count} with skills"
+	},
+	"settings": {
+		"collector": {
+			"title": "Collector",
+			"exclude_forks": "Exclude forked repositories",
+			"excluded_repos": "Excluded repositories",
+			"include_origin_repos": "Also collect repositories where skills were copied from",
+			"included_extra_repos": "Additional repositories",
+			"history_limit": "Collection history limit"
+		},
+		"catalog": {
+			"title": "Catalog",
+			"fresh_period_days": "\"New\" badge duration (days)"
+		},
+		"governance": {
+			"title": "Governance Policies",
+			"skill_path": "Skill",
+			"policy": "Policy",
+			"note": "Note",
+			"empty": "No policies defined."
+		},
+		"empty_list": "Not configured",
+		"enabled": "Enabled",
+		"disabled": "Disabled"
 	},
 	"docs": {
 		"nav": "Docs"

@@ -44,6 +44,9 @@ importers:
       3d-force-graph:
         specifier: 1.79.1
         version: 1.79.1
+      zod:
+        specifier: 4.3.6
+        version: 4.3.6
     devDependencies:
       '@internationalized/date':
         specifier: ^3.11.0
@@ -2236,6 +2239,9 @@ packages:
   zimmerframe@1.1.4:
     resolution: {integrity: sha512-B58NGBEoc8Y9MWWCQGl/gq9xBCe4IiKM0a2x7GZdQKOW5Exr8S1W24J6OgM1njK8xCRGvAJIL/MxXHf6SkmQKQ==}
 
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
 snapshots:
 
   3d-force-graph@1.79.1:
@@ -4104,3 +4110,5 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   zimmerframe@1.1.4: {}
+
+  zod@4.3.6: {}

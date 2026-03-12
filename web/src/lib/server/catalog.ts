@@ -6,6 +6,8 @@ import { join, relative } from 'node:path';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 import type { CollectionEntry, FlatSkillEntry, RepoInfo, Visibility } from '$lib/types';
+import { governanceSchema, type GovernanceConfig } from '$lib/schemas/governance';
+import { settingsSchema, type SettingsConfig } from '$lib/schemas/settings';
 
 declare const __PROJECT_ROOT__: string;
 
@@ -14,14 +16,6 @@ type UsagePolicy = 'recommended' | 'discouraged' | 'prohibited' | 'none';
 interface GovernanceEntry {
 	usage_policy: UsagePolicy;
 	note?: string;
-}
-
-interface AdminConfig {
-	catalog?: {
-		skill?: {
-			fresh_period_days?: number;
-		};
-	};
 }
 
 interface SkillEntry {
@@ -61,7 +55,7 @@ const SKILLS_YAML_PATH = join(DATA_DIR, 'skills.yaml');
 const HISTORY_YAML_PATH = join(DATA_DIR, 'collect-history.yaml');
 const CONFIG_DIR = join(PROJECT_ROOT, 'config');
 const GOVERNANCE_PATH = join(CONFIG_DIR, 'governance.yaml');
-const SETTINGS_PATH = join(CONFIG_DIR, 'settings.yaml');
+const HARBOR_PATH = join(CONFIG_DIR, 'harbor.yaml');
 
 function detectOrgRepo(): { org: string | null; repo: string | null } {
 	let org: string | null = env.GH_ORG || null;
@@ -90,24 +84,32 @@ function detectOrgRepo(): { org: string | null; repo: string | null } {
 	return { org, repo };
 }
 
-function loadGovernance(): Record<string, GovernanceEntry> {
-	if (!existsSync(GOVERNANCE_PATH)) return {};
-	const raw = yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8')) as {
-		policies?: Record<string, GovernanceEntry>;
-	} | null;
-	if (!raw || typeof raw !== 'object') return {};
-	return raw.policies ?? {};
+function loadGovernanceRaw(): GovernanceConfig {
+	if (!existsSync(GOVERNANCE_PATH)) return governanceSchema.parse({});
+	try {
+		const raw = yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8'));
+		return governanceSchema.parse(raw ?? {});
+	} catch {
+		return governanceSchema.parse({});
+	}
 }
 
-function loadAdmin(): AdminConfig {
-	if (!existsSync(SETTINGS_PATH)) return {};
+function loadGovernance(): Record<string, GovernanceEntry> {
+	return loadGovernanceRaw().policies;
+}
+
+function loadSettingsRaw(): SettingsConfig {
+	if (!existsSync(HARBOR_PATH)) return settingsSchema.parse({});
 	try {
-		const raw = yamlLoad(readFileSync(SETTINGS_PATH, 'utf-8'));
-		if (!raw || typeof raw !== 'object') return {};
-		return raw as AdminConfig;
+		const raw = yamlLoad(readFileSync(HARBOR_PATH, 'utf-8'));
+		return settingsSchema.parse(raw ?? {});
 	} catch {
-		return {};
+		return settingsSchema.parse({});
 	}
+}
+
+function loadAdmin(): SettingsConfig {
+	return loadSettingsRaw();
 }
 
 function loadCatalogYaml(): CatalogYaml {
@@ -282,6 +284,14 @@ export function loadCatalog(): CatalogResult {
 export function getSkillBody(key: string): string {
 	const { bodyMap } = loadCatalog();
 	return bodyMap.get(key) ?? '';
+}
+
+export function loadSettingsConfig(): SettingsConfig {
+	return loadSettingsRaw();
+}
+
+export function loadGovernanceConfig(): GovernanceConfig {
+	return loadGovernanceRaw();
 }
 
 let cachedHistory: CollectionEntry[] | null = null;

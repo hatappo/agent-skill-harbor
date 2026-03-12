@@ -67,12 +67,12 @@ pnpm setup:dev    # Re-copy templates and fixtures
 │   └── src/lib/i18n/     # Internationalization (en, ja)
 ├── templates/            # Project scaffold templates (for init command)
 │   ├── .env.example      # Environment variable template
-│   ├── config/           # Default config files
+│   ├── config/           # Default settings files
 │   └── .github/workflows/# GitHub Actions workflows
 ├── fixtures/             # Sample data for local development
 │   ├── config/           # Sample governance policies
 │   └── data/             # Sample catalog and skill data
-├── config/               # Human-managed configuration (gitignored, created by setup:dev)
+├── config/               # Human-managed settings (gitignored, created by setup:dev)
 ├── data/                 # Machine-generated skill data (gitignored, created by setup:dev)
 └── docs/                 # Documentation
 ```
