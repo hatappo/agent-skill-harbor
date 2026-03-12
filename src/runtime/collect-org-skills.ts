@@ -133,10 +133,7 @@ function countFilesRecursive(dir: string): number {
 	return count;
 }
 
-function computeStatistics(
-	catalog: CatalogYaml,
-	org: string,
-): { org: CategoryStats; community: CategoryStats } {
+function computeStatistics(catalog: CatalogYaml, org: string): { org: CategoryStats; community: CategoryStats } {
 	const stats = {
 		org: { repos: 0, repos_with_skills: 0, skills: 0, files: 0 },
 		community: { repos: 0, repos_with_skills: 0, skills: 0, files: 0 },
@@ -212,17 +209,64 @@ async function sleep(ms: number): Promise<void> {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function checkRateLimit(octokit: Octokit): Promise<void> {
-	const { data } = await octokit.rateLimit.get();
-	const remaining = data.resources.core.remaining;
-	const resetAt = data.resources.core.reset * 1000;
+function isRetryableError(error: unknown): boolean {
+	if (error && typeof error === 'object' && 'status' in error) {
+		const status = (error as { status: number }).status;
+		return status === 500 || status === 502 || status === 503;
+	}
+	if (error instanceof Error) {
+		const msg = error.message.toLowerCase();
+		return msg.includes('econnreset') || msg.includes('etimedout') || msg.includes('socket hang up');
+	}
+	return false;
+}
 
-	if (remaining < 100) {
-		const waitMs = resetAt - Date.now() + 1000;
-		if (waitMs > 0) {
-			console.log(`Rate limit low (${remaining} remaining). Waiting ${Math.ceil(waitMs / 1000)}s...`);
-			await sleep(waitMs);
+function formatApiError(error: unknown): string {
+	if (error && typeof error === 'object' && 'status' in error) {
+		const status = (error as { status: number }).status;
+		const msg =
+			'message' in error && typeof (error as { message: unknown }).message === 'string'
+				? (error as { message: string }).message
+				: '';
+		return `HTTP ${status}${msg ? `: ${msg}` : ''}`;
+	}
+	return error instanceof Error ? error.message : String(error);
+}
+
+async function withRetry<T>(fn: () => Promise<T>, label: string, maxRetries = 3): Promise<T> {
+	for (let attempt = 0; attempt <= maxRetries; attempt++) {
+		try {
+			return await fn();
+		} catch (error) {
+			if (attempt < maxRetries && isRetryableError(error)) {
+				const delaySec = 2 ** attempt; // 1s, 2s, 4s
+				console.log(
+					`  [retry] ${label}: ${formatApiError(error)} — retrying in ${delaySec}s (${attempt + 1}/${maxRetries})`,
+				);
+				await sleep(delaySec * 1000);
+				continue;
+			}
+			throw error;
 		}
+	}
+	throw new Error('unreachable');
+}
+
+async function checkRateLimit(octokit: Octokit): Promise<void> {
+	try {
+		const { data } = await octokit.rateLimit.get();
+		const remaining = data.resources.core.remaining;
+		const resetAt = data.resources.core.reset * 1000;
+
+		if (remaining < 100) {
+			const waitMs = resetAt - Date.now() + 1000;
+			if (waitMs > 0) {
+				console.log(`Rate limit low (${remaining} remaining). Waiting ${Math.ceil(waitMs / 1000)}s...`);
+				await sleep(waitMs);
+			}
+		}
+	} catch {
+		// rate_limit API itself failed (e.g. 503) — continue without blocking
 	}
 }
 
@@ -311,7 +355,7 @@ async function findSkillFilesFallback(octokit: Octokit, owner: string, repo: str
 }
 
 async function fetchFileContent(octokit: Octokit, owner: string, repo: string, path: string): Promise<string> {
-	const { data } = await octokit.repos.getContent({ owner, repo, path });
+	const { data } = await withRetry(() => octokit.repos.getContent({ owner, repo, path }), `${owner}/${repo}/${path}`);
 	if (Array.isArray(data) || data.type !== 'file' || !data.content) {
 		throw new Error(`Unexpected response for ${path}`);
 	}
@@ -364,7 +408,7 @@ async function fetchRepoTarget(
 	const label = source === 'extra' ? 'included_extra_repos' : '_from';
 	try {
 		await checkRateLimit(octokit);
-		const { data } = await octokit.repos.get({ owner, repo });
+		const { data } = await withRetry(() => octokit.repos.get({ owner, repo }), `${owner}/${repo}`);
 		if (data.private) {
 			console.log(`  [skip] ${owner}/${repo} (via ${label}, not public)`);
 			return null;
@@ -379,8 +423,7 @@ async function fetchRepoTarget(
 			source,
 		};
 	} catch (error) {
-		const message = error instanceof Error ? error.message : String(error);
-		console.log(`  [skip] ${owner}/${repo} (via ${label}, unavailable: ${message})`);
+		console.log(`  [skip] ${owner}/${repo} (via ${label}, unavailable: ${formatApiError(error)})`);
 		return null;
 	}
 }
@@ -406,11 +449,16 @@ async function collectRepoSkills(
 	const existingRepo = catalog.repositories[repoKey];
 
 	await checkRateLimit(octokit);
-	const { data: branchData } = await octokit.repos.getBranch({
-		owner: target.owner,
-		repo: target.repo,
-		branch: target.default_branch,
-	});
+	const repoLabel = `${target.owner}/${target.repo}`;
+	const { data: branchData } = await withRetry(
+		() =>
+			octokit.repos.getBranch({
+				owner: target.owner,
+				repo: target.repo,
+				branch: target.default_branch,
+			}),
+		repoLabel,
+	);
 	const headSha = branchData.commit.sha;
 
 	const repoDir = join(SKILLS_DIR, platform, target.owner, target.repo);
@@ -427,12 +475,16 @@ async function collectRepoSkills(
 	}
 
 	await checkRateLimit(octokit);
-	const { data: treeData } = await octokit.git.getTree({
-		owner: target.owner,
-		repo: target.repo,
-		tree_sha: headSha,
-		recursive: 'true',
-	});
+	const { data: treeData } = await withRetry(
+		() =>
+			octokit.git.getTree({
+				owner: target.owner,
+				repo: target.repo,
+				tree_sha: headSha,
+				recursive: 'true',
+			}),
+		repoLabel,
+	);
 
 	let discoveredSkills: DiscoveredSkill[];
 	if (treeData.truncated) {
@@ -480,8 +532,7 @@ async function collectRepoSkills(
 					collectedFrontmatter = parseFrontmatter(content);
 				}
 			} catch (error) {
-				const message = error instanceof Error ? error.message : String(error);
-				console.error(`  [error] ${target.owner}/${target.repo} -> ${filePath}: ${message}`);
+				console.error(`  [error] ${target.owner}/${target.repo} -> ${filePath}: ${formatApiError(error)}`);
 			}
 		}
 
@@ -572,12 +623,16 @@ export async function runCollectOrgSkills(): Promise<void> {
 
 	while (true) {
 		await checkRateLimit(octokit);
-		const { data } = await octokit.repos.listForOrg({
-			org,
-			type: 'all',
-			per_page: 100,
-			page,
-		});
+		const { data } = await withRetry(
+			() =>
+				octokit.repos.listForOrg({
+					org,
+					type: 'all',
+					per_page: 100,
+					page,
+				}),
+			`listForOrg(${org}, page=${page})`,
+		);
 
 		if (data.length === 0) break;
 
@@ -636,8 +691,7 @@ export async function runCollectOrgSkills(): Promise<void> {
 				includeOriginRepos,
 			);
 		} catch (error) {
-			const message = error instanceof Error ? error.message : String(error);
-			console.error(`  [error] ${repo.owner}/${repo.repo}: ${message}`);
+			console.error(`  [error] ${repo.owner}/${repo.repo}: ${formatApiError(error)}`);
 		}
 	}
 
@@ -670,8 +724,7 @@ export async function runCollectOrgSkills(): Promise<void> {
 				includeOriginRepos,
 			);
 		} catch (error) {
-			const message = error instanceof Error ? error.message : String(error);
-			console.error(`  [error] ${target.owner}/${target.repo}: ${message}`);
+			console.error(`  [error] ${target.owner}/${target.repo}: ${formatApiError(error)}`);
 		}
 	}
 
@@ -696,8 +749,7 @@ export async function runCollectOrgSkills(): Promise<void> {
 					false,
 				);
 			} catch (error) {
-				const message = error instanceof Error ? error.message : String(error);
-				console.error(`  [error] ${target.owner}/${target.repo}: ${message}`);
+				console.error(`  [error] ${target.owner}/${target.repo}: ${formatApiError(error)}`);
 			}
 		}
 	}
@@ -744,7 +796,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
 	try {
 		await runCollectOrgSkills();
 	} catch (error) {
-		console.error(`Error: ${error instanceof Error ? error.message : String(error)}`);
+		console.error(`Error: ${formatApiError(error)}`);
 		process.exit(1);
 	}
 }

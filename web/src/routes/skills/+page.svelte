@@ -118,7 +118,11 @@
 	<div class="mb-6 flex items-center justify-between">
 		<ViewTabs activeView={view} onchange={handleViewChange} />
 		<div class="flex items-center gap-2">
-			<span class="text-sm font-medium {view === 'card' ? 'text-gray-400 dark:text-gray-600' : 'text-gray-700 dark:text-gray-300'}">{$t('grouping.label')}</span>
+			<span
+				class="text-sm font-medium {view === 'card'
+					? 'text-gray-400 dark:text-gray-600'
+					: 'text-gray-700 dark:text-gray-300'}">{$t('grouping.label')}</span
+			>
 			<button
 				onclick={toggleGroupByRepo}
 				disabled={view === 'card'}
@@ -139,7 +143,8 @@
 			<FilterPanel {filters} onchange={handleFilterChange} />
 			<span class="ml-auto shrink-0 tabular-nums text-sm text-gray-500 dark:text-gray-400">
 				{#if hasFilters}
-					<span class="font-semibold text-gray-900 dark:text-gray-100">{displayedSkills.length}</span> / {allSkills.length} skills
+					<span class="font-semibold text-gray-900 dark:text-gray-100">{displayedSkills.length}</span> / {allSkills.length}
+					skills
 				{:else}
 					<span class="font-semibold text-gray-900 dark:text-gray-100">{allSkills.length}</span> skills
 				{/if}

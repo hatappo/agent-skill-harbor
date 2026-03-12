@@ -216,9 +216,7 @@
 					? 'border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
 					: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
 			>
-				{ownerFilter
-					? $t(`common.orgOwnership.${ownerFilter}`)
-					: $t('filter.allOwner')}
+				{ownerFilter ? $t(`common.orgOwnership.${ownerFilter}`) : $t('filter.allOwner')}
 			</Select.Trigger>
 			<Select.Content>
 				<Select.Item value="__all__" label={$t('filter.all')} />
@@ -226,7 +224,6 @@
 				<Select.Item value="community" label={$t('common.orgOwnership.community')} />
 			</Select.Content>
 		</Select.Root>
-
 	</div>
 
 	<!-- KPI Cards -->
@@ -357,8 +354,29 @@
 					<tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
 						{#each displayedHistory as entry, i (entry.collecting.collected_at)}
 							{@const prev = data.collections[i + 1]}
-							{@const s = ownerFilter === 'org' ? entry.statistics.org : ownerFilter === 'community' ? entry.statistics.community : { repos: entry.statistics.org.repos + entry.statistics.community.repos, repos_with_skills: entry.statistics.org.repos_with_skills + entry.statistics.community.repos_with_skills, skills: entry.statistics.org.skills + entry.statistics.community.skills, files: entry.statistics.org.files + entry.statistics.community.files }}
-							{@const ps = prev ? (ownerFilter === 'org' ? prev.statistics.org : ownerFilter === 'community' ? prev.statistics.community : { repos_with_skills: prev.statistics.org.repos_with_skills + prev.statistics.community.repos_with_skills, skills: prev.statistics.org.skills + prev.statistics.community.skills }) : null}
+							{@const s =
+								ownerFilter === 'org'
+									? entry.statistics.org
+									: ownerFilter === 'community'
+										? entry.statistics.community
+										: {
+												repos: entry.statistics.org.repos + entry.statistics.community.repos,
+												repos_with_skills:
+													entry.statistics.org.repos_with_skills + entry.statistics.community.repos_with_skills,
+												skills: entry.statistics.org.skills + entry.statistics.community.skills,
+												files: entry.statistics.org.files + entry.statistics.community.files,
+											}}
+							{@const ps = prev
+								? ownerFilter === 'org'
+									? prev.statistics.org
+									: ownerFilter === 'community'
+										? prev.statistics.community
+										: {
+												repos_with_skills:
+													prev.statistics.org.repos_with_skills + prev.statistics.community.repos_with_skills,
+												skills: prev.statistics.org.skills + prev.statistics.community.skills,
+											}
+								: null}
 							{@const skillDiff = ps ? s.skills - ps.skills : 0}
 							{@const repoDiff = ps ? s.repos_with_skills - ps.repos_with_skills : 0}
 							<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
@@ -379,9 +397,7 @@
 										{s.skills}
 									</span>
 								</td>
-								<td
-									class="hidden whitespace-nowrap px-5 py-3 text-right text-sm sm:table-cell"
-								>
+								<td class="hidden whitespace-nowrap px-5 py-3 text-right text-sm sm:table-cell">
 									{#if repoDiff !== 0}
 										<span
 											class="mr-1 text-xs {repoDiff > 0
@@ -392,7 +408,9 @@
 										</span>
 									{/if}
 									<span class="tabular-nums text-gray-500 dark:text-gray-400">
-										{s.repos_with_skills} / {s.repos} ({s.repos > 0 ? Math.round((s.repos_with_skills / s.repos) * 100) : 0}%)
+										{s.repos_with_skills} / {s.repos} ({s.repos > 0
+											? Math.round((s.repos_with_skills / s.repos) * 100)
+											: 0}%)
 									</span>
 								</td>
 								<td

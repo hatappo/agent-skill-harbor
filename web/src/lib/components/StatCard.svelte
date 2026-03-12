@@ -9,9 +9,7 @@
 	let { label, value, change, sub }: Props = $props();
 </script>
 
-<div
-	class="rounded-lg border border-gray-200 bg-white px-5 py-4 shadow-sm dark:border-gray-700 dark:bg-gray-900"
->
+<div class="rounded-lg border border-gray-200 bg-white px-5 py-4 shadow-sm dark:border-gray-700 dark:bg-gray-900">
 	<dt class="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</dt>
 	<dd class="mt-1 flex items-baseline gap-2">
 		{#if change != null && change !== 0}

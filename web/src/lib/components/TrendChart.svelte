@@ -157,7 +157,13 @@
 					stroke-dasharray="6 3"
 				/>
 				{#each computed.secondary.points as point}
-					<circle cx={point.x} cy={point.y} r="3" class="fill-white stroke-amber-500 dark:fill-gray-900 dark:stroke-amber-400" stroke-width="1.5" />
+					<circle
+						cx={point.x}
+						cy={point.y}
+						r="3"
+						class="fill-white stroke-amber-500 dark:fill-gray-900 dark:stroke-amber-400"
+						stroke-width="1.5"
+					/>
 				{/each}
 			{/if}
 
@@ -189,7 +195,13 @@
 				<circle cx={hp.x} cy={hp.y} r="5" class="fill-blue-500 dark:fill-blue-400" opacity="0.8" />
 				{#if computed.secondary}
 					{@const sp = computed.secondary.points[hoveredIndex]}
-					<circle cx={sp.x} cy={sp.y} r="5" class="fill-white stroke-amber-500 dark:fill-gray-900 dark:stroke-amber-400" stroke-width="2" />
+					<circle
+						cx={sp.x}
+						cy={sp.y}
+						r="5"
+						class="fill-white stroke-amber-500 dark:fill-gray-900 dark:stroke-amber-400"
+						stroke-width="2"
+					/>
 				{/if}
 			{/if}
 
@@ -214,7 +226,9 @@
 			{@const tooltipOnRight = tooltipLeft < chartWidth / 2}
 			<div
 				class="pointer-events-none absolute z-10 rounded border border-gray-200 bg-white px-2.5 py-1.5 text-xs shadow-md dark:border-gray-600 dark:bg-gray-800"
-				style="top: {padding.top - 4}px; {tooltipOnRight ? `left: ${tooltipLeft + 12}px` : `right: ${chartWidth - tooltipLeft + 12}px`};"
+				style="top: {padding.top - 4}px; {tooltipOnRight
+					? `left: ${tooltipLeft + 12}px`
+					: `right: ${chartWidth - tooltipLeft + 12}px`};"
 			>
 				<div class="mb-1 font-medium text-gray-600 dark:text-gray-300">{hp.label}</div>
 				<div class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">

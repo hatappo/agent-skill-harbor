@@ -240,7 +240,6 @@
 				</div>
 			</div>
 		</div>
-
 	</div>
 
 	<!-- Side Panel -->
