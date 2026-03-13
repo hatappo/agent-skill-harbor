@@ -1,12 +1,17 @@
 <script lang="ts">
 	import { dev } from '$app/environment';
+	import { base } from '$app/paths';
 	import { locale } from '$lib/i18n';
 	import { marked } from 'marked';
 	import DOMPurify from 'isomorphic-dompurify';
 
 	let { data } = $props();
 
-	let html = $derived(DOMPurify.sanitize(marked(data.content[$locale] ?? data.content.en) as string));
+	let html = $derived.by(() => {
+		const rendered = marked(data.content[$locale] ?? data.content.en) as string;
+		const withBase = rendered.replaceAll('href="/guide', `href="${base}/guide`);
+		return DOMPurify.sanitize(withBase);
+	});
 	let title = $derived(data.title[$locale] ?? data.title.en);
 </script>
 

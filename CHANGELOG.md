@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.7] - 2026-03-14
+
+### Fixed
+
+- Guide markdown links now preserve `paths.base` during rendering so GitHub Pages prerender does not fail on `/guide` links
+
 ## [0.8.6] - 2026-03-14
 
 ### Added
