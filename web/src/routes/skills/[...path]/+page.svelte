@@ -436,7 +436,7 @@
 			{#if viewMode === 'raw'}
 				<pre class="whitespace-pre-wrap font-mono text-sm leading-relaxed text-gray-700 dark:text-gray-300">{body}</pre>
 			{:else}
-				<div class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+				<div class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
 					{@html renderedBody}
 				</div>
 			{/if}

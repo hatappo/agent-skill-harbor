@@ -20,6 +20,6 @@
 </svelte:head>
 
 <h1 class="mb-6 text-3xl font-bold text-gray-900 dark:text-gray-100">{title}</h1>
-<div class="prose prose-sm dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
+<div class="guide-content prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300">
 	{@html html}
 </div>
