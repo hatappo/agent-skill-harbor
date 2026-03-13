@@ -1,5 +1,15 @@
 # Changelog
 
+## [cli 0.10.2] / [web 0.9.3] - 2026-03-14
+
+### Fixed
+
+- GitHub Pages deploy workflow template now sets `include-hidden-files: true` on `upload-pages-artifact` so dot-prefixed paths (`.nojekyll`, `.claude/`) are no longer silently excluded from the upload
+
+### Changed
+
+- List view default grouping changed from Repository to Origin
+
 ## [web 0.9.2] - 2026-03-14
 
 ### Fixed

@@ -1,5 +1,15 @@
 # 変更履歴
 
+## [cli 0.10.2] / [web 0.9.3] - 2026-03-14
+
+### 修正
+
+- GitHub Pages デプロイ用ワークフローテンプレートの `upload-pages-artifact` に `include-hidden-files: true` を追加し、ドット始まりのパス（`.nojekyll`、`.claude/`）がアップロードから除外される問題を修正
+
+### 変更
+
+- List ビューのデフォルト grouping を Repository から Origin に変更
+
 ## [web 0.9.2] - 2026-03-14
 
 ### 修正
