@@ -11,6 +11,8 @@ config/*
 !config/.gitkeep
 data/*
 !data/.gitkeep
+guide/*
+!guide/.gitkeep
 
 # SvelteKit
 web/.svelte-kit/
