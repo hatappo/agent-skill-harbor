@@ -106,11 +106,11 @@ GitHub Pages の代わりに Cloudflare Pages にデプロイできます。GitH
 
 GitHub リポジトリの **Settings > Secrets and variables > Actions** に以下を追加します:
 
-| シークレット                       | 必須 | 説明                                   |
-| --------------------------------- | ---- | -------------------------------------- |
-| `CLOUDFLARE_API_TOKEN`            | Yes  | Pages 編集権限を持つ Cloudflare API トークン |
-| `CLOUDFLARE_ACCOUNT_ID`          | Yes  | Cloudflare アカウント ID                |
-| `CLOUDFLARE_PAGES_PROJECT_NAME`  | Yes  | Cloudflare Pages プロジェクト名         |
+| シークレット                    | 必須 | 説明                                         |
+| ------------------------------- | ---- | -------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN`          | Yes  | Pages 編集権限を持つ Cloudflare API トークン |
+| `CLOUDFLARE_ACCOUNT_ID`         | Yes  | Cloudflare アカウント ID                     |
+| `CLOUDFLARE_PAGES_PROJECT_NAME` | Yes  | Cloudflare Pages プロジェクト名              |
 
 ### 2. Basic 認証の設定（任意）
 

@@ -106,11 +106,11 @@ Instead of GitHub Pages, you can deploy to Cloudflare Pages. This is useful when
 
 Add the following secrets to your GitHub repository (**Settings > Secrets and variables > Actions**):
 
-| Secret                            | Required | Description                          |
-| --------------------------------- | -------- | ------------------------------------ |
-| `CLOUDFLARE_API_TOKEN`            | Yes      | Cloudflare API token with Pages edit |
-| `CLOUDFLARE_ACCOUNT_ID`          | Yes      | Your Cloudflare account ID           |
-| `CLOUDFLARE_PAGES_PROJECT_NAME`  | Yes      | Cloudflare Pages project name        |
+| Secret                          | Required | Description                          |
+| ------------------------------- | -------- | ------------------------------------ |
+| `CLOUDFLARE_API_TOKEN`          | Yes      | Cloudflare API token with Pages edit |
+| `CLOUDFLARE_ACCOUNT_ID`         | Yes      | Your Cloudflare account ID           |
+| `CLOUDFLARE_PAGES_PROJECT_NAME` | Yes      | Cloudflare Pages project name        |
 
 ### 2. Enable Basic Auth (Optional)
 

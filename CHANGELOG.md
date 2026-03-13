@@ -1,5 +1,15 @@
 # Changelog
 
+## [web 0.9.2] - 2026-03-14
+
+### Fixed
+
+- Broadened the Vite dev server filesystem allow list so `pnpm dev` works again when the installed web package is resolved from pnpm's nested store paths
+
+### Changed
+
+- Tightened the root workspace formatter to repository-level shared files only, leaving package-local formatting to `cli/` and `web/`
+
 ## [cli 0.10.1] / [web 0.9.1] - 2026-03-14
 
 ### Changed

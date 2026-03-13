@@ -1,5 +1,15 @@
 # 変更履歴
 
+## [web 0.9.2] - 2026-03-14
+
+### 修正
+
+- Vite dev server の filesystem allow list を広げ、pnpm の入れ子になった store path から web package を解決する構成でも `pnpm dev` が再び動作するよう修正
+
+### 変更
+
+- root workspace の formatter 対象を repository 共通ファイルのみに絞り、package ローカルの整形は `cli/` と `web/` 側に委ねる構成へ整理
+
 ## [cli 0.10.1] / [web 0.9.1] - 2026-03-14
 
 ### 変更

@@ -1,13 +1,23 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
+import { realpathSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { dirname, join, resolve } from 'node:path';
+import { defineConfig, searchForWorkspaceRoot } from 'vite';
 
 const require = createRequire(import.meta.url);
-const projectRoot = process.env.SKILL_HARBOR_ROOT || resolve(import.meta.dirname, '..');
-const webPackageRoot = resolve(import.meta.dirname);
-const svelteKitRoot = dirname(require.resolve('@sveltejs/kit/package.json'));
+const projectRoot = realpathSync(process.env.SKILL_HARBOR_ROOT || resolve(import.meta.dirname, '..'));
+const webPackageRoot = realpathSync(resolve(import.meta.dirname));
+const svelteKitRoot = realpathSync(dirname(require.resolve('@sveltejs/kit/package.json')));
+const viteRoot = realpathSync(dirname(require.resolve('vite/package.json')));
+const allowList = [
+	searchForWorkspaceRoot(projectRoot),
+	projectRoot,
+	join(projectRoot, 'node_modules'),
+	webPackageRoot,
+	svelteKitRoot,
+	viteRoot,
+];
 
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
@@ -18,7 +28,7 @@ export default defineConfig({
 	},
 	server: {
 		fs: {
-			allow: [projectRoot, webPackageRoot, svelteKitRoot],
+			allow: allowList,
 		},
 	},
 	ssr: { external: ['gray-matter'] },
