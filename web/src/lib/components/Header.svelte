@@ -16,14 +16,14 @@
 	let repoName = $derived(repoFullName?.split('/')[1] ?? null);
 
 	const navItems = [
-		{ href: '/skills', label: 'header.catalog', match: '/skills' },
-		{ href: '/config', label: 'header.config', match: '/config' },
-		{ href: '/guide', label: 'Guide', match: '/guide' },
+		{ href: '/skills', label: 'header.catalog', matches: ['/skills', '/stats', '/graph'] },
+		{ href: '/config', label: 'header.config', matches: ['/config'] },
+		{ href: '/guide', label: 'Guide', matches: ['/guide'] },
 	] as const;
 
-	function isActive(path: string, match: string): boolean {
+	function isActive(path: string, matches: readonly string[]): boolean {
 		const normalized = path.replace(base, '');
-		return normalized.startsWith(match);
+		return matches.some((match) => normalized.startsWith(match));
 	}
 </script>
 
@@ -37,7 +37,7 @@
 			{#each navItems as item}
 				<a
 					href="{base}{item.href}"
-					class="transition-colors {isActive($page.url.pathname, item.match)
+					class="transition-colors {isActive($page.url.pathname, item.matches)
 						? 'font-semibold text-gray-900 dark:text-gray-100'
 						: 'hover:text-gray-900 dark:hover:text-gray-100'}"
 				>{item.label.startsWith('header.') ? $t(item.label) : item.label}</a>
