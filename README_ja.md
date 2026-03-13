@@ -109,6 +109,7 @@ my-skill-harbor/
 - [組織セットアップ](docs/01-organization-setup_ja.md)
 - [ガバナンスガイド](docs/02-governance-guide_ja.md)
 - [ローカル開発](docs/03-local-development_ja.md)
+- [リリース](docs/04-release_ja.md)
 
 ## ライセンス
 

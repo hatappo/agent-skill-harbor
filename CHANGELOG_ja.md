@@ -1,5 +1,24 @@
 # 変更履歴
 
+## [0.8.2] - 2026-03-13
+
+### 追加
+
+- 専用の `04-release` ドキュメントを追加（EN/JA）
+- 公開される `agent-skill-harbor-web` パッケージ向けの npm README を追加
+- ルート・web・init template のバージョン整合を保つ `versions:sync` / `versions:check` を追加
+
+### 変更
+
+- 公開される Web ランタイムを `agent-skill-harbor-web` として分離し、CLI から依存する構成に変更
+- ローカル開発ドキュメントにパッケージ責務と publish 順序の説明を追加
+- `pnpm version` と `prepack` の前後で version 検証・同期を行うフックを追加
+
+### 修正
+
+- `harbor build` / `harbor dev` / `harbor preview` が、存在しない同梱パスではなくインストール済み Web パッケージから Vite を解決するよう修正
+- ソースリポジトリに収集済みスキルがない状態でも、スキル詳細ページの prerender でビルドが落ちないよう修正
+
 ## [0.8.1] - 2026-03-13
 
 ### 修正

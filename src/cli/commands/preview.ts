@@ -1,8 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { resolve } from 'node:path';
-import { webRoot, userRoot } from '../paths.js';
+import { dirname, resolve } from 'node:path';
+import { webPackageRequire, webRoot, userRoot } from '../paths.js';
 
-const viteCli = resolve(webRoot, 'node_modules/vite/bin/vite.js');
+const viteCli = resolve(dirname(webPackageRequire.resolve('vite/package.json')), 'bin/vite.js');
 
 console.log(`Starting preview server...`);
 console.log(`  Project root: ${userRoot}`);

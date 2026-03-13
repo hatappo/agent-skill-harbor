@@ -83,3 +83,15 @@ pnpm setup:dev    # テンプレートとフィクスチャを再コピー
 - **`web/vite.config.ts`**: `SKILL_HARBOR_ROOT` からコンパイル時定数 `__PROJECT_ROOT__` を注入。
 - **`web/src/lib/server/catalog.ts`**: プリレンダリング時に `data/skills.yaml` と `data/skills/` を読み込み。
 - **`adapter-static`**: すべてのページはビルド時にプリレンダリングされ、静的 HTML として配信。サーバーランタイム不要。
+
+### パッケージ構成
+
+- **`agent-skill-harbor`**: 公開される CLI パッケージ。`harbor` 実行ファイル、プロジェクトテンプレート、collect ランタイムを含みます。
+- **`agent-skill-harbor-web`**: 公開される SvelteKit Web パッケージ。フロントエンドのソース、SvelteKit 設定、Web ビルド依存を含みます。
+- **実行時依存の向き**: CLI パッケージは `agent-skill-harbor-web` に依存し、`web/` を CLI tarball に同梱するのではなく、インストール済みの Web パッケージからビルドツール群を解決します。
+- **依存の管理責務**: Web UI と SvelteKit の依存は `web/package.json` を正とし、ルート `package.json` には CLI/ランタイム依存のみを置きます。
+
+### リリース補足
+
+- publish 順序は `agent-skill-harbor-web` が先、その後に `agent-skill-harbor` です。
+- 詳細なリリース手順は [04-release_ja.md](docs/04-release_ja.md) を参照してください。

@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.8.2] - 2026-03-13
+
+### Added
+
+- Release documentation split into dedicated `04-release` docs (EN/JA)
+- Internal npm README files for the published `agent-skill-harbor-web` package
+- `versions:sync` and `versions:check` scripts to keep root, web, and init template versions aligned
+
+### Changed
+
+- Split the published web runtime into `agent-skill-harbor-web` and made the CLI depend on it
+- Updated local development docs to explain package ownership and publish order
+- Added version lifecycle hooks around `pnpm version` and `prepack`
+
+### Fixed
+
+- `harbor build`, `harbor dev`, and `harbor preview` now resolve Vite from the installed web package instead of a missing bundled path
+- Skill detail prerendering now works when building without crawled skill entries present in the source repository
+
 ## [0.8.1] - 2026-03-13
 
 ### Fixed

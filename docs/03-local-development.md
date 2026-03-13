@@ -83,3 +83,15 @@ pnpm setup:dev    # Re-copy templates and fixtures
 - **`web/vite.config.ts`**: Injects `__PROJECT_ROOT__` as a compile-time constant from `SKILL_HARBOR_ROOT`.
 - **`web/src/lib/server/catalog.ts`**: Reads `data/skills.yaml` and `data/skills/` at build time for prerendering.
 - **`adapter-static`**: All pages are prerendered to static HTML at build time. No server runtime needed.
+
+### Package Layout
+
+- **`agent-skill-harbor`**: The published CLI package. It contains the `harbor` executable, project templates, and collector runtime.
+- **`agent-skill-harbor-web`**: The published SvelteKit web package. It contains the frontend source, SvelteKit config, and web build dependencies.
+- **Runtime dependency direction**: The CLI package depends on `agent-skill-harbor-web` and resolves the web build toolchain from the installed web package instead of bundling `web/` into the CLI tarball.
+- **Dependency ownership**: Web UI and SvelteKit dependencies should be managed in `web/package.json`. The root `package.json` should keep only CLI/runtime dependencies.
+
+### Release Notes
+
+- Publish order matters: release `agent-skill-harbor-web` first, then `agent-skill-harbor`.
+- For the detailed release workflow, see [04-release.md](docs/04-release.md).

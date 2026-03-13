@@ -1,6 +1,13 @@
 import { error } from '@sveltejs/kit';
 import { getSkillBody, loadCatalog } from '$lib/server/catalog';
 
+export const prerender = 'auto';
+
+export const entries = () => {
+	const { skills } = loadCatalog();
+	return skills.map((skill) => ({ path: skill.key }));
+};
+
 export const load = ({ params }) => {
 	const { skills, freshPeriodDays } = loadCatalog();
 	const path = params.path.replace(/\/+$/, '');

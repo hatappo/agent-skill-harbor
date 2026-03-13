@@ -1,11 +1,11 @@
-import { resolve } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { webRoot, userRoot } from '../paths.js';
+import { webPackageRequire, webRoot, userRoot } from '../paths.js';
 
 const args = process.argv.slice(3);
 const basePath = args.find((a) => a.startsWith('--base='))?.split('=')[1] ?? '';
 const outputDir = resolve(userRoot, 'build');
-const viteCli = resolve(webRoot, 'node_modules/vite/bin/vite.js');
+const viteCli = resolve(dirname(webPackageRequire.resolve('vite/package.json')), 'bin/vite.js');
 
 console.log(`Building web catalog...`);
 console.log(`  Project root: ${userRoot}`);

@@ -6,6 +6,7 @@ const args = process.argv.slice(3);
 const targetDir = args[0] ? resolve(process.cwd(), args[0]) : process.cwd();
 const projectName = basename(targetDir);
 const templatesDir = resolve(packageRoot, 'templates/init');
+const packageVersion = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf-8')).version as string;
 
 console.log(`\nInitializing Agent Skill Harbor project: ${projectName}`);
 console.log(`  Directory: ${targetDir}\n`);
@@ -27,7 +28,10 @@ if (existing.length > 0) {
 
 // package.json (template is named 'package.template.json' to avoid pnpm workspace issues)
 const pkgTemplate = readFileSync(join(templatesDir, 'package.template.json'), 'utf-8');
-writeFileSync(join(targetDir, 'package.json'), pkgTemplate.replace('{{PROJECT_NAME}}', projectName));
+writeFileSync(
+	join(targetDir, 'package.json'),
+	pkgTemplate.replace('{{PROJECT_NAME}}', projectName).replace('{{PACKAGE_VERSION}}', packageVersion),
+);
 console.log('  Created package.json');
 
 // env files

@@ -1,6 +1,6 @@
 {
 	"name": "agent-skill-harbor",
-	"version": "0.8.1",
+	"version": "0.8.2",
 	"type": "module",
 	"description": "Skill governance for companies. Skill discovery for teams.",
 	"keywords": [
@@ -23,21 +23,23 @@
 		"harbor": "./dist/bin/cli.js",
 		"agent-skill-harbor": "./dist/bin/cli.js"
 	},
+	"dependencies": {
+		"@octokit/rest": "^21.1.1",
+		"agent-skill-harbor-web": "workspace:^0.8.2",
+		"js-yaml": "^4.1.0"
+	},
 	"files": [
 		"dist/",
-		"web/src/",
-		"web/static/",
-		"web/package.json",
-		"web/svelte.config.js",
-		"web/tsconfig.json",
-		"web/vite.config.ts",
-		"web/components.json",
 		"templates/"
 	],
 	"scripts": {
 		"build:cli": "tsup",
-		"prepack": "pnpm build:cli",
+		"prepack": "pnpm versions:check && pnpm build:cli",
+		"preversion": "pnpm versions:check",
+		"version": "pnpm versions:sync && pnpm versions:check && git add package.json web/package.json templates/init/package.template.json pnpm-lock.yaml",
 		"setup:dev": "tsx scripts/setup-dev.ts",
+		"versions:sync": "tsx scripts/sync-versions.ts",
+		"versions:check": "tsx scripts/check-versions.ts",
 		"collect": "tsx bin/cli.ts collect",
 		"dev": "tsx bin/cli.ts dev",
 		"build": "tsx bin/cli.ts build",
@@ -53,11 +55,8 @@
 		]
 	},
 	"devDependencies": {
-		"@octokit/rest": "^21.1.1",
 		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^22.15.0",
-		"gray-matter": "^4.0.3",
-		"js-yaml": "^4.1.0",
 		"prettier": "3.8.1",
 		"prettier-plugin-svelte": "3.5.1",
 		"tsup": "8.5.1",
