@@ -43,14 +43,28 @@ function resolveIndexPath(locale: string): string | null {
 	return null;
 }
 
+function findFileWithPrefix(dir: string, slug: string, suffix: string): string | null {
+	const direct = join(dir, `${slug}${suffix}`);
+	if (fileExists(direct)) return direct;
+
+	if (!fileExists(dir)) return null;
+	const pattern = new RegExp(`^\\d+-${slug.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}${suffix.replace('.', '\\.')}$`);
+	for (const file of readdirSync(dir)) {
+		if (pattern.test(file)) return join(dir, file);
+	}
+	return null;
+}
+
 function resolveGuidePath(slug: string, locale: string): string | null {
 	if (slug === '') return resolveIndexPath(locale);
 
 	for (const dir of SOURCE_DIRS) {
-		const localized = join(dir, `${slug}_${locale}.md`);
-		const fallback = join(dir, `${slug}.md`);
-		if (locale !== 'en' && fileExists(localized)) return localized;
-		if (fileExists(fallback)) return fallback;
+		if (locale !== 'en') {
+			const localized = findFileWithPrefix(dir, slug, `_${locale}.md`);
+			if (localized) return localized;
+		}
+		const fallback = findFileWithPrefix(dir, slug, '.md');
+		if (fallback) return fallback;
 	}
 
 	return null;
@@ -63,7 +77,7 @@ function stripPreamble(content: string): string {
 
 function rewriteGuideLinks(content: string): string {
 	return content
-		.replace(/\(guide\/([^)]+?)(?:_[a-z]{2})?\.md\)/g, '(/guide/$1)')
+		.replace(/\(guide\/(?:\d+-)?([^)]+?)(?:_[a-z]{2})?\.md\)/g, '(/guide/$1)')
 		.replace(/\((?:\.\/)?README(?:_[a-z]{2})?\.md\)/g, '(/guide)');
 }
 
@@ -79,8 +93,12 @@ function buildEntry(slug: string): DocEntry | null {
 	return { slug, title: { en: enTitle, ja: jaTitle } };
 }
 
+function stripOrderPrefix(name: string): string {
+	return name.replace(/^\d+-/, '');
+}
+
 function listGuideSlugs(): string[] {
-	const slugs = new Set<string>();
+	const fileNames = new Set<string>();
 
 	for (const dir of SOURCE_DIRS) {
 		if (!fileExists(dir)) continue;
@@ -90,12 +108,12 @@ function listGuideSlugs(): string[] {
 			if (file === 'index.md' || /^index_[a-z]{2}\.md$/.test(file)) continue;
 			if (file === 'README.md' || /^README_[a-z]{2}\.md$/.test(file)) continue;
 
-			const slug = file.replace(/(?:_[a-z]{2})?\.md$/, '');
-			slugs.add(slug);
+			const baseName = file.replace(/(?:_[a-z]{2})?\.md$/, '');
+			fileNames.add(baseName);
 		}
 	}
 
-	return [...slugs].sort();
+	return [...fileNames].sort().map(stripOrderPrefix);
 }
 
 export function listDocs(): DocEntry[] {
