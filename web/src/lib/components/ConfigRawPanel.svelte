@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { t } from '$lib/i18n';
+	import { highlightYamlLines } from '$lib/utils/yaml-highlight';
 
 	interface Props {
 		path: string;
@@ -7,6 +8,7 @@
 	}
 
 	let { path, content }: Props = $props();
+	const highlightedLines = $derived(highlightYamlLines(content));
 </script>
 
 <details
@@ -36,8 +38,8 @@
 			>
 				{path}
 			</code>
-			<pre class="overflow-x-auto rounded-md bg-gray-950 px-4 py-3 text-xs leading-6 text-gray-100"><code
-					>{content}</code
+			<pre class="overflow-x-auto rounded-md bg-gray-950 px-4 py-3 text-xs leading-6 text-gray-100"><code class="block"
+					>{#each highlightedLines as line}<span class="block whitespace-pre">{@html line}</span>{/each}</code
 				></pre>
 		{:else}
 			<p class="text-sm text-gray-500 dark:text-gray-400">{$t('settings.raw.empty')}</p>
