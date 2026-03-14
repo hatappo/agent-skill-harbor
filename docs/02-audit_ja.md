@@ -188,6 +188,8 @@ workflow の停止を避けるため、以下の制約があります。
 
 built-in の `builtin.static` engine は、キャッシュ済み Markdown ファイルから危険なパターンを検出します。
 
+> 注意: `builtin.static` はまだアルファ品質の扱いです。シグナル抽出には有用ですが、誤検知はまだ多いです。
+
 以下のような付加情報を findings に含めることがあります。
 
 - `permission_scope`, `external_communication` などの `category`
