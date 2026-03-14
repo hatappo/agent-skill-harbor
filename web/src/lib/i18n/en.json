@@ -140,7 +140,8 @@
 			"skill_path": "Skill",
 			"policy": "Policy",
 			"note": "Note",
-			"empty": "No policies defined."
+			"empty": "No policies defined.",
+			"not_found": "Not in catalog"
 		},
 		"empty_list": "Not configured",
 		"enabled": "Enabled",
