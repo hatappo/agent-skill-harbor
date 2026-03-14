@@ -6,7 +6,7 @@ import { join, relative } from 'node:path';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
 import type { CollectionEntry, FlatSkillEntry, RepoInfo, Visibility } from '$lib/types';
-import { governanceSchema, type GovernanceConfig } from '$lib/schemas/governance';
+import { governancePolicySchema, type GovernanceConfig } from '$lib/schemas/governance';
 import { settingsSchema, type SettingsConfig } from '$lib/schemas/settings';
 
 declare const __PROJECT_ROOT__: string;
@@ -85,13 +85,17 @@ function detectOrgRepo(): { org: string | null; repo: string | null } {
 }
 
 function loadGovernanceRaw(): GovernanceConfig {
-	if (!existsSync(GOVERNANCE_PATH)) return governanceSchema.parse({});
-	try {
-		const raw = yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8'));
-		return governanceSchema.parse(raw ?? {});
-	} catch {
-		return governanceSchema.parse({});
+	if (!existsSync(GOVERNANCE_PATH)) return { policies: {} };
+	const raw = yamlLoad(readFileSync(GOVERNANCE_PATH, 'utf-8'));
+	const obj = (raw && typeof raw === 'object' && 'policies' in raw ? raw.policies : {}) as Record<string, unknown>;
+	const policies: GovernanceConfig['policies'] = {};
+	for (const [key, value] of Object.entries(obj)) {
+		const result = governancePolicySchema.safeParse(value);
+		if (result.success) {
+			policies[key] = result.data;
+		}
 	}
+	return { policies };
 }
 
 function loadGovernance(): Record<string, GovernanceEntry> {
