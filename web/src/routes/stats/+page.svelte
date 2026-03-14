@@ -101,7 +101,14 @@
 				: ownerFilter === 'community'
 					? previous.statistics.community.repos_with_skills
 					: previous.statistics.org.repos_with_skills + previous.statistics.community.repos_with_skills;
-		return reposWithSkills - prevReposWithSkills;
+		const prevRepos =
+			ownerFilter === 'org'
+				? previous.statistics.org.repos
+				: ownerFilter === 'community'
+					? previous.statistics.community.repos
+					: previous.statistics.org.repos + previous.statistics.community.repos;
+		const prevPct = prevRepos > 0 ? Math.round((prevReposWithSkills / prevRepos) * 100) : 0;
+		return repoAdoptionPct - prevPct;
 	});
 
 	let lastCollectedFormatted = $derived.by(() => {
@@ -231,8 +238,10 @@
 		<StatCard label={$t('stats.totalSkills')} value={totalSkills} change={skillChange} />
 		<StatCard
 			label={$t('stats.totalRepos')}
-			value="{reposWithSkills} / {totalRepos} ({repoAdoptionPct}%)"
+			value="{repoAdoptionPct}%"
+			sub="{reposWithSkills} / {totalRepos}"
 			change={repoChange}
+			changeSuffix="pt"
 		/>
 		<StatCard label={$t('stats.totalFiles')} value={totalFiles.toLocaleString()} />
 		<StatCard label={$t('stats.lastCollected')} value={lastCollectedFormatted} />
@@ -372,13 +381,16 @@
 									: ownerFilter === 'community'
 										? prev.statistics.community
 										: {
+												repos: prev.statistics.org.repos + prev.statistics.community.repos,
 												repos_with_skills:
 													prev.statistics.org.repos_with_skills + prev.statistics.community.repos_with_skills,
 												skills: prev.statistics.org.skills + prev.statistics.community.skills,
 											}
 								: null}
 							{@const skillDiff = ps ? s.skills - ps.skills : 0}
-							{@const repoDiff = ps ? s.repos_with_skills - ps.repos_with_skills : 0}
+							{@const adoptionPct = s.repos > 0 ? Math.round((s.repos_with_skills / s.repos) * 100) : 0}
+							{@const prevAdoptionPct = ps && ps.repos > 0 ? Math.round((ps.repos_with_skills / ps.repos) * 100) : 0}
+							{@const repoDiff = ps ? adoptionPct - prevAdoptionPct : 0}
 							<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
 								<td class="whitespace-nowrap px-5 py-3 text-sm text-gray-900 dark:text-gray-100">
 									{formatDate(entry.collecting.collected_at)}
@@ -404,13 +416,14 @@
 												? 'text-emerald-600 dark:text-emerald-400'
 												: 'text-red-600 dark:text-red-400'}"
 										>
-											{repoDiff > 0 ? '+' : ''}{repoDiff}
+											{repoDiff > 0 ? '+' : ''}{repoDiff}pt
 										</span>
 									{/if}
-									<span class="tabular-nums text-gray-500 dark:text-gray-400">
-										{s.repos_with_skills} / {s.repos} ({s.repos > 0
-											? Math.round((s.repos_with_skills / s.repos) * 100)
-											: 0}%)
+									<span class="tabular-nums font-medium text-gray-900 dark:text-gray-100">
+										{adoptionPct}%
+									</span>
+									<span class="tabular-nums text-gray-400 dark:text-gray-500">
+										({s.repos_with_skills}/{s.repos})
 									</span>
 								</td>
 								<td
