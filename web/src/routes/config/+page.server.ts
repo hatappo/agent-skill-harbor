@@ -1,8 +1,6 @@
-import { loadSettingsConfig, loadGovernanceConfig } from '$lib/server/catalog';
+import { redirect } from '@sveltejs/kit';
+import { base } from '$app/paths';
 
 export const load = () => {
-	return {
-		settings: loadSettingsConfig(),
-		governance: loadGovernanceConfig(),
-	};
+	redirect(301, `${base}/config/harbor`);
 };

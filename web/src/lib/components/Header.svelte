@@ -17,7 +17,7 @@
 
 	const navItems = [
 		{ href: '/skills', label: 'header.catalog', matches: ['/skills', '/stats', '/graph'] },
-		{ href: '/config', label: 'header.config', matches: ['/config'] },
+		{ href: '/config/harbor', label: 'header.config', matches: ['/config'] },
 		{ href: '/guide', label: 'Guide', matches: ['/guide'] },
 	] as const;
 
