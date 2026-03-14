@@ -39,6 +39,7 @@ const DEFAULT_AUDIT_SETTINGS: AuditSettingsConfig = {
 export function parseCliArgs(argv: string[]): ParsedCliArgs {
 	let force = false;
 	let engineIds: string[] | undefined;
+	let historyId: string | undefined;
 
 	for (let i = 0; i < argv.length; i++) {
 		const arg = argv[i];
@@ -57,10 +58,18 @@ export function parseCliArgs(argv: string[]): ParsedCliArgs {
 			i++;
 			continue;
 		}
+		if (arg === '--history-id') {
+			const value = argv[i + 1];
+			if (!value) throw new Error('--history-id requires a value.');
+			historyId = value.trim();
+			if (!historyId) throw new Error('--history-id requires a non-empty value.');
+			i++;
+			continue;
+		}
 		throw new Error(`Unknown option: ${arg}`);
 	}
 
-	return { force, engineIds };
+	return { force, engineIds, historyId };
 }
 
 export function loadAuditSettings(projectRoot: string): AuditSettingsConfig {

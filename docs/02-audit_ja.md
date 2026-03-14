@@ -53,7 +53,7 @@ Harbor は設定された engine のコマンドを実行するだけで、Pytho
 
 ### GitHub Actions の例
 
-Python ベースの engine を使う場合は、`npx harbor audit` の前に `AuditSkills` workflow でセットアップします。
+GitHub Actions で Python ベースの engine を使う場合は、`npx harbor audit` の前に `CollectAndAuditSkills` workflow でセットアップします。
 
 ```yaml
 - uses: actions/setup-python@v5
@@ -63,8 +63,12 @@ Python ベースの engine を使う場合は、`npx harbor audit` の前に `Au
 - name: Install Python audit dependencies
   run: pip install -r scripts/audit-requirements.txt
 
+- name: Collect skills
+  id: collect
+  run: npx harbor collect
+
 - name: Audit collected skills
-  run: npx harbor audit
+  run: npx harbor audit --history-id "${{ steps.collect.outputs.history_id }}"
 ```
 
 ### ローカル実行
@@ -89,10 +93,14 @@ harbor audit
 ```bash
 harbor audit --force
 harbor audit --engines static,company-policy
+harbor audit --history-id 550e8400-e29b-41d4-a716-446655440000
 ```
 
 - `--force`: `tree_sha` に変更がなくても再監査します
 - `--engines`: この実行時だけ設定済み engine 一覧を上書きします
+- `--history-id`: 既存の `collect-history.yaml` entry に監査サマリを紐付けます
+
+`harbor audit` は常に `data/report.yaml` を更新します。履歴エントリを更新するのは `--history-id` を付けた場合だけです。
 
 ## Engine 契約
 
@@ -150,7 +158,9 @@ engine は標準出力で JSON を返します。
 
 ## 出力
 
-監査結果は `data/audit-results.yaml` に保存されます。
+最新の監査結果は `data/report.yaml` に保存されます。
+
+`--history-id` を付けて実行した場合は、対応する `collect-history.yaml` の entry に `auditing` と `report` のサマリも保存されます。
 
 各スキルごとに以下を保持します。
 

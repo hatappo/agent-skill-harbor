@@ -53,7 +53,7 @@ If your engine needs an additional runtime, prepare it in the environment that r
 
 ### GitHub Actions Example
 
-If you use a Python-based engine, add setup steps to `AuditSkills` before `npx harbor audit`:
+If you use a Python-based engine in GitHub Actions, add setup steps to `CollectAndAuditSkills` before `npx harbor audit`:
 
 ```yaml
 - uses: actions/setup-python@v5
@@ -63,8 +63,12 @@ If you use a Python-based engine, add setup steps to `AuditSkills` before `npx h
 - name: Install Python audit dependencies
   run: pip install -r scripts/audit-requirements.txt
 
+- name: Collect skills
+  id: collect
+  run: npx harbor collect
+
 - name: Audit collected skills
-  run: npx harbor audit
+  run: npx harbor audit --history-id "${{ steps.collect.outputs.history_id }}"
 ```
 
 ### Local Execution
@@ -89,10 +93,14 @@ Available options:
 ```bash
 harbor audit --force
 harbor audit --engines static,company-policy
+harbor audit --history-id 550e8400-e29b-41d4-a716-446655440000
 ```
 
 - `--force`: Re-run audit even when `tree_sha` has not changed
 - `--engines`: Override the configured engine list for this run
+- `--history-id`: Attach the audit summary to an existing `collect-history.yaml` entry
+
+`harbor audit` always updates `data/report.yaml`. History is updated only when `--history-id` is provided.
 
 ## Engine Contract
 
@@ -150,7 +158,9 @@ Extended response:
 
 ## Output
 
-Audit results are stored in `data/audit-results.yaml`.
+Latest audit results are stored in `data/report.yaml`.
+
+When `--history-id` is provided, a summary is also stored in the matching `collect-history.yaml` entry under `auditing` and `report`.
 
 Each skill stores:
 

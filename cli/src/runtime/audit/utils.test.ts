@@ -4,7 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { DEFAULT_ENGINE_TIMEOUT_SEC, MAX_ENGINE_TIMEOUT_SEC } from './types.js';
-import { loadAuditSettings, resolveAuditEngines } from './utils.js';
+import { loadAuditSettings, parseCliArgs, resolveAuditEngines } from './utils.js';
 
 test('loadAuditSettings preserves an explicit empty engine list', () => {
 	const root = mkdtempSync(join(tmpdir(), 'audit-settings-'));
@@ -45,4 +45,11 @@ test('resolveAuditEngines rejects timeout values above the maximum', () => {
 	};
 
 	assert.throws(() => resolveAuditEngines(settings), /timeout_sec must be <=/);
+});
+
+test('parseCliArgs accepts --history-id', () => {
+	const parsed = parseCliArgs(['--history-id', '1234', '--engines', 'static']);
+
+	assert.equal(parsed.historyId, '1234');
+	assert.deepEqual(parsed.engineIds, ['static']);
 });

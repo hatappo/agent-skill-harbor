@@ -24,6 +24,41 @@ export interface AuditResultsYaml {
 	results: Record<string, AuditSkillResult>;
 }
 
+export interface AuditResultCounts {
+	pass: number;
+	warn: number;
+	fail: number;
+}
+
+export interface AuditHistoryReportBucket {
+	processed: AuditResultCounts;
+	skipped: AuditResultCounts;
+}
+
+export interface AuditHistoryReport {
+	org: AuditHistoryReportBucket;
+	community: AuditHistoryReportBucket;
+}
+
+export interface AuditHistoryMeta {
+	audited_at: string;
+	duration_sec: number;
+	engines: string[];
+	skipped: boolean;
+	skip_reason?: string;
+}
+
+export interface AuditRunSummary {
+	overall: AuditResultValue;
+	total: number;
+	skipped: number;
+	processed: number;
+	duration_ms: number;
+	average_duration_ms: number;
+	report?: AuditHistoryReport;
+	auditing: AuditHistoryMeta;
+}
+
 export interface AuditEngineConfig {
 	id: string;
 	command?: string[];
@@ -42,6 +77,7 @@ export const MAX_ENGINE_TIMEOUT_SEC = 300;
 export interface ParsedCliArgs {
 	force: boolean;
 	engineIds?: string[];
+	historyId?: string;
 }
 
 export interface CatalogSkillEntry {
