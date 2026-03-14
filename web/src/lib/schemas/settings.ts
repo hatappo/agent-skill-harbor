@@ -16,6 +16,10 @@ const catalogSchema = z.object({
 	skill: skillSchema.default(() => skillSchema.parse({})),
 });
 
+const uiSchema = z.object({
+	title: z.string().default('Agent Skill Harbor'),
+});
+
 const auditEngineSchema = z.object({
 	id: z.string(),
 	command: z.array(z.string()).optional(),
@@ -31,6 +35,7 @@ export const settingsSchema = z.object({
 	collector: collectorSchema.default(() => collectorSchema.parse({})),
 	catalog: catalogSchema.default(() => catalogSchema.parse({})),
 	audit: auditSchema.default(() => auditSchema.parse({})),
+	ui: uiSchema.default(() => uiSchema.parse({})),
 });
 
 export type SettingsConfig = z.infer<typeof settingsSchema>;

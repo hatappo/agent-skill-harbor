@@ -139,6 +139,10 @@
 			"title": "カタログ",
 			"fresh_period_days": "「New」バッジの表示期間（日数）"
 		},
+		"ui": {
+			"title": "UI",
+			"title_value": "ヘッダタイトル"
+		},
 		"audit": {
 			"title": "監査",
 			"exclude_community_repos": "自組織所有のリポジトリのみ監査",

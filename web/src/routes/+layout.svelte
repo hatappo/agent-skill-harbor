@@ -17,7 +17,7 @@
 
 <TooltipProvider delayDuration={700}>
 	<div class="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950">
-		<Header repoFullName={data.repoFullName} />
+		<Header repoFullName={data.repoFullName} title={data.settings.ui.title} />
 		<main class="flex-1">
 			{@render children()}
 		</main>

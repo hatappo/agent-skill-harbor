@@ -237,4 +237,25 @@
 			</table>
 		</div>
 	</section>
+
+	<!-- UI Section -->
+	<section>
+		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+			{$t('settings.ui.title')}
+		</h2>
+		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+			<table class="w-full">
+				<tbody>
+					<tr>
+						<td class="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+							{$t('settings.ui.title_value')}
+						</td>
+						<td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+							{data.settings.ui.title}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
 </div>

@@ -7,10 +7,6 @@ collector:
   #   - https://github.com/owner/repo
   history_limit: 50 # max entries kept in collect-history.yaml (0 = unlimited)
 
-catalog:
-  skill:
-    fresh_period_days: 30 # 0 = disable "New" badge
-
 audit:
   exclude_community_repos: true # audit only your org-owned repos by default
   engines:
@@ -18,3 +14,11 @@ audit:
     # - id: company-policy
     #   command: ["python3", "scripts/company-policy-audit.py"]
     #   timeout_sec: 30 # default 30, max 300
+
+catalog:
+  skill:
+    fresh_period_days: 30 # 0 = disable "New" badge
+
+
+# ui:
+#   title: Agent Skill Harbor

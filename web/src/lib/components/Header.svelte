@@ -8,9 +8,10 @@
 
 	interface Props {
 		repoFullName?: string | null;
+		title?: string;
 	}
 
-	let { repoFullName = null }: Props = $props();
+	let { repoFullName = null, title = 'Agent Skill Harbor' }: Props = $props();
 
 	let orgName = $derived(repoFullName?.split('/')[0] ?? null);
 	let repoName = $derived(repoFullName?.split('/')[1] ?? null);
@@ -34,7 +35,7 @@
 			class="min-w-0 flex items-center gap-2 text-lg font-bold text-gray-900 dark:text-gray-100 sm:text-xl"
 		>
 			{#if dev}<span class="text-orange-500">(Dev)</span>{/if}
-			<span class="truncate">{$t('header.title')}</span>
+			<span class="truncate">{title}</span>
 		</a>
 		<nav class="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
 			{#each navItems as item}
