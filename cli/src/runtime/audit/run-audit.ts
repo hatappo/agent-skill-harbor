@@ -48,7 +48,7 @@ function deriveOverall(skill: AuditSkillResult): AuditResultValue {
 function formatEngineSummary(engines: AuditEngineConfig[]): string {
 	return engines
 		.map((engine) => {
-			if (engine.id === 'static') return 'static(built-in)';
+			if (engine.id === 'builtin.static') return 'builtin.static';
 			const timeout = engine.timeout_sec ?? 'n/a';
 			return `${engine.id}(timeout=${timeout}s)`;
 		})

@@ -68,7 +68,7 @@ function formatEngineFailure(summary: string): AuditEngineResult {
 }
 
 export function runAuditEngine(projectRoot: string, engine: AuditEngineConfig, skillKey: string): AuditEngineResult {
-	if (engine.id === 'static') {
+	if (engine.id === 'builtin.static') {
 		return analyzeStaticSkill(projectRoot, skillKey);
 	}
 

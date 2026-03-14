@@ -31,7 +31,7 @@ type RawSettings = {
 
 const DEFAULT_AUDIT_SETTINGS: AuditSettingsConfig = {
 	exclude_community_repos: true,
-	engines: [{ id: 'static' }],
+	engines: [{ id: 'builtin.static' }],
 };
 
 export function parseCliArgs(argv: string[]): ParsedCliArgs {
@@ -94,8 +94,8 @@ export function resolveAuditEngines(settings: AuditSettingsConfig, overrideIds?:
 	const resolved: AuditEngineConfig[] = [];
 
 	for (const id of selected) {
-		if (id === 'static') {
-			resolved.push({ id: 'static' });
+		if (id === 'builtin.static') {
+			resolved.push({ id: 'builtin.static' });
 			continue;
 		}
 
@@ -119,9 +119,9 @@ export function validateAuditEngines(engines: AuditEngineConfig[]): void {
 		if (seen.has(engine.id)) throw new Error(`Duplicate audit engine id: ${engine.id}`);
 		seen.add(engine.id);
 
-		if (engine.id === 'static') {
+		if (engine.id === 'builtin.static') {
 			if (engine.command && engine.command.length > 0) {
-				throw new Error('Built-in audit engine "static" must not define a command.');
+				throw new Error('Built-in audit engine "builtin.static" must not define a command.');
 			}
 			continue;
 		}

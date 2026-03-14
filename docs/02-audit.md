@@ -2,7 +2,7 @@
 
 Agent Skill Harbor can audit collected skills for potentially risky instructions after `harbor collect`.
 
-The audit workflow is designed to work with both the built-in `static` engine and user-defined engines.
+The audit workflow is designed to work with both the built-in `builtin.static` engine and user-defined engines.
 
 ## What Gets Audited
 
@@ -22,7 +22,7 @@ Audit settings are defined in `config/harbor.yaml`.
 audit:
   exclude_community_repos: true
   engines:
-    - id: static
+    - id: builtin.static
     - id: company-policy
       command: ['python3', 'scripts/company-policy-audit.py']
       timeout_sec: 10
@@ -36,7 +36,7 @@ audit:
 ### Engine Rules
 
 - `id` is required for every engine
-- `static` is the built-in engine name
+- `builtin.static` is the built-in engine id
 - Built-in engines do not need `command`
 - User-defined engines must provide `command`
 - `timeout_sec` is optional and applies per engine invocation for one skill
@@ -90,7 +90,7 @@ Available options:
 
 ```bash
 harbor audit --force
-harbor audit --engines static,company-policy
+harbor audit --engines builtin.static,company-policy
 harbor audit --history-id 550e8400-e29b-41d4-a716-446655440000
 ```
 
@@ -186,7 +186,7 @@ To avoid hanging workflows:
 
 ## Built-in Static Engine
 
-The built-in `static` engine scans cached Markdown files for risky patterns and can emit:
+The built-in `builtin.static` engine scans cached Markdown files for risky patterns and can emit:
 
 - `category` values such as `permission_scope` or `external_communication`
 - `references` values such as `2026-ASI03`
@@ -195,7 +195,7 @@ These fields are optional in the public engine contract, but the built-in engine
 
 ### Static Audit Categories
 
-The built-in `static` engine currently groups findings into the following categories.
+The built-in `builtin.static` engine currently groups findings into the following categories.
 
 | Category                 | What it checks                                                  | Typical matches                                                                     | Default level            | References                 |
 | ------------------------ | --------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------ | -------------------------- |

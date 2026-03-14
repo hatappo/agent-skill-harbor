@@ -46,8 +46,8 @@ test('resolveAuditEngines rejects timeout values above the maximum', () => {
 });
 
 test('parseCliArgs accepts --history-id', () => {
-	const parsed = parseCliArgs(['--history-id', '1234', '--engines', 'static']);
+	const parsed = parseCliArgs(['--history-id', '1234', '--engines', 'builtin.static']);
 
 	assert.equal(parsed.historyId, '1234');
-	assert.deepEqual(parsed.engineIds, ['static']);
+	assert.deepEqual(parsed.engineIds, ['builtin.static']);
 });

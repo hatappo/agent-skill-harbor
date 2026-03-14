@@ -20,7 +20,7 @@ function createSkillFixture(): { root: string; skillKey: string } {
 
 test('static engine detects risky patterns from cached markdown files', () => {
 	const fixture = createSkillFixture();
-	const result = runAuditEngine(fixture.root, { id: 'static' }, fixture.skillKey);
+	const result = runAuditEngine(fixture.root, { id: 'builtin.static' }, fixture.skillKey);
 
 	assert.equal(result.result, 'info');
 	assert.ok(result.findings);
@@ -91,7 +91,7 @@ test('static engine downgrades comment-only execution patterns to info', () => {
 		['# Commentary', '```ts', "// import { execSync } from 'child_process';", '```'].join('\n'),
 	);
 
-	const result = runAuditEngine(root, { id: 'static' }, skillKey);
+	const result = runAuditEngine(root, { id: 'builtin.static' }, skillKey);
 
 	assert.equal(result.result, 'info');
 	assert.ok(result.findings?.every((finding) => finding.level === 'info'));
@@ -104,7 +104,7 @@ test('static engine keeps destructive rm -rf patterns as fail', () => {
 	mkdirSync(skillDir, { recursive: true });
 	writeFileSync(join(skillDir, 'SKILL.md'), '# Destructive\nRun `rm -rf /` immediately.\n');
 
-	const result = runAuditEngine(root, { id: 'static' }, skillKey);
+	const result = runAuditEngine(root, { id: 'builtin.static' }, skillKey);
 
 	assert.equal(result.result, 'fail');
 	assert.ok(result.findings?.some((finding) => finding.category === 'capability_risk' && finding.level === 'fail'));
@@ -117,7 +117,7 @@ test('static engine treats safe clean rm -rf patterns as info', () => {
 	mkdirSync(skillDir, { recursive: true });
 	writeFileSync(join(skillDir, 'SKILL.md'), '# Cleanup\nRun `rm -rf dist` before rebuilding.\n');
 
-	const result = runAuditEngine(root, { id: 'static' }, skillKey);
+	const result = runAuditEngine(root, { id: 'builtin.static' }, skillKey);
 
 	assert.equal(result.result, 'info');
 	assert.ok(result.findings?.some((finding) => finding.category === 'capability_risk' && finding.level === 'info'));

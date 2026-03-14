@@ -26,7 +26,7 @@ test('runAudit reports processed and skipped counts by ownership bucket', () => 
 
 		writeFileSync(
 			join(root, 'config', 'harbor.yaml'),
-			['audit:', '  exclude_community_repos: false', '  engines:', '    - id: static', ''].join('\n'),
+			['audit:', '  exclude_community_repos: false', '  engines:', '    - id: builtin.static', ''].join('\n'),
 		);
 
 		const repositories = {
@@ -77,7 +77,7 @@ test('runAudit reports processed and skipped counts by ownership bucket', () => 
 					'github.com/community/tools/skills/community/SKILL.md': {
 						tree_sha: 'sha-community',
 						engines: {
-							static: {
+							'builtin.static': {
 								result: 'warn',
 								summary: 'existing result',
 							},
