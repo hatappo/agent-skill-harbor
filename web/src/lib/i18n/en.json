@@ -131,6 +131,10 @@
 			"label": "Setting",
 			"value": "Value"
 		},
+		"raw": {
+			"toggle": "Show raw file",
+			"empty": "This config file does not exist."
+		},
 		"label": {
 			"collector": {
 				"exclude_forks": "Exclude forked repositories",

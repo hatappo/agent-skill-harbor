@@ -1,4 +1,5 @@
 <script lang="ts">
+	import ConfigRawPanel from '$lib/components/ConfigRawPanel.svelte';
 	import { t } from '$lib/i18n';
 	import * as Popover from '$lib/components/ui/popover';
 
@@ -21,6 +22,8 @@
 		return `settings.label.${yamlKey}`;
 	}
 </script>
+
+<ConfigRawPanel path="config/harbor.yaml" content={data.rawConfigs.harbor} />
 
 {#snippet yamlKeyHint(key: string)}
 	{@const helpText = getHelpText(key, $t)}

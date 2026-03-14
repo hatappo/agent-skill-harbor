@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { base } from '$app/paths';
+	import ConfigRawPanel from '$lib/components/ConfigRawPanel.svelte';
 	import { t } from '$lib/i18n';
 	import GovernanceBadge from '$lib/components/GovernanceBadge.svelte';
 	import type { UsagePolicy } from '$lib/types';
@@ -16,6 +17,8 @@
 		return fullPath;
 	}
 </script>
+
+<ConfigRawPanel path="config/governance.yaml" content={data.rawConfigs.governance} />
 
 <section>
 	<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">

@@ -294,6 +294,24 @@ export function loadSettingsConfig(): SettingsConfig {
 	return loadSettingsRaw();
 }
 
+export function loadSettingsConfigRaw(): string | null {
+	if (!existsSync(HARBOR_PATH)) return null;
+	try {
+		return readFileSync(HARBOR_PATH, 'utf-8');
+	} catch {
+		return null;
+	}
+}
+
+export function loadGovernanceConfigRaw(): string | null {
+	if (!existsSync(GOVERNANCE_PATH)) return null;
+	try {
+		return readFileSync(GOVERNANCE_PATH, 'utf-8');
+	} catch {
+		return null;
+	}
+}
+
 export function loadGovernanceConfig(): GovernanceConfig {
 	return loadGovernanceRaw();
 }

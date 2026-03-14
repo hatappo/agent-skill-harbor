@@ -131,6 +131,10 @@
 			"label": "項目",
 			"value": "値"
 		},
+		"raw": {
+			"toggle": "RAW ファイルを表示",
+			"empty": "この設定ファイルは存在しません。"
+		},
 		"label": {
 			"collector": {
 				"exclude_forks": "フォークリポジトリを除外",
