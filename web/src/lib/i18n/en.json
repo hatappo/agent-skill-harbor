@@ -139,6 +139,13 @@
 			"title": "Catalog",
 			"fresh_period_days": "\"New\" badge duration (days)"
 		},
+		"audit": {
+			"title": "Audit",
+			"exclude_community_repos": "Audit only org-owned repositories",
+			"engines": "Engines",
+			"command": "Command",
+			"timeout_sec": "Timeout"
+		},
 		"governance": {
 			"title": "Governance Policies",
 			"skill_path": "Skill",
