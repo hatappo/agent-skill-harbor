@@ -188,7 +188,7 @@ To avoid hanging workflows:
 
 The built-in `builtin.static` engine scans cached Markdown files for risky patterns and can emit:
 
-> Note: `builtin.static` is still considered alpha-quality. It is useful for surfacing signals, but false positives are still common.
+> Note: `builtin.static` is still alpha-quality and currently produces many false positives.
 
 - `category` values such as `permission_scope` or `external_communication`
 - `references` values such as `2026-ASI03`
