@@ -531,7 +531,8 @@ async function collectRepoSkills(
 			for (const [skillPath, skillEntry] of Object.entries(existingRepo.skills)) {
 				if (skillEntry.resolved_from) continue;
 				const frontmatter = readFrontmatterFromSavedSkill(repoDir, skillPath);
-				skillEntry.resolved_from = resolveSkillResolvedFrom(frontmatter, skillPath, cachedLockEntries, platform) ?? undefined;
+				skillEntry.resolved_from =
+					resolveSkillResolvedFrom(frontmatter, skillPath, cachedLockEntries, platform) ?? undefined;
 			}
 		}
 		counts.skippedRepoCount++;

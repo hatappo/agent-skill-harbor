@@ -1,5 +1,17 @@
 # Changelog
 
+## [cli 0.12.0] / [web 0.11.0] - 2026-03-16
+
+### Added
+
+- Added normalized `resolved_from` provenance tracking so collected skills can trace copied origins from `_from` frontmatter or GitHub-based `skills-lock.json`
+- Added a Skill Catalog guide that documents the catalog pages and provenance tracking behavior
+
+### Changed
+
+- Reduced `data/skills.yaml` to catalog metadata only and stopped copying each skill frontmatter into the YAML snapshot
+- Updated fixture catalog snapshots to match the slimmer `skills.yaml` format and include `resolved_from` where available
+
 ## [cli 0.11.1] / [web 0.10.0] - 2026-03-15
 
 ### Changed

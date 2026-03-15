@@ -35,7 +35,9 @@ export function normalizeResolvedFromFrontmatter(from: unknown, platform = DEFAU
 	if (!raw) return null;
 	const parsed = parseRepoRef(raw);
 	if (!parsed) return null;
-	return parsed.sha ? `${platform}/${parsed.owner}/${parsed.repo}@${parsed.sha}` : `${platform}/${parsed.owner}/${parsed.repo}`;
+	return parsed.sha
+		? `${platform}/${parsed.owner}/${parsed.repo}@${parsed.sha}`
+		: `${platform}/${parsed.owner}/${parsed.repo}`;
 }
 
 export function parseProjectSkillsLock(content: string): Map<string, ProjectSkillsLockEntry> {

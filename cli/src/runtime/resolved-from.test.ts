@@ -28,10 +28,7 @@ test('normalizeResolvedFromSkillsLock resolves GitHub entries without sha', () =
 		}),
 	);
 
-	assert.equal(
-		normalizeResolvedFromSkillsLock('deploy-to-vercel', entries),
-		'github.com/vercel-labs/agent-skills',
-	);
+	assert.equal(normalizeResolvedFromSkillsLock('deploy-to-vercel', entries), 'github.com/vercel-labs/agent-skills');
 });
 
 test('normalizeResolvedFromSkillsLock ignores non-GitHub entries', () => {
