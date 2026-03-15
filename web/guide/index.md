@@ -1,4 +1,4 @@
-# Agent Skill Harbor ガイド
+# Agent Skill Harbor Guide
 
 This page is a guide from the administrators of your Agent Skill Harbor instance to developers in your organization.
 
