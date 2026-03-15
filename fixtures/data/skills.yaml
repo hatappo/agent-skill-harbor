@@ -7,44 +7,22 @@ repositories:
         tree_sha: f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2
         updated_at: '2026-02-20T09:15:00.000Z'
         registered_at: '2026-01-10T14:30:00.000Z'
-        frontmatter:
-          name: frontend-design
-          description: >-
-            Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the
-            user asks to build web components, pages, artifacts, posters, or applications.
-          license: Complete terms in LICENSE.txt
-          _from: skill-mill/sk-frontend-kit@41456e9c51152090f4c65a8e06438b25fa6a9be2
+        resolved_from: github.com/skill-mill/sk-frontend-kit@41456e9c51152090f4c65a8e06438b25fa6a9be2
       skills/mcp-builder/SKILL.md:
         tree_sha: f2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3
         updated_at: '2026-02-20T09:15:00.000Z'
         registered_at: '2026-01-10T14:30:00.000Z'
-        frontmatter:
-          name: mcp-builder
-          description: >-
-            Guide for creating high-quality MCP (Model Context Protocol) servers that enable LLMs to interact with
-            external services through well-designed tools.
-          license: Complete terms in LICENSE.txt
-          _from: skill-mill/sk-mcp-toolkit@f563876de3c1b2356695b7f375c475652f3621d6
+        resolved_from: github.com/skill-mill/sk-mcp-toolkit@f563876de3c1b2356695b7f375c475652f3621d6
       skills/pdf/SKILL.md:
         tree_sha: f3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4
         updated_at: '2026-02-20T09:15:00.000Z'
         registered_at: '2026-01-10T14:30:00.000Z'
-        frontmatter:
-          name: pdf
-          description: Use this skill whenever the user wants to do anything with PDF files.
-          license: Proprietary. LICENSE.txt has complete terms
-          _from: skill-mill/sk-doc-tools@c6a2ea78213a7d0356e93846b73a484acc76b166
+        resolved_from: github.com/skill-mill/sk-doc-tools@c6a2ea78213a7d0356e93846b73a484acc76b166
       skills/skill-creator/SKILL.md:
         tree_sha: f4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5
         updated_at: '2026-02-18T11:00:00.000Z'
         registered_at: '2026-01-10T14:30:00.000Z'
-        frontmatter:
-          name: skill-creator
-          description: >-
-            Guide for creating effective skills. This skill should be used when users want to create a new skill (or
-            update an existing skill) that extends Claude's capabilities.
-          license: Complete terms in LICENSE.txt
-          _from: skill-mill/sk-onboarding-kit@7196b39e893b5317f303447822e30ee44abfce88
+        resolved_from: github.com/skill-mill/sk-onboarding-kit@7196b39e893b5317f303447822e30ee44abfce88
   github.com/example-org/internal-tools:
     visibility: private
     repo_sha: b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3
@@ -53,28 +31,12 @@ repositories:
         tree_sha: f5e6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6
         updated_at: '2026-02-22T16:45:00.000Z'
         registered_at: '2026-01-15T08:00:00.000Z'
-        frontmatter:
-          name: legacy-rest-client
-          description: >-
-            Generate client code for the internal Platform API v1. Handles authentication, pagination, and error mapping
-            for legacy endpoints.
-          license: UNLICENSED
-          metadata:
-            author: platform-team
-            version: 1.2.0
-          _from: skill-mill/sk-code-quality@d382462ec4e7f587df04c912ab80cfedf6256add
+        resolved_from: github.com/skill-mill/sk-code-quality@d382462ec4e7f587df04c912ab80cfedf6256add
       skills/manual-db-migration/SKILL.md:
         tree_sha: f6f1a2b3c4d5e6f1a2b3c4d5e6f1a2b3c4d5e6f1
         updated_at: '2026-02-22T16:45:00.000Z'
         registered_at: '2026-02-01T10:20:00.000Z'
-        frontmatter:
-          name: manual-db-migration
-          description: Generate raw SQL migration scripts for direct execution against production databases.
-          license: UNLICENSED
-          metadata:
-            author: data-team
-            version: 0.9.0
-          _from: skill-mill/sk-data-pipeline@9d7ac6fdaa1059c8dc3a4778d5c54a09a863e6e2
+        resolved_from: github.com/skill-mill/sk-data-pipeline@9d7ac6fdaa1059c8dc3a4778d5c54a09a863e6e2
   github.com/hashicorp/agent-skills:
     visibility: public
     repo_sha: c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
@@ -83,34 +45,17 @@ repositories:
         tree_sha: f7a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1
         updated_at: '2026-02-24T07:30:00.000Z'
         registered_at: '2026-01-20T12:00:00.000Z'
-        frontmatter:
-          name: aws-ami-builder
-          description: >-
-            Build Amazon Machine Images (AMIs) with Packer using the amazon-ebs builder. Use when creating custom AMIs
-            for EC2 instances.
-          _from: skill-mill/sk-devops-handbook@ddf642a6cc111a2f427e31b17d75291be71dbe08
+        resolved_from: github.com/skill-mill/sk-devops-handbook@ddf642a6cc111a2f427e31b17d75291be71dbe08
       terraform/code-generation/skills/terraform-style-guide/SKILL.md:
         tree_sha: f8b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
         updated_at: '2026-02-24T07:30:00.000Z'
         registered_at: '2026-01-20T12:00:00.000Z'
-        frontmatter:
-          name: terraform-style-guide
-          description: Generate Terraform HCL code following HashiCorp's official style conventions and best practices.
-          _from: skill-mill/sk-infra-automation@b9be7d34027ea96c42932b5514caac3830c78681
+        resolved_from: github.com/skill-mill/sk-infra-automation@b9be7d34027ea96c42932b5514caac3830c78681
       terraform/code-generation/skills/terraform-test/SKILL.md:
         tree_sha: f9c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3
         updated_at: '2026-02-24T07:30:00.000Z'
         registered_at: '2026-01-20T12:00:00.000Z'
-        frontmatter:
-          name: terraform-test
-          description: >-
-            Comprehensive guide for writing and running Terraform tests. Use when creating test files (.tftest.hcl),
-            writing test scenarios with run blocks, validating infrastructure behavior with assertions, mocking
-            providers and data sources.
-          metadata:
-            copyright: Copyright IBM Corp. 2026
-            version: 0.0.1
-          _from: skill-mill/sk-infra-automation@b9be7d34027ea96c42932b5514caac3830c78681
+        resolved_from: github.com/skill-mill/sk-infra-automation@b9be7d34027ea96c42932b5514caac3830c78681
   github.com/remotion-dev/skills:
     visibility: public
     repo_sha: d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5
@@ -120,12 +65,7 @@ repositories:
         tree_sha: fad4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4
         updated_at: '2026-02-25T03:00:00.000Z'
         registered_at: '2026-02-05T17:45:00.000Z'
-        frontmatter:
-          name: remotion-best-practices
-          description: Best practices for Remotion - Video creation in React.
-          metadata:
-            tags: remotion, video, react, animation, composition
-          _from: skill-mill/sk-creative-tools@d20608c5fcf813d430a2e8599eac1a2cb0d6ebb4
+        resolved_from: github.com/skill-mill/sk-creative-tools@d20608c5fcf813d430a2e8599eac1a2cb0d6ebb4
   github.com/wshobson/agents:
     visibility: public
     repo_sha: e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6
@@ -135,9 +75,4 @@ repositories:
         tree_sha: fbe5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5
         updated_at: '2026-02-25T03:00:00.000Z'
         registered_at: '2026-02-10T09:30:00.000Z'
-        frontmatter:
-          name: postgresql-table-design
-          description: >-
-            Design a PostgreSQL-specific schema. Covers best-practices, data types, indexing, constraints, performance
-            patterns, and advanced features.
-          _from: skill-mill/sk-database-patterns@5cccdc6fca40e9616f7d31d5bd3f4c9c4ad08a90
+        resolved_from: github.com/skill-mill/sk-database-patterns@5cccdc6fca40e9616f7d31d5bd3f4c9c4ad08a90
