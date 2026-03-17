@@ -5,11 +5,11 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync,
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
-	createCollectHistoryEntry,
-	prependCollectHistoryEntry,
+	createCollectEntry,
+	prependCollectEntry,
 	type CategoryStats,
-	type CollectHistoryEntry,
-} from './collect-history.js';
+	type CollectEntry,
+} from './collects.js';
 import {
 	normalizeResolvedFromFrontmatter,
 	normalizeResolvedFromSkillsLock,
@@ -19,12 +19,6 @@ import {
 } from './resolved-from.js';
 
 const PROJECT_ROOT = process.env.SKILL_HARBOR_ROOT || join(import.meta.dirname, '..', '..');
-const DATA_DIR = join(PROJECT_ROOT, 'data');
-const SKILLS_DIR = join(DATA_DIR, 'skills');
-const SKILLS_YAML_PATH = join(DATA_DIR, 'skills.yaml');
-const CONFIG_DIR = join(PROJECT_ROOT, 'config');
-const SETTINGS_PATH = join(CONFIG_DIR, 'harbor.yaml');
-
 interface SettingsConfig {
 	collector?: {
 		exclude_forks?: boolean;
@@ -35,12 +29,13 @@ interface SettingsConfig {
 	};
 }
 
-function loadSettings(): SettingsConfig {
-	if (!existsSync(SETTINGS_PATH)) {
+function loadSettings(projectRoot = PROJECT_ROOT): SettingsConfig {
+	const settingsPath = join(projectRoot, 'config', 'harbor.yaml');
+	if (!existsSync(settingsPath)) {
 		return {};
 	}
 	try {
-		const raw = yamlLoad(readFileSync(SETTINGS_PATH, 'utf-8'));
+		const raw = yamlLoad(readFileSync(settingsPath, 'utf-8'));
 		if (!raw || typeof raw !== 'object') return {};
 		return raw as SettingsConfig;
 	} catch {
@@ -53,7 +48,6 @@ interface SkillEntry {
 	updated_at?: string;
 	registered_at?: string;
 	resolved_from?: string;
-	drift_status?: 'drifted' | 'in_sync' | 'unknown';
 }
 
 interface RepositoryEntry {
@@ -112,21 +106,23 @@ interface LoadedProjectSkillsLock {
 	entries: Map<string, ProjectSkillsLockEntry>;
 }
 
-function loadCatalog(): CatalogYaml {
-	if (!existsSync(SKILLS_YAML_PATH)) {
+export function loadCatalog(projectRoot = PROJECT_ROOT): CatalogYaml {
+	const skillsYamlPath = join(projectRoot, 'data', 'skills.yaml');
+	if (!existsSync(skillsYamlPath)) {
 		return { repositories: {} };
 	}
 	try {
-		const raw = yamlLoad(readFileSync(SKILLS_YAML_PATH, 'utf-8')) as CatalogYaml;
+		const raw = yamlLoad(readFileSync(skillsYamlPath, 'utf-8')) as CatalogYaml;
 		return raw?.repositories ? raw : { repositories: {} };
 	} catch {
 		return { repositories: {} };
 	}
 }
 
-function saveCatalog(catalog: CatalogYaml & { meta?: unknown }): void {
+function saveCatalog(catalog: CatalogYaml & { meta?: unknown }, projectRoot = PROJECT_ROOT): void {
+	const skillsYamlPath = join(projectRoot, 'data', 'skills.yaml');
 	const { meta: _meta, ...rest } = catalog;
-	writeFileSync(SKILLS_YAML_PATH, yamlDump(sanitizeCatalogForSave(rest), { lineWidth: 120, noRefs: true }));
+	writeFileSync(skillsYamlPath, yamlDump(sanitizeCatalogForSave(rest), { lineWidth: 120, noRefs: true }));
 }
 
 export function sanitizeCatalogForSave(catalog: CatalogYaml): CatalogYaml {
@@ -146,7 +142,6 @@ export function sanitizeCatalogForSave(catalog: CatalogYaml): CatalogYaml {
 								...(skillEntry.updated_at ? { updated_at: skillEntry.updated_at } : {}),
 								...(skillEntry.registered_at ? { registered_at: skillEntry.registered_at } : {}),
 								...(skillEntry.resolved_from ? { resolved_from: skillEntry.resolved_from } : {}),
-								...(skillEntry.drift_status ? { drift_status: skillEntry.drift_status } : {}),
 							},
 						]),
 					),
@@ -168,6 +163,7 @@ function countFilesRecursive(dir: string): number {
 }
 
 function computeStatistics(catalog: CatalogYaml, org: string): { org: CategoryStats; community: CategoryStats } {
+	const skillsDir = join(PROJECT_ROOT, 'data', 'skills');
 	const stats = {
 		org: { repos: 0, repos_with_skills: 0, skills: 0, files: 0 },
 		community: { repos: 0, repos_with_skills: 0, skills: 0, files: 0 },
@@ -179,7 +175,7 @@ function computeStatistics(catalog: CatalogYaml, org: string): { org: CategorySt
 		const skillCount = Object.keys(repoEntry.skills).length;
 		if (skillCount > 0) stats[category].repos_with_skills++;
 		stats[category].skills += skillCount;
-		const repoDir = join(SKILLS_DIR, repoKey);
+		const repoDir = join(skillsDir, repoKey);
 		if (existsSync(repoDir)) {
 			stats[category].files += countFilesRecursive(repoDir);
 		}
@@ -468,66 +464,6 @@ function resolveSkillIdentity(frontmatter: Record<string, unknown>, skillPath: s
 	return resolveSkillLookupName(frontmatter, skillPath);
 }
 
-export function updateDriftStatus(
-	catalog: CatalogYaml,
-	readFrontmatter: (repoKey: string, skillPath: string) => Record<string, unknown>,
-): void {
-	const skillIdentityCache = new Map<string, string | null>();
-
-	function getSkillIdentity(repoKey: string, skillPath: string): string | null {
-		const cacheKey = `${repoKey}:${skillPath}`;
-		if (skillIdentityCache.has(cacheKey)) {
-			return skillIdentityCache.get(cacheKey) ?? null;
-		}
-		const identity = resolveSkillIdentity(readFrontmatter(repoKey, skillPath), skillPath);
-		skillIdentityCache.set(cacheKey, identity);
-		return identity;
-	}
-
-	for (const [repoKey, repoEntry] of Object.entries(catalog.repositories)) {
-		for (const [skillPath, skillEntry] of Object.entries(repoEntry.skills)) {
-			if (!skillEntry.resolved_from) {
-				delete skillEntry.drift_status;
-				continue;
-			}
-
-			const parsed = parseResolvedFromRef(skillEntry.resolved_from);
-			if (!parsed?.sha) {
-				skillEntry.drift_status = 'unknown';
-				continue;
-			}
-
-			const originRepo = catalog.repositories[parsed.repoKey];
-			if (!originRepo) {
-				skillEntry.drift_status = 'unknown';
-				continue;
-			}
-
-			const identity = getSkillIdentity(repoKey, skillPath);
-			if (!identity) {
-				skillEntry.drift_status = 'unknown';
-				continue;
-			}
-
-			const originMatch = Object.entries(originRepo.skills).find(([originSkillPath]) => {
-				return getSkillIdentity(parsed.repoKey, originSkillPath) === identity;
-			});
-			if (!originMatch) {
-				skillEntry.drift_status = 'unknown';
-				continue;
-			}
-
-			const [, originSkillEntry] = originMatch;
-			if (!originSkillEntry.tree_sha) {
-				skillEntry.drift_status = 'unknown';
-				continue;
-			}
-
-			skillEntry.drift_status = originSkillEntry.tree_sha.startsWith(parsed.sha) ? 'in_sync' : 'drifted';
-		}
-	}
-}
-
 async function loadProjectSkillsLock(
 	octokit: Octokit,
 	target: RepoTarget,
@@ -613,7 +549,7 @@ async function collectRepoSkills(
 	);
 	const headSha = branchData.commit.sha;
 
-	const repoDir = join(SKILLS_DIR, platform, target.owner, target.repo);
+	const repoDir = join(PROJECT_ROOT, 'data', 'skills', platform, target.owner, target.repo);
 	if (existingRepo?.repo_sha === headSha) {
 		const needsResolvedFromBackfill = Object.values(existingRepo.skills).some((skill) => !skill.resolved_from);
 		const { entries: cachedLockEntries } = await loadProjectSkillsLock(
@@ -777,14 +713,14 @@ export async function runCollectOrgSkills(): Promise<void> {
 	const startTime = Date.now();
 	const octokit = new Octokit({ auth: token });
 	const platform = 'github.com';
-	const catalog = loadCatalog();
+	const catalog = loadCatalog(PROJECT_ROOT);
 
 	console.log(`Collecting skills from organization: ${org}`);
 	if (selfRepo) {
 		console.log(`Excluding self repository: ${org}/${selfRepo}`);
 	}
 
-	const settings = loadSettings();
+	const settings = loadSettings(PROJECT_ROOT);
 	const excludeForks = settings.collector?.exclude_forks ?? false;
 	const excludeRepos = new Set(settings.collector?.excluded_repos ?? []);
 	const includeOriginRepos = settings.collector?.include_origin_repos ?? true;
@@ -930,15 +866,10 @@ export async function runCollectOrgSkills(): Promise<void> {
 	const totalRepos = repos.length + extraRepoCount + fromRepoCount;
 	const totalSkills = counts.collectedCount + counts.skippedSkillCount;
 
-	updateDriftStatus(catalog, (repoKey, skillPath) => {
-		const repoDir = join(SKILLS_DIR, repoKey);
-		return readFrontmatterFromSavedSkill(repoDir, skillPath);
-	});
-
-	saveCatalog(catalog);
+	saveCatalog(catalog, PROJECT_ROOT);
 
 	const statistics = computeStatistics(catalog, org);
-	const historyEntry: CollectHistoryEntry = createCollectHistoryEntry({
+	const historyEntry: CollectEntry = createCollectEntry({
 		collecting: {
 			collected_at: new Date().toISOString(),
 			duration_sec: durationSec,
@@ -946,10 +877,10 @@ export async function runCollectOrgSkills(): Promise<void> {
 		statistics,
 	});
 	const historyLimit = settings.collector?.history_limit ?? 50;
-	prependCollectHistoryEntry(PROJECT_ROOT, historyEntry, historyLimit);
-	console.log(`  history_id: ${historyEntry.id}`);
-	if (process.env.GITHUB_OUTPUT && historyEntry.id) {
-		writeFileSync(process.env.GITHUB_OUTPUT, `history_id=${historyEntry.id}\n`, { flag: 'a' });
+	prependCollectEntry(PROJECT_ROOT, historyEntry, historyLimit);
+	console.log(`  collect_id: ${historyEntry.collect_id}`);
+	if (process.env.GITHUB_OUTPUT && historyEntry.collect_id) {
+		writeFileSync(process.env.GITHUB_OUTPUT, `collect_id=${historyEntry.collect_id}\n`, { flag: 'a' });
 	}
 
 	console.log(`\n--- Summary ---`);

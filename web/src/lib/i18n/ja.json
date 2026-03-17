@@ -31,11 +31,6 @@
 		"prohibitedTip": "使用禁止 — ポリシーでブロック",
 		"unclassifiedTip": "ガバナンス未レビュー"
 	},
-	"driftStatus": {
-		"drifted": "乖離あり",
-		"inSync": "同期中",
-		"unknown": "不明"
-	},
 	"common": {
 		"visibility": {
 			"public": "パブリック",
@@ -118,10 +113,6 @@
 		"byVisibility": "公開範囲別",
 		"byOwnership": "オーナー別",
 		"collectHistory": "収集履歴",
-		"audit": "監査",
-		"auditSkipped": "スキップ",
-		"auditProcessed": "今回処理",
-		"auditReused": "再利用",
 		"date": "日時",
 		"duration": "所要時間",
 		"skills": "スキル",
@@ -148,9 +139,8 @@
 				"included_extra_repos": "追加リポジトリ",
 				"history_limit": "収集履歴の保持数"
 			},
-			"audit": {
-				"exclude_community_repos": "自組織所有のリポジトリのみ監査",
-				"engines": "エンジン"
+			"post_collect": {
+				"plugins": "プラグイン"
 			},
 			"catalog": {
 				"skill": {
@@ -169,9 +159,8 @@
 				"included_extra_repos": "通常の組織スキャンに加えて追加で収集するリポジトリ URL です。",
 				"history_limit": "保持する収集履歴エントリ数の上限です。"
 			},
-			"audit": {
-				"exclude_community_repos": "組織所有のリポジトリだけを監査し、コミュニティ由来のスキルは対象外にします。",
-				"engines": "各スキルに対して順に実行する監査エンジンの一覧です。"
+			"post_collect": {
+				"plugins": "各 collect の後に順番に実行するプラグインの一覧です。"
 			},
 			"catalog": {
 				"skill": {
@@ -191,10 +180,9 @@
 		"ui": {
 			"title": "UI"
 		},
-		"audit": {
-			"title": "監査",
-			"command": "コマンド",
-			"timeout_sec": "タイムアウト"
+		"post_collect": {
+			"title": "Post Collect",
+			"path": "パス"
 		},
 		"governance": {
 			"title": "ガバナンスポリシー",
@@ -226,7 +214,6 @@
 		"field": {
 			"owner": "オーナー:",
 			"origin": "オリジン:",
-			"driftStatus": "乖離状態:",
 			"repository": "リポジトリ:",
 			"skillPath": "スキルパス:",
 			"platform": "プラットフォーム:",

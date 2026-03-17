@@ -1,6 +1,22 @@
 import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
-import type { AuditEngineResult, AuditFinding, AuditResultValue } from './types.js';
+
+export type StaticAuditResultValue = 'pass' | 'info' | 'warn' | 'fail';
+
+export interface StaticAuditFinding {
+	level?: 'info' | 'warn' | 'fail';
+	summary: string;
+	file?: string;
+	line?: number;
+	category?: string;
+	references?: string[];
+}
+
+export interface StaticAuditResult {
+	result: StaticAuditResultValue;
+	summary?: string;
+	findings?: StaticAuditFinding[];
+}
 
 interface StaticRule {
 	pattern: RegExp;
@@ -124,14 +140,14 @@ function collectMarkdownFiles(dir: string): string[] {
 	return files.sort();
 }
 
-function deriveResult(findings: AuditFinding[]): AuditResultValue {
+function deriveResult(findings: StaticAuditFinding[]): StaticAuditResultValue {
 	if (findings.some((finding) => finding.level === 'fail')) return 'fail';
 	if (findings.some((finding) => finding.level === 'warn')) return 'warn';
 	if (findings.some((finding) => finding.level === 'info')) return 'info';
 	return 'pass';
 }
 
-export function analyzeStaticSkill(projectRoot: string, skillKey: string): AuditEngineResult {
+export function analyzeStaticSkill(projectRoot: string, skillKey: string): StaticAuditResult {
 	const skillMdPath = join(projectRoot, 'data', 'skills', skillKey);
 	if (!existsSync(skillMdPath)) {
 		return {
@@ -149,7 +165,7 @@ export function analyzeStaticSkill(projectRoot: string, skillKey: string): Audit
 
 	const skillDir = dirname(skillMdPath);
 	const markdownFiles = collectMarkdownFiles(skillDir);
-	const findings: AuditFinding[] = [];
+	const findings: StaticAuditFinding[] = [];
 
 	for (const filePath of markdownFiles) {
 		const relPath = relative(skillDir, filePath) || 'SKILL.md';

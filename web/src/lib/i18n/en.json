@@ -31,11 +31,6 @@
 		"prohibitedTip": "Do not use — blocked by policy",
 		"unclassifiedTip": "Not yet reviewed by governance"
 	},
-	"driftStatus": {
-		"drifted": "Drifted",
-		"inSync": "In Sync",
-		"unknown": "Unknown"
-	},
 	"common": {
 		"visibility": {
 			"public": "Public",
@@ -118,10 +113,6 @@
 		"byVisibility": "By Visibility",
 		"byOwnership": "By Ownership",
 		"collectHistory": "Collection History",
-		"audit": "Audit",
-		"auditSkipped": "Skipped",
-		"auditProcessed": "processed",
-		"auditReused": "reused",
 		"date": "Date",
 		"duration": "Duration",
 		"skills": "Skills",
@@ -148,9 +139,8 @@
 				"included_extra_repos": "Additional repositories",
 				"history_limit": "Collection history limit"
 			},
-			"audit": {
-				"exclude_community_repos": "Audit only org-owned repositories",
-				"engines": "Engines"
+			"post_collect": {
+				"plugins": "Plugins"
 			},
 			"catalog": {
 				"skill": {
@@ -169,9 +159,8 @@
 				"included_extra_repos": "Additional repository URLs to collect outside the default organization scan.",
 				"history_limit": "Maximum number of collection history entries to keep."
 			},
-			"audit": {
-				"exclude_community_repos": "Audit only repositories owned by your organization and skip community-owned skills.",
-				"engines": "Ordered list of audit engines to run for each collected skill."
+			"post_collect": {
+				"plugins": "Ordered list of plugins to run after each collect."
 			},
 			"catalog": {
 				"skill": {
@@ -191,10 +180,9 @@
 		"ui": {
 			"title": "UI"
 		},
-		"audit": {
-			"title": "Audit",
-			"command": "Command",
-			"timeout_sec": "Timeout"
+		"post_collect": {
+			"title": "Post Collect",
+			"path": "Path"
 		},
 		"governance": {
 			"title": "Governance Policies",
@@ -226,7 +214,6 @@
 		"field": {
 			"owner": "Owner:",
 			"origin": "Origin:",
-			"driftStatus": "Drift:",
 			"repository": "Repository:",
 			"skillPath": "Skill path:",
 			"platform": "Platform:",

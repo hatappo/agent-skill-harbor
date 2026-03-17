@@ -9,6 +9,7 @@ Agent Skill Harbor の CLI パッケージです。
 - `harbor` / `agent-skill-harbor` 実行ファイル
 - `harbor init` で使われるプロジェクト雛形テンプレート
 - Skill Harbor プロジェクト向けの collect / build ランタイム
+- drift 検出と static audit の built-in `post_collect` プラグイン
 
 ## クイックスタート
 
@@ -31,6 +32,12 @@ node cli/dist/bin/cli.js collect
 
 ```bash
 node --import tsx bin/cli.ts collect
+```
+
+`post_collect` だけを単独で試す場合は次を使います。
+
+```bash
+node --import tsx bin/cli.ts post-collect
 ```
 
 製品全体の概要やドキュメントは、リポジトリの README を参照してください。

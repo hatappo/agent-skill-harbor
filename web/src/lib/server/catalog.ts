@@ -5,7 +5,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
-import type { CollectionEntry, FlatSkillEntry, RepoInfo, Visibility } from '$lib/types';
+import type { CollectionEntry, FlatSkillEntry, PluginOutput, RepoInfo, Visibility } from '$lib/types';
 import { governancePolicySchema, type GovernanceConfig } from '$lib/schemas/governance';
 import { settingsSchema, type SettingsConfig } from '$lib/schemas/settings';
 import { normalizeResolvedFromFrontmatter } from '$lib/utils/resolved-from';
@@ -24,7 +24,6 @@ interface SkillEntry {
 	updated_at?: string;
 	registered_at?: string;
 	resolved_from?: string;
-	drift_status?: 'drifted' | 'in_sync' | 'unknown';
 }
 
 interface RepositoryEntry {
@@ -54,7 +53,8 @@ const PROJECT_ROOT = __PROJECT_ROOT__;
 const DATA_DIR = join(PROJECT_ROOT, 'data');
 const SKILLS_DIR = join(DATA_DIR, 'skills');
 const SKILLS_YAML_PATH = join(DATA_DIR, 'skills.yaml');
-const HISTORY_YAML_PATH = join(DATA_DIR, 'collect-history.yaml');
+const COLLECTS_YAML_PATH = join(DATA_DIR, 'collects.yaml');
+const PLUGINS_DIR = join(DATA_DIR, 'plugins');
 const CONFIG_DIR = join(PROJECT_ROOT, 'config');
 const GOVERNANCE_PATH = join(CONFIG_DIR, 'governance.yaml');
 const HARBOR_PATH = join(CONFIG_DIR, 'harbor.yaml');
@@ -257,7 +257,6 @@ function buildCatalogData(): CatalogResult {
 				tree_sha: skillData.tree_sha ?? null,
 				...(repoEntry.fork ? { is_fork: true } : {}),
 				...(resolvedFrom ? { resolved_from: resolvedFrom } : {}),
-				...(skillData.drift_status ? { drift_status: skillData.drift_status } : {}),
 			};
 
 			skills.push(entry);
@@ -325,15 +324,40 @@ let cachedHistory: CollectionEntry[] | null = null;
 
 export function loadCollectHistory(): CollectionEntry[] {
 	if (!dev && cachedHistory) return cachedHistory;
-	if (!existsSync(HISTORY_YAML_PATH)) {
+	if (!existsSync(COLLECTS_YAML_PATH)) {
 		cachedHistory = [];
 		return cachedHistory;
 	}
 	try {
-		const raw = yamlLoad(readFileSync(HISTORY_YAML_PATH, 'utf-8'));
+		const raw = yamlLoad(readFileSync(COLLECTS_YAML_PATH, 'utf-8'));
 		cachedHistory = Array.isArray(raw) ? raw : [];
 	} catch {
 		cachedHistory = [];
 	}
 	return cachedHistory;
+}
+
+let cachedPluginOutputs: PluginOutput[] | null = null;
+
+export function loadPluginOutputs(): PluginOutput[] {
+	if (!dev && cachedPluginOutputs) return cachedPluginOutputs;
+	if (!existsSync(PLUGINS_DIR)) {
+		cachedPluginOutputs = [];
+		return cachedPluginOutputs;
+	}
+	const outputs: PluginOutput[] = [];
+	for (const entry of readdirSync(PLUGINS_DIR)) {
+		if (!entry.endsWith('.yaml') && !entry.endsWith('.yml')) continue;
+		try {
+			const raw = yamlLoad(readFileSync(join(PLUGINS_DIR, entry), 'utf-8'));
+			if (raw && typeof raw === 'object' && 'plugin' in raw) {
+				outputs.push(raw as PluginOutput);
+			}
+		} catch {
+			// ignore invalid plugin output
+		}
+	}
+	outputs.sort((a, b) => a.plugin.id.localeCompare(b.plugin.id));
+	cachedPluginOutputs = outputs;
+	return cachedPluginOutputs;
 }

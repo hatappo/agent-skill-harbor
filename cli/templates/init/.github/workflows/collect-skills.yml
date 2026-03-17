@@ -26,14 +26,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Example for Python-based user-defined audit engines:
-      # - uses: actions/setup-python@v5
-      #   with:
-      #     python-version: '3.12'
-      #
-      # - name: Install Python audit dependencies
-      #   run: pip install -r scripts/audit-requirements.txt
-      #
       - name: Collect skills from org repositories
         id: collect
         continue-on-error: true
@@ -44,13 +36,13 @@ jobs:
         # For local development (source repo), use instead:
         # run: pnpm collect
 
-      - name: Audit collected skills
-        id: audit
+      - name: Run post-collect plugins
+        id: post_collect
         if: ${{ steps.collect.outcome == 'success' }}
         continue-on-error: true
-        env:
-          GH_ORG: ${{ vars.GH_ORG }}
-        run: npx harbor audit --history-id "${{ steps.collect.outputs.history_id }}"
+        run: npx harbor post-collect --collect-id "${{ steps.collect.outputs.collect_id }}"
+        # For local development (source repo), use instead:
+        # run: pnpm post-collect --collect-id "${{ steps.collect.outputs.collect_id }}"
 
       - name: Commit and push changes
         run: |
@@ -68,6 +60,6 @@ jobs:
         if: ${{ steps.collect.outcome != 'success' }}
         run: exit 1
 
-      - name: Fail when audit reports blocking issues
-        if: ${{ steps.collect.outcome == 'success' && steps.audit.outcome != 'success' }}
+      - name: Fail when post-collect reports blocking issues
+        if: ${{ steps.collect.outcome == 'success' && steps.post_collect.outcome != 'success' }}
         run: exit 1

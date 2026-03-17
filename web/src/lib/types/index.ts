@@ -11,7 +11,6 @@ export interface CatalogSkillEntry {
 	updated_at?: string;
 	registered_at?: string;
 	resolved_from?: string;
-	drift_status?: 'drifted' | 'in_sync' | 'unknown';
 }
 
 export interface RepositoryEntry {
@@ -44,7 +43,7 @@ export interface CategoryStats {
 }
 
 export interface CollectionEntry {
-	id?: string;
+	collect_id?: string;
 	collecting: {
 		collected_at: string;
 		duration_sec: number;
@@ -53,23 +52,25 @@ export interface CollectionEntry {
 		org: CategoryStats;
 		community: CategoryStats;
 	};
-	auditing?: {
-		audited_at: string;
-		duration_sec: number;
-		engines: string[];
-		skipped: boolean;
-		skip_reason?: string;
+}
+
+export type LabelIntent = 'neutral' | 'info' | 'success' | 'warn' | 'danger';
+
+export interface PluginSkillResult {
+	label?: string;
+	raw?: string;
+	[key: string]: unknown;
+}
+
+export interface PluginOutput {
+	plugin: {
+		id: string;
+		generated_at: string;
+		collect_id?: string;
 	};
-	report?: {
-		org: {
-			processed: { pass: number; info: number; warn: number; fail: number };
-			skipped: { pass: number; info: number; warn: number; fail: number };
-		};
-		community: {
-			processed: { pass: number; info: number; warn: number; fail: number };
-			skipped: { pass: number; info: number; warn: number; fail: number };
-		};
-	};
+	summary?: string;
+	label_intents?: Record<string, LabelIntent>;
+	results?: Record<string, PluginSkillResult>;
 }
 
 export interface FlatSkillEntry {
@@ -92,5 +93,4 @@ export interface FlatSkillEntry {
 	tree_sha?: string | null;
 	is_fork?: boolean;
 	resolved_from?: string;
-	drift_status?: 'drifted' | 'in_sync' | 'unknown';
 }

@@ -75,7 +75,7 @@ pnpm dev
 1. リポジトリにプッシュ
 2. **Actions > CollectSkills** を開く
 3. **Run workflow** をクリックして初回収集をトリガー
-4. `CollectSkills` で `collect` と `audit` が別 step として順に実行されます
+4. `CollectSkills` で `collect` と `post-collect` が別 step で実行されます
 5. `CollectSkills` 成功後、デプロイワークフローが自動実行されます
 
 ## ステップ 7: ガバナンスポリシーの設定
@@ -141,7 +141,7 @@ pnpm update agent-skill-harbor
 │  - Org リポジトリをスキャン      │
 │  - SKILL.md をパース           │
 │  - YAML を書き出し             │
-│  - audit step を実行           │
+│  - post_collect を実行         │
 │  - report/history を更新       │
 │  - コミット & プッシュ          │
 └────────┬─────────────────────┘

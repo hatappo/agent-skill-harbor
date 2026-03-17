@@ -5,17 +5,14 @@ collector:
   include_origin_repos: true # collect public repositories referenced by _from (1 level, deduped by owner/repo)
   # included_extra_repos: # additional repositories to collect by URL
   #   - https://github.com/owner/repo
-  history_limit: 50 # max entries kept in collect-history.yaml (0 = unlimited)
+  history_limit: 50 # max entries kept in collects.yaml (0 = unlimited)
 
-audit:
-  exclude_community_repos: true # audit only your org-owned repos by default
-  engines: [] # default empty; enable engines explicitly after reviewing your audit policy
-  # builtin.static is still alpha, so keep it opt-in until you are ready to use Harbor audit
-  # engines:
-  #   - id: builtin.static
-    # - id: company-policy
-    #   command: ["python3", "scripts/company-policy-audit.py"]
-    #   timeout_sec: 30 # default 30, max 300
+post_collect:
+  plugins:
+    - id: detect-drift
+  #   - id: audit-static
+  #   - id: company-policy
+  #     path: ./scripts/plugins/company-policy.ts
 
 catalog:
   skill:

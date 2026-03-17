@@ -2,7 +2,6 @@
 	import { SvelteMap, SvelteSet } from 'svelte/reactivity';
 	import type { FlatSkillEntry, RepoInfo, UsagePolicy } from '$lib/types';
 	import GovernanceBadge from './GovernanceBadge.svelte';
-	import DriftStatusBadge from './DriftStatusBadge.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import { t } from '$lib/i18n';
 	import { base } from '$app/paths';
@@ -193,7 +192,6 @@
 									<td class="whitespace-nowrap px-4 py-2">
 										<div class="flex flex-wrap items-center gap-1.5">
 											<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
-											<DriftStatusBadge status={skill.drift_status} />
 										</div>
 									</td>
 									<td class="hidden px-4 py-2 md:table-cell"></td>

@@ -20,21 +20,19 @@ const uiSchema = z.object({
 	title: z.string().default('Agent Skill Harbor'),
 });
 
-const auditEngineSchema = z.object({
+const postCollectPluginSchema = z.object({
 	id: z.string(),
-	command: z.array(z.string()).optional(),
-	timeout_sec: z.number().int().min(1).max(300).optional(),
+	path: z.string().optional(),
 });
 
-const auditSchema = z.object({
-	exclude_community_repos: z.boolean().default(true),
-	engines: z.array(auditEngineSchema).default([{ id: 'static' }]),
+const postCollectSchema = z.object({
+	plugins: z.array(postCollectPluginSchema).default([{ id: 'detect-drift' }]),
 });
 
 export const settingsSchema = z.object({
 	collector: collectorSchema.default(() => collectorSchema.parse({})),
 	catalog: catalogSchema.default(() => catalogSchema.parse({})),
-	audit: auditSchema.default(() => auditSchema.parse({})),
+	post_collect: postCollectSchema.default(() => postCollectSchema.parse({})),
 	ui: uiSchema.default(() => uiSchema.parse({})),
 });
 

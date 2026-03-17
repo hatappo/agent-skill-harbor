@@ -4,6 +4,7 @@
 	"type": "module",
 	"scripts": {
 		"collect": "harbor collect",
+		"post-collect": "harbor post-collect",
 		"build": "harbor build",
 		"deploy:cloudflare": "harbor deploy cloudflare-pages",
 		"dev": "harbor dev",
