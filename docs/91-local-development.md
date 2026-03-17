@@ -39,7 +39,7 @@ The development server will start at `http://localhost:5173`.
 1. `cli/templates/init/.env.example` → `.env`
 2. `cli/templates/init/config/*` → `config/`
 3. `fixtures/config/*` → `config/` (overwrites with sample governance policies)
-4. `fixtures/data/*` → `data/` (sample catalog and skill data)
+4. `fixtures/data/*` → `data/` (sample catalog, `collects.yaml`, and skill data)
 
 ### Commands
 
@@ -54,6 +54,8 @@ tsx cli/bin/cli.ts collect    # Collect skills (requires GH_TOKEN)
 cd cli && pnpm build          # Build CLI package (after modifying bin/ or src/)
 pnpm setup:dev                # Re-copy templates and fixtures
 ```
+
+The local sample data includes `data/collects.yaml` and `data/skills.yaml`. Sample plugin outputs are not included by default.
 
 ### Project Structure
 

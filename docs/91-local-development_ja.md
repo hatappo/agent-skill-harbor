@@ -39,7 +39,7 @@ tsx cli/bin/cli.ts dev
 1. `cli/templates/init/.env.example` → `.env`
 2. `cli/templates/init/config/*` → `config/`
 3. `fixtures/config/*` → `config/`（サンプルのガバナンスポリシーで上書き）
-4. `fixtures/data/*` → `data/`（サンプルのカタログ・スキルデータ）
+4. `fixtures/data/*` → `data/`（サンプルのカタログ、`collects.yaml`、スキルデータ）
 
 ### コマンド
 
@@ -54,6 +54,8 @@ tsx cli/bin/cli.ts collect    # スキル収集（GH_TOKEN が必要）
 cd cli && pnpm build          # CLI パッケージをビルド（bin/ や src/ を変更した後に実行）
 pnpm setup:dev                # テンプレートとフィクスチャを再コピー
 ```
+
+ローカル開発用のサンプルデータには `data/collects.yaml` と `data/skills.yaml` が含まれます。sample plugin の出力は既定では含まれません。
 
 ### プロジェクト構成
 
