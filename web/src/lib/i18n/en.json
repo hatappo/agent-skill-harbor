@@ -12,8 +12,11 @@
 		"clearAll": "Clear all",
 		"allStatus": "Status",
 		"allVisibility": "Visibility",
+		"allOrigin": "Origin",
 		"allOwner": "Owner",
-		"all": "All"
+		"all": "All",
+		"originYes": "Has origin",
+		"originNo": "No origin"
 	},
 	"skillList": {
 		"empty": "No skills found matching your criteria."

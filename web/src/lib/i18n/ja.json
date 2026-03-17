@@ -12,8 +12,11 @@
 		"clearAll": "すべて解除",
 		"allStatus": "ステータス",
 		"allVisibility": "公開範囲",
+		"allOrigin": "Origin",
 		"allOwner": "オーナー",
-		"all": "すべて"
+		"all": "すべて",
+		"originYes": "あり",
+		"originNo": "なし"
 	},
 	"skillList": {
 		"empty": "条件に一致するスキルが見つかりません。"

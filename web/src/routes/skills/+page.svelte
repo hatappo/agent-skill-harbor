@@ -13,7 +13,7 @@
 	import type { ViewMode } from '$lib/components/ViewTabs.svelte';
 	import type { FlatSkillEntry, PluginFilterOption, RepoInfo, UsagePolicy, Visibility } from '$lib/types';
 	import { createSearchIndex, searchSkills } from '$lib/utils/search';
-	import { filterSkills, type FilterState, type OrgOwnership } from '$lib/utils/filter';
+	import { filterSkills, type FilterState, type OrgOwnership, type OriginPresence } from '$lib/utils/filter';
 	import { groupByOrigin } from '$lib/utils/origin';
 	import { getResolvedFromRepoLabel } from '$lib/utils/resolved-from';
 	import { t } from '$lib/i18n';
@@ -39,7 +39,13 @@
 
 	// Client-side state
 	let query = $state('');
-	let filters = $state<FilterState>({ status: null, visibility: null, orgOwnership: null, pluginLabels: {} });
+	let filters = $state<FilterState>({
+		status: null,
+		visibility: null,
+		orgOwnership: null,
+		hasOrigin: null,
+		pluginLabels: {},
+	});
 	let view = $state<'card' | 'list'>('card');
 	let groupMode = $state<GroupMode>('none');
 
@@ -56,6 +62,7 @@
 			status: (params.get('status') as UsagePolicy | null) ?? null,
 			visibility: (params.get('visibility') as Visibility | null) ?? null,
 			orgOwnership: (params.get('origin') as OrgOwnership | null) ?? null,
+			hasOrigin: (params.get('has_origin') as OriginPresence | null) ?? null,
 			pluginLabels,
 		};
 		const v = params.get('view');
@@ -80,6 +87,7 @@
 			filters.status === null &&
 			filters.visibility === null &&
 			filters.orgOwnership === null &&
+			filters.hasOrigin === null &&
 			Object.keys(filters.pluginLabels).length === 0
 		) {
 			return allRepos;
@@ -104,6 +112,7 @@
 		if (newFilters.status) params.set('status', newFilters.status);
 		if (newFilters.visibility) params.set('visibility', newFilters.visibility);
 		if (newFilters.orgOwnership) params.set('origin', newFilters.orgOwnership);
+		if (newFilters.hasOrigin) params.set('has_origin', newFilters.hasOrigin);
 		for (const [pluginId, label] of Object.entries(newFilters.pluginLabels)) {
 			params.set(`plugin_${pluginId}`, label);
 		}
@@ -143,6 +152,7 @@
 			filters.status !== null ||
 			filters.visibility !== null ||
 			filters.orgOwnership !== null ||
+			filters.hasOrigin !== null ||
 			Object.keys(filters.pluginLabels).length > 0,
 	);
 

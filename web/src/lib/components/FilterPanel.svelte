@@ -1,6 +1,11 @@
 <script lang="ts">
 	import type { LabelIntent, PluginFilterOption, UsagePolicy, Visibility } from '$lib/types';
-	import { PLUGIN_NO_LABEL_VALUE, type FilterState, type OrgOwnership } from '$lib/utils/filter';
+	import {
+		PLUGIN_NO_LABEL_VALUE,
+		type FilterState,
+		type OrgOwnership,
+		type OriginPresence,
+	} from '$lib/utils/filter';
 	import { t } from '$lib/i18n';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Select from '$lib/components/ui/select';
@@ -52,6 +57,10 @@
 		{ value: 'org', labelKey: 'common.orgOwnership.org' },
 		{ value: 'community', labelKey: 'common.orgOwnership.community' },
 	];
+	const originOptions: { value: OriginPresence; labelKey: string }[] = [
+		{ value: 'yes', labelKey: 'filter.originYes' },
+		{ value: 'no', labelKey: 'filter.originNo' },
+	];
 
 	const NONE_LABEL = '(no label)';
 	const pluginIntentClasses: Record<LabelIntent, string> = {
@@ -75,6 +84,10 @@
 		onchange({ ...filters, orgOwnership: value && value !== '__all__' ? (value as OrgOwnership) : null });
 	}
 
+	function onOriginChange(value: string | undefined) {
+		onchange({ ...filters, hasOrigin: value && value !== '__all__' ? (value as OriginPresence) : null });
+	}
+
 	function onPluginLabelChange(pluginId: string, value: string | undefined) {
 		const pluginLabels = { ...filters.pluginLabels };
 		if (!value || value === '__all__') {
@@ -88,19 +101,21 @@
 	let statusValue = $derived(filters.status ?? '__all__');
 	let visibilityValue = $derived(filters.visibility ?? '__all__');
 	let orgOwnershipValue = $derived(filters.orgOwnership ?? '__all__');
+	let originValue = $derived(filters.hasOrigin ?? '__all__');
 	let hasActiveFilters = $derived(
 		filters.status !== null ||
 			filters.visibility !== null ||
 			filters.orgOwnership !== null ||
+			filters.hasOrigin !== null ||
 			Object.keys(filters.pluginLabels).length > 0,
 	);
 
 	function clearAll() {
-		onchange({ status: null, visibility: null, orgOwnership: null, pluginLabels: {} });
+		onchange({ status: null, visibility: null, orgOwnership: null, hasOrigin: null, pluginLabels: {} });
 	}
 
 	function getStatusLabel(value: UsagePolicy | null): string {
-		if (value === 'none') return NONE_LABEL;
+		if (value === 'none') return $t('governance.unclassified');
 		return value ? $t(policyOptions.find((opt) => opt.value === value)?.labelKey ?? '') : $t('filter.allStatus');
 	}
 
@@ -145,6 +160,25 @@
 		</Select.Content>
 	</Select.Root>
 
+	<Select.Root type="single" value={originValue} onValueChange={onOriginChange}>
+		<Select.Trigger
+			size="sm"
+			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.hasOrigin
+				? 'border-violet-300 bg-violet-100 text-violet-800 dark:border-violet-700 dark:bg-violet-900/30 dark:text-violet-300'
+				: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
+		>
+			{filters.hasOrigin
+				? $t(originOptions.find((o) => o.value === filters.hasOrigin)?.labelKey ?? '')
+				: $t('filter.allOrigin')}
+		</Select.Trigger>
+		<Select.Content>
+			<Select.Item value="__all__" label={$t('filter.all')} />
+			{#each originOptions as opt}
+				<Select.Item value={opt.value} label={$t(opt.labelKey)} />
+			{/each}
+		</Select.Content>
+	</Select.Root>
+
 	<!-- Visibility select -->
 	<Select.Root type="single" value={visibilityValue} onValueChange={onVisibilityChange}>
 		<Select.Trigger
@@ -179,7 +213,7 @@
 		<Select.Content>
 			<Select.Item value="__all__" label={$t('filter.all')} />
 			{#each policyOptions as opt}
-				<Select.Item value={opt.value} label={opt.value === 'none' ? NONE_LABEL : $t(opt.labelKey)} />
+				<Select.Item value={opt.value} label={$t(opt.labelKey)} />
 			{/each}
 		</Select.Content>
 	</Select.Root>
