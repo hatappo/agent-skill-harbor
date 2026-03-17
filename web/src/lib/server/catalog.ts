@@ -5,7 +5,15 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { dev } from '$app/environment';
 import { env } from '$env/dynamic/private';
-import type { CollectionEntry, FlatSkillEntry, PluginLabelEntry, PluginOutput, RepoInfo, Visibility } from '$lib/types';
+import type {
+	CollectionEntry,
+	FlatSkillEntry,
+	PluginFilterOption,
+	PluginLabelEntry,
+	PluginOutputEntry,
+	RepoInfo,
+	Visibility,
+} from '$lib/types';
 import { governancePolicySchema, type GovernanceConfig } from '$lib/schemas/governance';
 import { settingsSchema, type SettingsConfig } from '$lib/schemas/settings';
 import { normalizeResolvedFromFrontmatter } from '$lib/utils/resolved-from';
@@ -46,7 +54,7 @@ interface CatalogResult {
 	bodyMap: Map<string, string>;
 }
 
-function buildPluginLabelMap(outputs: PluginOutput[]): Map<string, PluginLabelEntry[]> {
+function buildPluginLabelMap(outputs: PluginOutputEntry[]): Map<string, PluginLabelEntry[]> {
 	const map = new Map<string, PluginLabelEntry[]>();
 	for (const output of outputs) {
 		const labelIntents = output.label_intents ?? {};
@@ -56,7 +64,7 @@ function buildPluginLabelMap(outputs: PluginOutput[]): Map<string, PluginLabelEn
 			}
 			const entries = map.get(skillKey) ?? [];
 			entries.push({
-				plugin_id: output.plugin.id,
+				plugin_id: output.plugin_id,
 				label: result.label,
 				intent: labelIntents[result.label] ?? 'neutral',
 			});
@@ -213,7 +221,7 @@ function buildCatalogData(): CatalogResult {
 	const freshPeriodDays = admin.catalog?.skill?.fresh_period_days ?? 0;
 	const governance = loadGovernance();
 	const catalogYaml = loadCatalogYaml();
-	const pluginLabelMap = buildPluginLabelMap(loadPluginOutputs());
+	const pluginLabelMap = buildPluginLabelMap(loadLatestPluginOutputs());
 
 	const skills: FlatSkillEntry[] = [];
 	const repos: RepoInfo[] = [];
@@ -365,27 +373,75 @@ export function loadCollectHistory(): CollectionEntry[] {
 	return cachedHistory;
 }
 
-let cachedPluginOutputs: PluginOutput[] | null = null;
+let cachedPluginOutputs: PluginOutputEntry[] | null = null;
+let cachedLatestPluginOutputs: PluginOutputEntry[] | null = null;
 
-export function loadPluginOutputs(): PluginOutput[] {
+export function loadPluginOutputHistory(): PluginOutputEntry[] {
 	if (!dev && cachedPluginOutputs) return cachedPluginOutputs;
 	if (!existsSync(PLUGINS_DIR)) {
 		cachedPluginOutputs = [];
 		return cachedPluginOutputs;
 	}
-	const outputs: PluginOutput[] = [];
+	const outputs: PluginOutputEntry[] = [];
 	for (const entry of readdirSync(PLUGINS_DIR)) {
 		if (!entry.endsWith('.yaml') && !entry.endsWith('.yml')) continue;
+		const pluginId = entry.replace(/\.(yaml|yml)$/i, '');
 		try {
 			const raw = yamlLoad(readFileSync(join(PLUGINS_DIR, entry), 'utf-8'));
-			if (raw && typeof raw === 'object' && 'plugin' in raw) {
-				outputs.push(raw as PluginOutput);
+			if (Array.isArray(raw)) {
+				for (const item of raw) {
+					if (!item || typeof item !== 'object') continue;
+					outputs.push({ plugin_id: pluginId, ...(item as Omit<PluginOutputEntry, 'plugin_id'>) });
+				}
 			}
 		} catch {
 			// ignore invalid plugin output
 		}
 	}
-	outputs.sort((a, b) => a.plugin.id.localeCompare(b.plugin.id));
+	outputs.sort((a, b) =>
+		a.plugin_id === b.plugin_id
+			? b.generated_at.localeCompare(a.generated_at)
+			: a.plugin_id.localeCompare(b.plugin_id),
+	);
 	cachedPluginOutputs = outputs;
 	return cachedPluginOutputs;
+}
+
+function getLatestCollectId(): string | null {
+	return loadCollectHistory()[0]?.collect_id ?? null;
+}
+
+export function loadLatestPluginOutputs(): PluginOutputEntry[] {
+	if (!dev && cachedLatestPluginOutputs) return cachedLatestPluginOutputs;
+	const latestCollectId = getLatestCollectId();
+	if (!latestCollectId) {
+		cachedLatestPluginOutputs = [];
+		return cachedLatestPluginOutputs;
+	}
+	const latestByPlugin = new Map<string, PluginOutputEntry>();
+	for (const output of loadPluginOutputHistory()) {
+		if (output.collect_id !== latestCollectId) continue;
+		if (!latestByPlugin.has(output.plugin_id)) {
+			latestByPlugin.set(output.plugin_id, output);
+		}
+	}
+	cachedLatestPluginOutputs = [...latestByPlugin.values()].sort((a, b) => a.plugin_id.localeCompare(b.plugin_id));
+	return cachedLatestPluginOutputs;
+}
+
+export function loadPluginFilterOptions(): PluginFilterOption[] {
+	const labelsByPlugin = new Map<string, Set<string>>();
+	for (const output of loadLatestPluginOutputs()) {
+		const labels = labelsByPlugin.get(output.plugin_id) ?? new Set<string>();
+		for (const label of Object.keys(output.label_intents ?? {})) {
+			if (label) labels.add(label);
+		}
+		for (const result of Object.values(output.results ?? {})) {
+			if (result?.label) labels.add(result.label);
+		}
+		labelsByPlugin.set(output.plugin_id, labels);
+	}
+	return [...labelsByPlugin.entries()]
+		.map(([plugin_id, labels]) => ({ plugin_id, labels: [...labels].sort() }))
+		.sort((a, b) => a.plugin_id.localeCompare(b.plugin_id));
 }

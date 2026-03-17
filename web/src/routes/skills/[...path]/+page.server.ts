@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { getSkillBody, loadCatalog, loadPluginOutputs } from '$lib/server/catalog';
+import { getSkillBody, loadCatalog, loadLatestPluginOutputs } from '$lib/server/catalog';
 
 export const prerender = 'auto';
 
@@ -15,9 +15,9 @@ export const load = ({ params }) => {
 
 	if (!skill) throw error(404, 'Skill not found');
 
-	const pluginOutputs = loadPluginOutputs()
+	const pluginOutputs = loadLatestPluginOutputs()
 		.map((output) => ({
-			id: output.plugin.id,
+			id: output.plugin_id,
 			labelIntents: output.label_intents ?? {},
 			result: output.results?.[skill.key] ?? null,
 		}))

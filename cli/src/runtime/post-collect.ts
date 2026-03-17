@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { loadCatalog } from './catalog-store.js';
 import { runPostCollect } from './post-collect/run-post-collect.js';
-import { loadCatalog } from './collect-org-skills.js';
 
 const PROJECT_ROOT = process.env.SKILL_HARBOR_ROOT || join(import.meta.dirname, '..', '..');
 

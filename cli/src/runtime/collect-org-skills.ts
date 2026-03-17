@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
+import { load as yamlLoad } from 'js-yaml';
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -10,6 +10,13 @@ import {
 	type CategoryStats,
 	type CollectEntry,
 } from './collects.js';
+import {
+	loadCatalog,
+	saveCatalog,
+	type CatalogRepositoryEntry as RepositoryEntry,
+	type CatalogSkillEntry as SkillEntry,
+	type CatalogYaml,
+} from './catalog-store.js';
 import {
 	normalizeResolvedFromFrontmatter,
 	normalizeResolvedFromSkillsLock,
@@ -41,24 +48,6 @@ function loadSettings(projectRoot = PROJECT_ROOT): SettingsConfig {
 	} catch {
 		return {};
 	}
-}
-
-interface SkillEntry {
-	tree_sha: string | null;
-	updated_at?: string;
-	registered_at?: string;
-	resolved_from?: string;
-}
-
-interface RepositoryEntry {
-	visibility: string;
-	repo_sha?: string;
-	fork?: boolean;
-	skills: Record<string, SkillEntry>;
-}
-
-interface CatalogYaml {
-	repositories: Record<string, RepositoryEntry>;
 }
 
 interface TreeEntry {
@@ -104,51 +93,6 @@ interface ParsedResolvedFrom {
 interface LoadedProjectSkillsLock {
 	raw: string | null;
 	entries: Map<string, ProjectSkillsLockEntry>;
-}
-
-export function loadCatalog(projectRoot = PROJECT_ROOT): CatalogYaml {
-	const skillsYamlPath = join(projectRoot, 'data', 'skills.yaml');
-	if (!existsSync(skillsYamlPath)) {
-		return { repositories: {} };
-	}
-	try {
-		const raw = yamlLoad(readFileSync(skillsYamlPath, 'utf-8')) as CatalogYaml;
-		return raw?.repositories ? raw : { repositories: {} };
-	} catch {
-		return { repositories: {} };
-	}
-}
-
-function saveCatalog(catalog: CatalogYaml & { meta?: unknown }, projectRoot = PROJECT_ROOT): void {
-	const skillsYamlPath = join(projectRoot, 'data', 'skills.yaml');
-	const { meta: _meta, ...rest } = catalog;
-	writeFileSync(skillsYamlPath, yamlDump(sanitizeCatalogForSave(rest), { lineWidth: 120, noRefs: true }));
-}
-
-export function sanitizeCatalogForSave(catalog: CatalogYaml): CatalogYaml {
-	return {
-		repositories: Object.fromEntries(
-			Object.entries(catalog.repositories).map(([repoKey, repoEntry]) => [
-				repoKey,
-				{
-					visibility: repoEntry.visibility,
-					...(repoEntry.repo_sha ? { repo_sha: repoEntry.repo_sha } : {}),
-					...(repoEntry.fork ? { fork: true } : {}),
-					skills: Object.fromEntries(
-						Object.entries(repoEntry.skills).map(([skillPath, skillEntry]) => [
-							skillPath,
-							{
-								tree_sha: skillEntry.tree_sha,
-								...(skillEntry.updated_at ? { updated_at: skillEntry.updated_at } : {}),
-								...(skillEntry.registered_at ? { registered_at: skillEntry.registered_at } : {}),
-								...(skillEntry.resolved_from ? { resolved_from: skillEntry.resolved_from } : {}),
-							},
-						]),
-					),
-				},
-			]),
-		),
-	};
 }
 
 function countFilesRecursive(dir: string): number {

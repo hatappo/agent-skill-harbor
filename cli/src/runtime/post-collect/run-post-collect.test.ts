@@ -53,9 +53,11 @@ test('runPostCollect saves detect-drift output', async () => {
 	const output = yamlLoad(
 		readFileSync(join(root, 'data', 'plugins', 'builtin.detect-drift.yaml'), 'utf-8'),
 	) as {
+		collect_id?: string;
 		results: Record<string, { label?: string }>;
-	};
-	assert.equal(output.results['github.com/example/copy/skills/tooling/SKILL.md']?.label, 'In sync');
+	}[];
+	assert.equal(output[0].collect_id, 'collect-1');
+	assert.equal(output[0].results['github.com/example/copy/skills/tooling/SKILL.md']?.label, 'In sync');
 });
 
 test('runPostCollect loads local ts plugin with tsx', async () => {
@@ -100,9 +102,9 @@ test('runPostCollect loads local ts plugin with tsx', async () => {
 	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'sample_plugin.yaml'), 'utf-8')) as {
 		summary?: string;
 		results?: Record<string, { label?: string; raw?: string }>;
-	};
-	assert.equal(output.summary, 'checked 1 repo(s)');
-	assert.deepEqual(output.results?.['github.com/example/demo/tools/SKILL.md'], {
+	}[];
+	assert.equal(output[0].summary, 'checked 1 repo(s)');
+	assert.deepEqual(output[0].results?.['github.com/example/demo/tools/SKILL.md'], {
 		label: 'Reviewed',
 		raw: 'plugin ok',
 	});
@@ -150,8 +152,43 @@ test('runPostCollect prefers mjs over js and ts for local plugins', async () => 
 
 	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'sample_plugin.yaml'), 'utf-8')) as {
 		results?: Record<string, { label?: string }>;
-	};
-	assert.equal(output.results?.skill?.label, 'mjs');
+	}[];
+	assert.equal(output[0].results?.skill?.label, 'mjs');
+});
+
+test('runPostCollect replaces same collect_id and respects history limit', async () => {
+	const root = mkdtempSync(join(tmpdir(), 'post-collect-history-'));
+	mkdirSync(join(root, 'plugins', 'sample_plugin'), { recursive: true });
+	mkdirSync(join(root, 'config'), { recursive: true });
+	mkdirSync(join(root, 'data'), { recursive: true });
+
+	writeFileSync(join(root, 'config', 'harbor.yaml'), 'collector:\n  history_limit: 2\n');
+	writeFileSync(
+		join(root, 'plugins', 'sample_plugin', 'index.ts'),
+		[
+			'let count = 0;',
+			'export async function run() {',
+			'  count += 1;',
+			"  return { results: { skill: { label: `run-${count}` } } };",
+			'}',
+			'',
+		].join('\n'),
+	);
+
+	await runPostCollect({ projectRoot: root, collectId: 'collect-1', catalog: { repositories: {} }, log: false, plugins: [{ id: 'sample_plugin' }] });
+	await runPostCollect({ projectRoot: root, collectId: 'collect-1', catalog: { repositories: {} }, log: false, plugins: [{ id: 'sample_plugin' }] });
+	await runPostCollect({ projectRoot: root, collectId: 'collect-2', catalog: { repositories: {} }, log: false, plugins: [{ id: 'sample_plugin' }] });
+	await runPostCollect({ projectRoot: root, collectId: 'collect-3', catalog: { repositories: {} }, log: false, plugins: [{ id: 'sample_plugin' }] });
+
+	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'sample_plugin.yaml'), 'utf-8')) as {
+		collect_id?: string;
+		results?: Record<string, { label?: string }>;
+	}[];
+	assert.deepEqual(
+		output.map((entry) => entry.collect_id),
+		['collect-3', 'collect-2'],
+	);
+	assert.equal(output[0].results?.skill?.label, 'run-4');
 });
 
 test('runPostCollect rejects invalid user plugin ids', async () => {

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { collectFromResolvedFrom, sanitizeCatalogForSave } from './collect-org-skills.js';
+import { sanitizeCatalogForSave } from './catalog-store.js';
+import { collectFromResolvedFrom } from './collect-org-skills.js';
 
 test('sanitizeCatalogForSave strips copied frontmatter from skills.yaml entries', () => {
 	assert.deepEqual(

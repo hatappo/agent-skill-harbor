@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { UsagePolicy, Visibility } from '$lib/types';
+	import type { PluginFilterOption, UsagePolicy, Visibility } from '$lib/types';
 	import type { FilterState, OrgOwnership } from '$lib/utils/filter';
 	import { t } from '$lib/i18n';
 	import * as Tooltip from '$lib/components/ui/tooltip';
@@ -7,11 +7,11 @@
 
 	interface Props {
 		filters: FilterState;
-		pluginLabels?: string[];
+		pluginFilterOptions?: PluginFilterOption[];
 		onchange: (filters: FilterState) => void;
 	}
 
-	let { filters, pluginLabels = [], onchange }: Props = $props();
+	let { filters, pluginFilterOptions = [], onchange }: Props = $props();
 
 	const policyOptions: { value: UsagePolicy; labelKey: string; tooltipKey: string; color: string }[] = [
 		{
@@ -53,42 +53,40 @@
 		{ value: 'community', labelKey: 'common.orgOwnership.community' },
 	];
 
-	function toggleStatus(status: UsagePolicy) {
-		const statuses = filters.statuses.includes(status)
-			? filters.statuses.filter((s) => s !== status)
-			: [...filters.statuses, status];
-		onchange({ ...filters, statuses });
+	function onStatusChange(value: string | undefined) {
+		onchange({ ...filters, status: value && value !== '__all__' ? (value as UsagePolicy) : null });
 	}
 
 	function onVisibilityChange(value: string | undefined) {
-		const visibilities = value && value !== '__all__' ? [value as Visibility] : [];
-		onchange({ ...filters, visibilities });
+		onchange({ ...filters, visibility: value && value !== '__all__' ? (value as Visibility) : null });
 	}
 
 	function onOrgOwnershipChange(value: string | undefined) {
-		const orgOwnerships = value && value !== '__all__' ? [value as OrgOwnership] : [];
-		onchange({ ...filters, orgOwnerships });
+		onchange({ ...filters, orgOwnership: value && value !== '__all__' ? (value as OrgOwnership) : null });
 	}
 
-	function togglePluginLabel(label: string) {
-		const pluginLabels = filters.pluginLabels.includes(label)
-			? filters.pluginLabels.filter((entry) => entry !== label)
-			: [...filters.pluginLabels, label];
+	function onPluginLabelChange(pluginId: string, value: string | undefined) {
+		const pluginLabels = { ...filters.pluginLabels };
+		if (!value || value === '__all__') {
+			delete pluginLabels[pluginId];
+		} else {
+			pluginLabels[pluginId] = value;
+		}
 		onchange({ ...filters, pluginLabels });
 	}
 
-	let visibilityValue = $derived(filters.visibilities[0] ?? '__all__');
-	let orgOwnershipValue = $derived(filters.orgOwnerships[0] ?? '__all__');
-
+	let statusValue = $derived(filters.status ?? '__all__');
+	let visibilityValue = $derived(filters.visibility ?? '__all__');
+	let orgOwnershipValue = $derived(filters.orgOwnership ?? '__all__');
 	let hasActiveFilters = $derived(
-		filters.statuses.length > 0 ||
-			filters.visibilities.length > 0 ||
-			filters.orgOwnerships.length > 0 ||
-			filters.pluginLabels.length > 0,
+		filters.status !== null ||
+			filters.visibility !== null ||
+			filters.orgOwnership !== null ||
+			Object.keys(filters.pluginLabels).length > 0,
 	);
 
 	function clearAll() {
-		onchange({ statuses: [], visibilities: [], orgOwnerships: [], pluginLabels: [] });
+		onchange({ status: null, visibility: null, orgOwnership: null, pluginLabels: {} });
 	}
 </script>
 
@@ -99,12 +97,12 @@
 	<Select.Root type="single" value={orgOwnershipValue} onValueChange={onOrgOwnershipChange}>
 		<Select.Trigger
 			size="sm"
-			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.orgOwnerships.length > 0
+			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.orgOwnership
 				? 'border-blue-300 bg-blue-100 text-blue-800 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
 				: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
 		>
-			{filters.orgOwnerships.length > 0
-				? $t(orgOwnershipOptions.find((o) => o.value === filters.orgOwnerships[0])?.labelKey ?? '')
+			{filters.orgOwnership
+				? $t(orgOwnershipOptions.find((o) => o.value === filters.orgOwnership)?.labelKey ?? '')
 				: $t('filter.allOwner')}
 		</Select.Trigger>
 		<Select.Content>
@@ -119,12 +117,12 @@
 	<Select.Root type="single" value={visibilityValue} onValueChange={onVisibilityChange}>
 		<Select.Trigger
 			size="sm"
-			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.visibilities.length > 0
+			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.visibility
 				? 'border-indigo-300 bg-indigo-100 text-indigo-800 dark:border-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'
 				: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
 		>
-			{filters.visibilities.length > 0
-				? $t(visibilityOptions.find((o) => o.value === filters.visibilities[0])?.labelKey ?? '')
+			{filters.visibility
+				? $t(visibilityOptions.find((o) => o.value === filters.visibility)?.labelKey ?? '')
 				: $t('filter.allVisibility')}
 		</Select.Trigger>
 		<Select.Content>
@@ -135,41 +133,45 @@
 		</Select.Content>
 	</Select.Root>
 
-	<span class="mx-1 text-gray-300 dark:text-gray-600">|</span>
+	<Select.Root type="single" value={statusValue} onValueChange={onStatusChange}>
+		<Select.Trigger
+			size="sm"
+			class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.status
+				? policyOptions.find((opt) => opt.value === filters.status)?.color
+				: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
+		>
+			{filters.status ? $t(policyOptions.find((opt) => opt.value === filters.status)?.labelKey ?? '') : $t('filter.allStatus')}
+		</Select.Trigger>
+		<Select.Content>
+			<Select.Item value="__all__" label={$t('filter.all')} />
+			{#each policyOptions as opt}
+				<Select.Item value={opt.value} label={$t(opt.labelKey)} />
+			{/each}
+		</Select.Content>
+	</Select.Root>
 
-	<!-- Usage policy filters -->
-	{#each policyOptions as opt}
-		<Tooltip.Root>
-			<Tooltip.Trigger>
-				{#snippet child({ props })}
-					<button
-						{...props}
-						onclick={() => toggleStatus(opt.value)}
-						class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.statuses.includes(
-							opt.value,
-						)
-							? opt.color + ' ring-1 ring-offset-1 dark:ring-offset-gray-950'
-							: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
-					>
-						{$t(opt.labelKey)}
-					</button>
-				{/snippet}
-			</Tooltip.Trigger>
-			<Tooltip.Content>{$t(opt.tooltipKey)}</Tooltip.Content>
-		</Tooltip.Root>
-	{/each}
-
-	{#if pluginLabels.length > 0}
-		<span class="mx-1 text-gray-300 dark:text-gray-600">|</span>
-		{#each pluginLabels as label}
-			<button
-				onclick={() => togglePluginLabel(label)}
-				class="rounded-full border px-3 py-1 text-xs font-medium transition-colors {filters.pluginLabels.includes(label)
-					? 'border-gray-300 bg-gray-900 text-white ring-1 ring-offset-1 dark:border-gray-500 dark:bg-gray-100 dark:text-gray-900 dark:ring-offset-gray-950'
-					: 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700'}"
+	{#if pluginFilterOptions.length > 0}
+		{#each pluginFilterOptions as option (option.plugin_id)}
+			<Select.Root
+				type="single"
+				value={filters.pluginLabels[option.plugin_id] ?? '__all__'}
+				onValueChange={(value) => onPluginLabelChange(option.plugin_id, value)}
 			>
-				{label}
-			</button>
+				<Select.Trigger
+					size="sm"
+					class="h-7 rounded-full border px-3 py-1 text-xs font-medium shadow-none {filters.pluginLabels[option.plugin_id]
+						? 'border-gray-300 bg-gray-900 text-white dark:border-gray-500 dark:bg-gray-100 dark:text-gray-900'
+						: 'border-gray-200 bg-white text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400'}"
+				>
+					{filters.pluginLabels[option.plugin_id] ?? option.plugin_id}
+				</Select.Trigger>
+				<Select.Content>
+					<Select.Item value="__all__" label={$t('filter.all')} />
+					{#each option.labels as label}
+						<Select.Item value={label} {label} />
+					{/each}
+				</Select.Content>
+			</Select.Root>
 		{/each}
 	{/if}
 

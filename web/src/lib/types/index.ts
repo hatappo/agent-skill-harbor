@@ -62,15 +62,18 @@ export interface PluginSkillResult {
 	[key: string]: unknown;
 }
 
-export interface PluginOutput {
-	plugin: {
-		id: string;
-		generated_at: string;
-		collect_id?: string;
-	};
+export interface PluginOutputEntry {
+	plugin_id: string;
+	generated_at: string;
+	collect_id?: string;
 	summary?: string;
 	label_intents?: Record<string, LabelIntent>;
 	results?: Record<string, PluginSkillResult>;
+}
+
+export interface PluginFilterOption {
+	plugin_id: string;
+	labels: string[];
 }
 
 export interface PluginLabelEntry {

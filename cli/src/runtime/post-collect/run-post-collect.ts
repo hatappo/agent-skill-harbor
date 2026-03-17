@@ -21,17 +21,17 @@ const BUILTIN_PLUGINS = new Map<string, BuiltinPostCollectPlugin>([
 ]);
 
 interface RawSettings {
+	collector?: {
+		history_limit?: number;
+	};
 	post_collect?: {
 		plugins?: PostCollectPluginConfig[];
 	};
 }
 
-interface SavedPluginOutput extends PostCollectPluginResult {
-	plugin: {
-		id: string;
-		generated_at: string;
-		collect_id?: string;
-	};
+interface SavedPluginOutputEntry extends PostCollectPluginResult {
+	generated_at: string;
+	collect_id?: string;
 }
 
 function loadPostCollectSettings(projectRoot: string): PostCollectSettings {
@@ -46,6 +46,19 @@ function loadPostCollectSettings(projectRoot: string): PostCollectSettings {
 		};
 	} catch {
 		return { plugins: [{ id: 'builtin.detect-drift' }] };
+	}
+}
+
+function loadHistoryLimit(projectRoot: string): number {
+	const settingsPath = join(projectRoot, 'config', 'harbor.yaml');
+	if (!existsSync(settingsPath)) {
+		return 50;
+	}
+	try {
+		const raw = yamlLoad(readFileSync(settingsPath, 'utf-8')) as RawSettings | null;
+		return raw?.collector?.history_limit ?? 50;
+	} catch {
+		return 50;
 	}
 }
 
@@ -104,18 +117,32 @@ async function loadUserPlugin(projectRoot: string, pluginId: string): Promise<Po
 	return candidate as PostCollectPluginModule;
 }
 
+function loadPluginOutputHistory(projectRoot: string, pluginId: string): SavedPluginOutputEntry[] {
+	const outputPath = join(projectRoot, 'data', 'plugins', `${pluginId}.yaml`);
+	if (!existsSync(outputPath)) return [];
+	try {
+		const raw = yamlLoad(readFileSync(outputPath, 'utf-8'));
+		return Array.isArray(raw) ? (raw as SavedPluginOutputEntry[]) : [];
+	} catch {
+		return [];
+	}
+}
+
 function savePluginOutput(projectRoot: string, pluginId: string, collectId: string | null, result: PostCollectPluginResult): void {
 	const outputPath = join(projectRoot, 'data', 'plugins', `${pluginId}.yaml`);
+	const historyLimit = loadHistoryLimit(projectRoot);
 	mkdirSync(dirname(outputPath), { recursive: true });
-	const payload: SavedPluginOutput = {
-		plugin: {
-			id: pluginId,
-			generated_at: new Date().toISOString(),
-			...(collectId ? { collect_id: collectId } : {}),
-		},
+	const payload: SavedPluginOutputEntry = {
+		generated_at: new Date().toISOString(),
+		...(collectId ? { collect_id: collectId } : {}),
 		...result,
 	};
-	writeFileSync(outputPath, yamlDump(payload, { lineWidth: 120, noRefs: true }));
+	const existing = loadPluginOutputHistory(projectRoot, pluginId).filter(
+		(entry) => !(collectId && entry.collect_id === collectId),
+	);
+	const next = [payload, ...existing];
+	const trimmed = historyLimit > 0 ? next.slice(0, historyLimit) : next;
+	writeFileSync(outputPath, yamlDump(trimmed, { lineWidth: 120, noRefs: true }));
 }
 
 export interface RunPostCollectOptions {

@@ -10,6 +10,7 @@
 	"filter": {
 		"label": "絞り込み:",
 		"clearAll": "すべて解除",
+		"allStatus": "ステータス",
 		"allVisibility": "公開範囲",
 		"allOwner": "オーナー",
 		"all": "すべて"
