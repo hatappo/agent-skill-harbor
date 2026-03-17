@@ -33,16 +33,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GH_ORG: ${{ vars.GH_ORG }}
         run: npx harbor collect
-        # For local development (source repo), use instead:
-        # run: pnpm collect
 
       - name: Run post-collect plugins
         id: post_collect
         if: ${{ steps.collect.outcome == 'success' }}
         continue-on-error: true
         run: npx harbor post-collect --collect-id "${{ steps.collect.outputs.collect_id }}"
-        # For local development (source repo), use instead:
-        # run: pnpm post-collect --collect-id "${{ steps.collect.outputs.collect_id }}"
 
       - name: Commit and push changes
         run: |

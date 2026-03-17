@@ -61,6 +61,7 @@ pnpm dev
 | コマンド                 | 説明                                 |
 | ------------------------ | ------------------------------------ |
 | `harbor init [dir]`      | 新しいプロジェクトをスキャフォールド |
+| `harbor gen sample-plugin` | サンプル post-collect plugin を生成   |
 | `harbor collect`         | GitHub Organization からスキルを収集 |
 | `harbor post-collect`    | collect 後プラグインを実行           |
 | `harbor build`           | 静的サイトをビルド                   |
@@ -85,6 +86,9 @@ harbor build --base=/my-repo-name
 6. `CollectSkills` では `collect` と `post-collect` を別 step で順に実行します
 7. `CollectSkills` 成功後、デプロイワークフローが自動実行されます
 
+ユーザー定義の post_collect plugin は `plugins/<id>/index.mjs`、次に `index.js`、最後に `index.ts` の順で探索されます。
+サンプル plugin が必要な場合は `harbor gen sample-plugin` を実行し、`config/harbor.yaml` の `sample_plugin` をアンコメントしてください。
+
 詳細は [組織セットアップガイド](docs/01-organization-setup_ja.md) を参照してください。
 
 ## プロジェクト構成（ユーザープロジェクト）
@@ -95,9 +99,10 @@ my-skill-harbor/
 ├── config/
 │   ├── harbor.yaml         # 収集・カタログ設定
 │   └── governance.yaml     # スキル使用ポリシー
+├── plugins/                # 任意のユーザー定義 post_collect plugin
 ├── data/                   # collect で生成（Git 管理）
 │   ├── collects.yaml       # 収集履歴
-│   ├── plugins/            # post_collect プラグインの出力
+│   ├── plugins/            # 生成された post_collect plugin 出力
 │   ├── skills.yaml         # スキルメタデータ
 │   └── skills/             # キャッシュされた SKILL.md ファイル
 ├── .github/workflows/      # GitHub Actions (収集 + デプロイ)

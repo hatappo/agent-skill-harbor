@@ -9,7 +9,7 @@ CLI package for Agent Skill Harbor.
 - The `harbor` / `agent-skill-harbor` executable
 - Project scaffolding templates used by `harbor init`
 - Collector and build runtime for Skill Harbor projects
-- Built-in `post_collect` plugins for drift detection and static audit
+- Built-in `post_collect` plugins such as `builtin.detect-drift` and `builtin.audit-static`
 
 ## Quick Start
 
@@ -39,6 +39,9 @@ To run `post_collect` directly in this CLI package repository:
 ```bash
 node --import tsx cli/bin/cli.ts post-collect
 ```
+
+User-defined plugins are resolved from `plugins/<id>/index.mjs`, then `index.js`, then `index.ts`.
+Generate the sample plugin scaffold with `harbor gen sample-plugin`.
 
 For the full product overview and documentation, see the repository README:
 

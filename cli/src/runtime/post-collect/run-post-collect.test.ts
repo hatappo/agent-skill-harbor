@@ -47,10 +47,12 @@ test('runPostCollect saves detect-drift output', async () => {
 		collectId: 'collect-1',
 		catalog,
 		log: false,
-		plugins: [{ id: 'detect-drift' }],
+		plugins: [{ id: 'builtin.detect-drift' }],
 	});
 
-	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'detect-drift.yaml'), 'utf-8')) as {
+	const output = yamlLoad(
+		readFileSync(join(root, 'data', 'plugins', 'builtin.detect-drift.yaml'), 'utf-8'),
+	) as {
 		results: Record<string, { label?: string }>;
 	};
 	assert.equal(output.results['github.com/example/copy/skills/tooling/SKILL.md']?.label, 'In sync');
@@ -58,12 +60,11 @@ test('runPostCollect saves detect-drift output', async () => {
 
 test('runPostCollect loads local ts plugin with tsx', async () => {
 	const root = mkdtempSync(join(tmpdir(), 'post-collect-ts-'));
-	mkdirSync(join(root, 'config'), { recursive: true });
-	mkdirSync(join(root, 'scripts', 'plugins'), { recursive: true });
+	mkdirSync(join(root, 'plugins', 'sample_plugin'), { recursive: true });
 	mkdirSync(join(root, 'data'), { recursive: true });
 
 	writeFileSync(
-		join(root, 'scripts', 'plugins', 'company-policy.ts'),
+		join(root, 'plugins', 'sample_plugin', 'index.ts'),
 		[
 			"export async function run(context) {",
 			"  return {",
@@ -93,10 +94,10 @@ test('runPostCollect loads local ts plugin with tsx', async () => {
 			},
 		},
 		log: false,
-		plugins: [{ id: 'company-policy', path: './scripts/plugins/company-policy.ts' }],
+		plugins: [{ id: 'sample_plugin' }],
 	});
 
-	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'company-policy.yaml'), 'utf-8')) as {
+	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'sample_plugin.yaml'), 'utf-8')) as {
 		summary?: string;
 		results?: Record<string, { label?: string; raw?: string }>;
 	};
@@ -105,4 +106,65 @@ test('runPostCollect loads local ts plugin with tsx', async () => {
 		label: 'Reviewed',
 		raw: 'plugin ok',
 	});
+});
+
+test('runPostCollect prefers mjs over js and ts for local plugins', async () => {
+	const root = mkdtempSync(join(tmpdir(), 'post-collect-order-'));
+	mkdirSync(join(root, 'plugins', 'sample_plugin'), { recursive: true });
+	mkdirSync(join(root, 'data'), { recursive: true });
+
+	writeFileSync(
+		join(root, 'plugins', 'sample_plugin', 'index.ts'),
+		[
+			"export async function run() {",
+			"  return { results: { 'skill': { label: 'ts' } } };",
+			'}',
+			'',
+		].join('\n'),
+	);
+	writeFileSync(
+		join(root, 'plugins', 'sample_plugin', 'index.js'),
+		[
+			'export async function run() {',
+			"  return { results: { 'skill': { label: 'js' } } };",
+			'}',
+			'',
+		].join('\n'),
+	);
+	writeFileSync(
+		join(root, 'plugins', 'sample_plugin', 'index.mjs'),
+		[
+			'export async function run() {',
+			"  return { results: { 'skill': { label: 'mjs' } } };",
+			'}',
+			'',
+		].join('\n'),
+	);
+
+	await runPostCollect({
+		projectRoot: root,
+		catalog: { repositories: {} },
+		log: false,
+		plugins: [{ id: 'sample_plugin' }],
+	});
+
+	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'sample_plugin.yaml'), 'utf-8')) as {
+		results?: Record<string, { label?: string }>;
+	};
+	assert.equal(output.results?.skill?.label, 'mjs');
+});
+
+test('runPostCollect rejects invalid user plugin ids', async () => {
+	const root = mkdtempSync(join(tmpdir(), 'post-collect-invalid-id-'));
+	mkdirSync(join(root, 'data'), { recursive: true });
+
+	await assert.rejects(
+		runPostCollect({
+			projectRoot: root,
+			catalog: { repositories: {} },
+			log: false,
+			plugins: [{ id: 'plugin.sample' }],
+		}),
+		/Invalid user plugin id "plugin\.sample"/,
+	);
 });

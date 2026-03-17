@@ -8,6 +8,7 @@ Usage: harbor <command>
 
 Commands:
   init      Scaffold a new project
+  gen       Generate optional project templates
   collect   Collect skills from GitHub organization
   post-collect Run collect follow-up plugins
   build     Build the web catalog (static site)
@@ -23,6 +24,9 @@ const command = process.argv[2];
 switch (command) {
 	case 'init':
 		await import('../src/cli/commands/init.js');
+		break;
+	case 'gen':
+		await import('../src/cli/commands/gen.js');
 		break;
 	case 'collect':
 		await import('../src/cli/commands/collect.js');

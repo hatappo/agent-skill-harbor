@@ -10,6 +10,7 @@ export default defineConfig({
 		'src/cli/commands/preview': 'src/cli/commands/preview.ts',
 		'src/cli/commands/collect': 'src/cli/commands/collect.ts',
 		'src/cli/commands/post-collect': 'src/cli/commands/post-collect.ts',
+		'src/cli/commands/gen': 'src/cli/commands/gen.ts',
 		'src/cli/commands/init': 'src/cli/commands/init.ts',
 		'src/runtime/collect-org-skills': 'src/runtime/collect-org-skills.ts',
 		'src/runtime/post-collect': 'src/runtime/post-collect.ts',

@@ -260,16 +260,6 @@
 											<div class="flex flex-wrap items-center gap-2">
 												<code class="rounded bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-800">{plugin.id}</code>
 											</div>
-											{#if plugin.path}
-												<div class="mt-2">
-													<div class="mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-														{$t('settings.post_collect.path')}
-													</div>
-													<code class="block break-all rounded bg-gray-100 px-2 py-1.5 text-xs dark:bg-gray-800">
-														{plugin.path}
-													</code>
-												</div>
-											{/if}
 										</div>
 									{/each}
 								</div>

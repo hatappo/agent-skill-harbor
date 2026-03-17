@@ -30,7 +30,7 @@ function mapAuditLabel(value: 'pass' | 'info' | 'warn' | 'fail'): string {
 }
 
 export const auditStaticPlugin: BuiltinPostCollectPlugin = {
-	id: 'audit-static',
+	id: 'builtin.audit-static',
 	run(context): PostCollectPluginResult {
 		const results: NonNullable<PostCollectPluginResult['results']> = {};
 

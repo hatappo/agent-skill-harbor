@@ -1,6 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { dirname, join } from 'node:path';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { tsImport } from 'tsx/esm/api';
 import { auditStaticPlugin } from './plugins/audit-static.js';
@@ -38,15 +37,15 @@ interface SavedPluginOutput extends PostCollectPluginResult {
 function loadPostCollectSettings(projectRoot: string): PostCollectSettings {
 	const settingsPath = join(projectRoot, 'config', 'harbor.yaml');
 	if (!existsSync(settingsPath)) {
-		return { plugins: [{ id: 'detect-drift' }] };
+		return { plugins: [{ id: 'builtin.detect-drift' }] };
 	}
 	try {
 		const raw = yamlLoad(readFileSync(settingsPath, 'utf-8')) as RawSettings | null;
 		return {
-			plugins: raw?.post_collect?.plugins ?? [{ id: 'detect-drift' }],
+			plugins: raw?.post_collect?.plugins ?? [{ id: 'builtin.detect-drift' }],
 		};
 	} catch {
-		return { plugins: [{ id: 'detect-drift' }] };
+		return { plugins: [{ id: 'builtin.detect-drift' }] };
 	}
 }
 
@@ -73,14 +72,34 @@ function normalizePluginResult(result: PostCollectPluginResult | null | undefine
 	return next;
 }
 
-async function loadUserPlugin(projectRoot: string, pluginPath: string): Promise<PostCollectPluginModule> {
-	const modulePath = isAbsolute(pluginPath) ? pluginPath : resolve(projectRoot, pluginPath);
+function isValidUserPluginId(pluginId: string): boolean {
+	return /^[a-z0-9][a-z0-9_-]*$/.test(pluginId);
+}
+
+function resolveUserPluginPath(projectRoot: string, pluginId: string): string {
+	if (!isValidUserPluginId(pluginId)) {
+		throw new Error(`Invalid user plugin id "${pluginId}". Use only lowercase letters, numbers, "-" and "_".`);
+	}
+
+	const baseDir = join(projectRoot, 'plugins', pluginId);
+	const candidates = ['index.mjs', 'index.js', 'index.ts'].map((name) => join(baseDir, name));
+	const resolved = candidates.find((candidate) => existsSync(candidate));
+	if (!resolved) {
+		throw new Error(
+			`Post-collect plugin "${pluginId}" was not found. Expected one of: ${candidates.map((candidate) => `"${candidate}"`).join(', ')}`,
+		);
+	}
+	return resolved;
+}
+
+async function loadUserPlugin(projectRoot: string, pluginId: string): Promise<PostCollectPluginModule> {
+	const modulePath = resolveUserPluginPath(projectRoot, pluginId);
 	const imported = (await tsImport(modulePath, import.meta.url)) as Partial<PostCollectPluginModule> & {
 		default?: Partial<PostCollectPluginModule>;
 	};
 	const candidate = imported.default?.run ? imported.default : imported;
 	if (typeof candidate.run !== 'function') {
-		throw new Error(`Plugin "${pluginPath}" must export run(context).`);
+		throw new Error(`Plugin "${pluginId}" must export run(context).`);
 	}
 	return candidate as PostCollectPluginModule;
 }
@@ -135,13 +154,9 @@ export async function runPostCollect(options: RunPostCollectOptions): Promise<vo
 		const builtIn = BUILTIN_PLUGINS.get(plugin.id);
 		const context: PostCollectPluginContext = { ...contextBase, plugin_id: plugin.id };
 		if (log) console.log(`  -> ${plugin.id}`);
-		const pluginPath = plugin.path;
-		if (!builtIn && !pluginPath) {
-			throw new Error(`Post-collect plugin "${plugin.id}" requires a path.`);
-		}
 		const result = builtIn
 			? await builtIn.run(context)
-			: await (await loadUserPlugin(options.projectRoot, pluginPath!)).run(context);
+			: await (await loadUserPlugin(options.projectRoot, plugin.id)).run(context);
 		savePluginOutput(options.projectRoot, plugin.id, options.collectId ?? null, normalizePluginResult(result));
 	}
 }

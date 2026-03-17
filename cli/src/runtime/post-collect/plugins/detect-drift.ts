@@ -58,7 +58,7 @@ function findOriginSkillPath(
 }
 
 export const detectDriftPlugin: BuiltinPostCollectPlugin = {
-	id: 'detect-drift',
+	id: 'builtin.detect-drift',
 	run(context): PostCollectPluginResult {
 		const results: PostCollectPluginResult['results'] = {};
 		const skillIdentityCache = new Map<string, string | null>();

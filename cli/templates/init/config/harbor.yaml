@@ -9,10 +9,11 @@ collector:
 
 post_collect:
   plugins:
-    - id: detect-drift
-  #   - id: audit-static
-  #   - id: company-policy
-  #     path: ./scripts/plugins/company-policy.ts
+    - id: builtin.detect-drift
+  #   - id: builtin.audit-static
+  #   - id: sample_plugin
+  # Generate the sample plugin first: harbor gen sample-plugin
+  # Then uncomment the line above.
 
 catalog:
   skill:

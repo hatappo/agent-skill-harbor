@@ -22,11 +22,10 @@ const uiSchema = z.object({
 
 const postCollectPluginSchema = z.object({
 	id: z.string(),
-	path: z.string().optional(),
 });
 
 const postCollectSchema = z.object({
-	plugins: z.array(postCollectPluginSchema).default([{ id: 'detect-drift' }]),
+	plugins: z.array(postCollectPluginSchema).default([{ id: 'builtin.detect-drift' }]),
 });
 
 export const settingsSchema = z.object({
