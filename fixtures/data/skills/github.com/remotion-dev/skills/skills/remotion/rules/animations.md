@@ -1,27 +1,31 @@
----
-name: animations
-description: Fundamental animation skills for Remotion
-metadata:
-  tags: animations, transitions, frames, useCurrentFrame
----
+# Animation Rules
 
-All animations MUST be driven by the `useCurrentFrame()` hook.  
-Write animations in seconds and multiply them by the `fps` value from `useVideoConfig()`.
+## interpolate()
 
 ```tsx
-import { useCurrentFrame } from "remotion";
+import { interpolate, useCurrentFrame } from "remotion";
 
-export const FadeIn = () => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-
-  const opacity = interpolate(frame, [0, 2 * fps], [0, 1], {
-    extrapolateRight: "clamp",
-  });
-
-  return <div style={{ opacity }}>Hello World!</div>;
-};
+const frame = useCurrentFrame();
+const opacity = interpolate(frame, [0, 30], [0, 1], {
+  extrapolateLeft: "clamp",
+  extrapolateRight: "clamp",
+});
 ```
 
-CSS transitions or animations are FORBIDDEN - they will not render correctly.  
-Tailwind animation class names are FORBIDDEN - they will not render correctly.
+- Always set `extrapolateLeft: "clamp"` and `extrapolateRight: "clamp"`
+- Use multiple `interpolate()` calls for complex animations
+- Prefer easing functions for natural motion
+
+## spring()
+
+```tsx
+import { spring, useCurrentFrame, useVideoConfig } from "remotion";
+
+const frame = useCurrentFrame();
+const { fps } = useVideoConfig();
+const scale = spring({ frame, fps, config: { damping: 200 } });
+```
+
+- `damping`: Higher = less bouncy (default: 10)
+- `mass`: Higher = slower (default: 1)
+- `stiffness`: Higher = faster (default: 100)
