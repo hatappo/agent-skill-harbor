@@ -1,0 +1,50 @@
+- generated_at: '2026-03-17T21:46:11.944Z'
+  collect_id: ca694391-7cb4-448e-8887-c1a29bd04da2
+  summary: 14 skill(s) checked for drift.
+  label_intents:
+    In sync: success
+    Drifted: warn
+    Unknown: neutral
+  results:
+    github.com/skill-mill/sk-frontend-kit/skills/algorithmic-art/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-frontend-kit/skills/frontend-design/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-infra-automation/terraform/code-generation/skills/terraform-style-guide/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-infra-automation/terraform/code-generation/skills/terraform-test/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-doc-tools/skills/docx/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-doc-tools/skills/pdf/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-mcp-toolkit/skills/mcp-builder/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-code-quality/skills/webapp-testing/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-devops-handbook/packer/builders/skills/aws-ami-builder/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-onboarding-kit/skills/skill-creator/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-creative-tools/skills/pptx/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-creative-tools/skills/xlsx/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-video-production/skills/remotion/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.
+    github.com/skill-mill/sk-ai-dev-tools/skills/doc-coauthoring/SKILL.md:
+      label: In sync
+      raw: Collected copy matches the current origin skill tree.

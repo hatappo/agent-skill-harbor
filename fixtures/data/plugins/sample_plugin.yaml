@@ -1,0 +1,197 @@
+- generated_at: '2026-03-17T22:38:41.732Z'
+  collect_id: ca694391-7cb4-448e-8887-c1a29bd04da2
+  summary: Generated sample output for 71 skill(s).
+  label_intents:
+    Pass: success
+    Review: warn
+  results:
+    github.com/skill-mill/sk-frontend-kit/.claude/skills/css-architecture/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-frontend-kit/skills/algorithmic-art/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-frontend-kit/skills/frontend-design/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-infra-automation/.claude/skills/kubernetes-deploy/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-infra-automation/terraform/code-generation/skills/terraform-style-guide/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-infra-automation/terraform/code-generation/skills/terraform-test/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-doc-tools/.claude/skills/api-docs-generator/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-doc-tools/skills/docx/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-doc-tools/skills/pdf/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-mcp-toolkit/skills/mcp-builder/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-code-quality/.claude/skills/code-review-standards/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-code-quality/.claude/skills/linting-guide/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-code-quality/skills/webapp-testing/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-security-playbook/.claude/skills/dependency-scanner/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-security-playbook/.claude/skills/secrets-detection/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-security-playbook/.claude/skills/security-audit/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-data-pipeline/.claude/skills/data-validation/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-data-pipeline/.claude/skills/etl-pipeline/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-data-pipeline/.claude/skills/sql-optimization/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-devops-handbook/.claude/skills/ci-cd-pipeline/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-devops-handbook/.claude/skills/docker-best-practices/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-devops-handbook/packer/builders/skills/aws-ami-builder/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-onboarding-kit/.claude/skills/new-dev-setup/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-onboarding-kit/.claude/skills/pr-standards/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-onboarding-kit/skills/skill-creator/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-creative-tools/.claude/skills/svg-generator/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-creative-tools/skills/pptx/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-creative-tools/skills/xlsx/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-azure-integration/.github/plugins/azure-sdk-typescript/skills/azure-ai-projects-ts/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-azure-integration/.github/plugins/azure-sdk-typescript/skills/azure-cosmos-ts/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-video-production/.claude/skills/video-editing-guide/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-video-production/skills/remotion/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-ai-dev-tools/.claude/skills/prompt-engineering/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-ai-dev-tools/skills/doc-coauthoring/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-database-patterns/.claude/skills/migration-strategy/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/skill-mill/sk-database-patterns/.claude/skills/schema-design/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/skill-mill/sk-platform-sdk/.claude/skills/api-gateway-config/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/skill-mill/sk-platform-sdk/.claude/skills/sdk-client-generator/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/anthropics/skills/skills/algorithmic-art/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/anthropics/skills/skills/brand-guidelines/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/anthropics/skills/skills/canvas-design/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/anthropics/skills/skills/claude-api/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/anthropics/skills/skills/doc-coauthoring/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/anthropics/skills/skills/docx/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/anthropics/skills/skills/frontend-design/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/anthropics/skills/skills/internal-comms/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/anthropics/skills/skills/mcp-builder/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/anthropics/skills/skills/pdf/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/anthropics/skills/skills/pptx/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/anthropics/skills/skills/skill-creator/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/anthropics/skills/skills/slack-gif-creator/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/anthropics/skills/skills/theme-factory/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/anthropics/skills/skills/web-artifacts-builder/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/anthropics/skills/skills/webapp-testing/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/anthropics/skills/skills/xlsx/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/anthropics/skills/template/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/hashicorp/agent-skills/packer/builders/skills/aws-ami-builder/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/hashicorp/agent-skills/packer/builders/skills/azure-image-builder/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/hashicorp/agent-skills/packer/builders/skills/windows-builder/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/hashicorp/agent-skills/packer/hcp/skills/push-to-registry/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/hashicorp/agent-skills/terraform/code-generation/skills/azure-verified-modules/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/hashicorp/agent-skills/terraform/code-generation/skills/terraform-search-import/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/hashicorp/agent-skills/terraform/code-generation/skills/terraform-style-guide/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/hashicorp/agent-skills/terraform/code-generation/skills/terraform-test/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/hashicorp/agent-skills/terraform/module-generation/skills/refactor-module/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/hashicorp/agent-skills/terraform/module-generation/skills/terraform-stacks/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/hashicorp/agent-skills/terraform/provider-development/skills/new-terraform-provider/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/hashicorp/agent-skills/terraform/provider-development/skills/provider-actions/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
+    github.com/hashicorp/agent-skills/terraform/provider-development/skills/provider-resources/SKILL.md:
+      raw: This is a sample post-collect plugin result without a label.
+    github.com/hashicorp/agent-skills/terraform/provider-development/skills/run-acceptance-tests/SKILL.md:
+      label: Pass
+      raw: This is a sample post-collect plugin result with a "Pass" label.
+    github.com/remotion-dev/skills/skills/remotion/SKILL.md:
+      label: Review
+      raw: This is a sample post-collect plugin result with a "Review" label.
