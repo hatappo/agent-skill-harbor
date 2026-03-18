@@ -29,7 +29,11 @@ cd agent-skill-harbor
 pnpm install
 pnpm setup:dev    # .env を作成し、demo repo の config/data/guide を取得
 # .env を編集: GH_TOKEN, GH_ORG のコメントを外して設定
-tsx cli/bin/cli.ts dev
+pnpm --dir collector build
+pnpm --dir post-collect build
+pnpm --dir cli build
+pnpm --dir web build
+node cli/dist/bin/cli.js dev
 ```
 
 開発サーバーは `http://localhost:5173` で起動します。
@@ -47,21 +51,45 @@ tsx cli/bin/cli.ts dev
 ### コマンド
 
 ```bash
-tsx cli/bin/cli.ts dev        # 開発サーバーの起動
-tsx cli/bin/cli.ts build      # CLI 経由でカタログサイトをビルド
-tsx cli/bin/cli.ts preview    # ビルド結果のプレビュー
+node cli/dist/bin/cli.js dev       # 開発サーバーの起動
+node cli/dist/bin/cli.js build     # CLI 経由でカタログサイトをビルド
+node cli/dist/bin/cli.js preview   # ビルド結果のプレビュー
 cd web && pnpm check          # web package の型チェック
 cd web && pnpm lint           # web package のリント
 pnpm format       # Prettier でフォーマット
-pnpm --dir cli build          # CLI パッケージをビルド（bin/ や src/ を変更した後に実行）
-GH_TOKEN=$(gh auth token) node cli/dist/bin/cli.js collect   # source からスキル収集
+pnpm --dir collector build    # collector/ を変更した後に再ビルド
+pnpm --dir post-collect build # post-collect/ を変更した後に再ビルド
+pnpm --dir cli build          # cli/ を変更した後に再ビルド
+pnpm --dir web build          # web/ を変更した後に再ビルド
+GH_TOKEN=$(gh auth token) node cli/dist/bin/cli.js collect
 node cli/dist/bin/cli.js post-collect --collect-id <collect_id>
 pnpm setup:dev                # ローカルの demo config/data/guide を更新
 ```
 
 demo データには `data/collects.yaml`、`data/skills.yaml`、sample plugin の出力が含まれます。
 
-source リポジトリでビルド済み CLI を実行する場合は、`config/` と `data/` を正しく参照させるため、必ずリポジトリルートで実行してください。
+source リポジトリでビルド済み CLI を実行する場合は、`config/`、`data/`、`guide/` を正しく参照させるため、リポジトリルートで実行してください。
+
+### 典型的な動作確認フロー
+
+```bash
+cd /Users/fumi/ws/hobby/agent-skill-harbor
+pnpm install
+pnpm setup:dev
+pnpm --dir collector build
+pnpm --dir post-collect build
+pnpm --dir cli build
+pnpm --dir web build
+
+GH_TOKEN=$(gh auth token) node cli/dist/bin/cli.js collect --force
+grep -m1 '^  collect_id:' data/collects.yaml
+node cli/dist/bin/cli.js post-collect --collect-id <collect_id>
+node cli/dist/bin/cli.js build
+node cli/dist/bin/cli.js dev
+node cli/dist/bin/cli.js preview
+```
+
+source repository 上で collector -> post-collect -> web まで一連の動作確認を行うなら、この手順が最も分かりやすいです。ライブな開発サーバーを見たいときは `dev`、ビルド済み成果物を確認したいときは `preview` を使ってください。
 
 ### プロジェクト構成
 

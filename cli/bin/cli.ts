@@ -52,7 +52,7 @@ async function importCommand(
 		if (typeof run !== 'function') {
 			throw new Error(`Missing exported function: ${exportName} from ${moduleName}`);
 		}
-		await run();
+		await run(process.argv.slice(3));
 	} catch (error) {
 		if (error && typeof error === 'object' && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') {
 			const message =

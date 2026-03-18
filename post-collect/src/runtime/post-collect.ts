@@ -3,7 +3,9 @@ import { pathToFileURL } from 'node:url';
 import { loadCatalog } from './catalog-store.js';
 import { runPostCollect } from './post-collect/run-post-collect.js';
 
-const PROJECT_ROOT = process.env.SKILL_HARBOR_ROOT || join(import.meta.dirname, '..', '..');
+function getProjectRoot(): string {
+	return process.env.SKILL_HARBOR_ROOT || join(import.meta.dirname, '..', '..');
+}
 
 function parseArgs(argv: string[]): { collectId?: string } {
 	let collectId: string | undefined;
@@ -21,11 +23,12 @@ function parseArgs(argv: string[]): { collectId?: string } {
 
 export async function runPostCollectCli(argv: string[] = process.argv.slice(2)): Promise<void> {
 	const args = parseArgs(argv);
+	const projectRoot = getProjectRoot();
 	await runPostCollect({
-		projectRoot: PROJECT_ROOT,
+		projectRoot,
 		collectId: args.collectId ?? null,
 		orgName: process.env.GH_ORG ?? undefined,
-		catalog: loadCatalog(PROJECT_ROOT),
+		catalog: loadCatalog(projectRoot),
 		log: true,
 	});
 }
