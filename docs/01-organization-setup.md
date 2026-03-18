@@ -75,8 +75,10 @@ pnpm dev
 1. Push to your repository
 2. Go to **Actions > CollectSkills**
 3. Click **Run workflow** to trigger the first collection
-4. `CollectSkills` will run `collect` and then `audit` as separate steps
+4. `CollectSkills` will run `collect` and `post-collect` as separate steps
 5. The deploy workflow will run automatically after `CollectSkills` succeeds
+
+For plugin configuration and output files, see [Post-Collect Plugins](03-post-collect-plugins.md).
 
 ## Step 7: Configure Governance Policies
 
@@ -141,7 +143,7 @@ Your configuration files (`config/`, `.env`) and data (`data/`) are not affected
 │  - Scan org repos       │
 │  - Parse SKILL.md       │
 │  - Write YAML           │
-│  - Run audit step       │
+│  - Run post_collect     │
 │  - Update report/history│
 │  - Commit & push        │
 └────────┬────────────────┘

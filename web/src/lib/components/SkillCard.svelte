@@ -1,15 +1,17 @@
 <script lang="ts">
 	import type { FlatSkillEntry, UsagePolicy } from '$lib/types';
 	import GovernanceBadge from './GovernanceBadge.svelte';
+	import PluginLabelBadge from './PluginLabelBadge.svelte';
 	import { t } from '$lib/i18n';
 	import { base } from '$app/paths';
 
 	interface Props {
 		skill: FlatSkillEntry;
 		freshPeriodDays?: number;
+		origin?: string;
 	}
 
-	let { skill, freshPeriodDays = 0 }: Props = $props();
+	let { skill, freshPeriodDays = 0, origin }: Props = $props();
 
 	let isNew = $derived(
 		freshPeriodDays > 0 &&
@@ -28,6 +30,7 @@
 	let skillName = $derived(String(skill.frontmatter.name ?? skill.repo));
 	let skillDescription = $derived(String(skill.frontmatter.description ?? ''));
 	let metadata = $derived((skill.frontmatter.metadata ?? {}) as Record<string, unknown>);
+	let showOrigin = $derived(!!origin);
 </script>
 
 <a
@@ -58,10 +61,15 @@
 					{$t('skillCard.new')}
 				</span>
 			{/if}
-			<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
 			<span class="inline-flex items-center rounded px-2 py-0.5 text-xs font-medium {visibilityStyle}">
 				{skill.visibility}
 			</span>
+			<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
+			{#if skill.plugin_labels}
+				{#each skill.plugin_labels as pluginLabel (`${pluginLabel.plugin_id}:${pluginLabel.label}`)}
+					<PluginLabelBadge label={pluginLabel.label} intent={pluginLabel.intent} />
+				{/each}
+			{/if}
 		</div>
 	</div>
 
@@ -92,6 +100,9 @@
 			</span>
 		{/if}
 		<span class="min-w-0 break-all">{skill.owner}/{skill.repo}</span>
+		{#if showOrigin}
+			<span class="min-w-0 break-all">Origin: {origin}</span>
+		{/if}
 		{#if metadata.author}
 			<span class="break-all">by {metadata.author}</span>
 		{/if}

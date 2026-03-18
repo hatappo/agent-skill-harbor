@@ -190,7 +190,9 @@
 										</div>
 									</td>
 									<td class="whitespace-nowrap px-4 py-2">
-										<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
+										<div class="flex flex-wrap items-center gap-1.5">
+											<GovernanceBadge status={skill.usage_policy as UsagePolicy} />
+										</div>
 									</td>
 									<td class="hidden px-4 py-2 md:table-cell"></td>
 									<td class="hidden px-4 py-2 lg:table-cell"></td>

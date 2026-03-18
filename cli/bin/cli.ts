@@ -8,8 +8,9 @@ Usage: harbor <command>
 
 Commands:
   init      Scaffold a new project
+  gen       Generate optional project templates
   collect   Collect skills from GitHub organization
-  audit     Audit collected skills
+  post-collect Run collect follow-up plugins
   build     Build the web catalog (static site)
   deploy    Deploy the built catalog
   dev       Start development server
@@ -24,11 +25,14 @@ switch (command) {
 	case 'init':
 		await import('../src/cli/commands/init.js');
 		break;
+	case 'gen':
+		await import('../src/cli/commands/gen.js');
+		break;
 	case 'collect':
 		await import('../src/cli/commands/collect.js');
 		break;
-	case 'audit':
-		await import('../src/cli/commands/audit.js');
+	case 'post-collect':
+		await import('../src/cli/commands/post-collect.js');
 		break;
 	case 'build':
 		await import('../src/cli/commands/build.js');

@@ -1,40 +1,95 @@
 /**
- * Set up local development environment by copying templates and fixtures.
- * This is for source repo contributors only, not for end users.
+ * Set up local development environment for source repo contributors.
  *
  * Steps:
  *   1. cli/templates/init/.env.example → .env
- *   2. cli/templates/init/config/*     → config/
- *   3. fixtures/config/*            → config/  (overwrites with sample governance)
- *   4. fixtures/data/*              → data/
+ *   2. Download demo repo archive
+ *   3. Copy demo repo config/, data/, guide/ → project root
  */
+import { execFileSync } from 'node:child_process';
+import { cpSync, copyFileSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { existsSync, cpSync, copyFileSync } from 'node:fs';
+
+const DEMO_OWNER = 'skill-mill';
+const DEMO_REPO = 'agent-skill-harbor-demo';
+const DEMO_REF = 'main';
+const DEMO_ARCHIVE_URL = `https://codeload.github.com/${DEMO_OWNER}/${DEMO_REPO}/tar.gz/refs/heads/${DEMO_REF}`;
+const DEMO_COPY_DIRS = ['config', 'data', 'guide'] as const;
 
 const projectRoot = resolve(import.meta.dirname, '..');
-const templatesDir = join(projectRoot, 'cli', 'templates/init');
-const fixturesDir = join(projectRoot, 'fixtures');
+const templatesDir = join(projectRoot, 'cli', 'templates', 'init');
+
+function logStep(message: string) {
+	console.log(`  ${message}`);
+}
+
+function copyDirectory(sourceDir: string, destDir: string) {
+	if (!existsSync(sourceDir)) {
+		throw new Error(`Expected demo directory does not exist: ${sourceDir}`);
+	}
+	rmSync(destDir, { force: true, recursive: true });
+	cpSync(sourceDir, destDir, { recursive: true });
+}
+
+async function downloadDemoArchive(archivePath: string) {
+	const response = await fetch(DEMO_ARCHIVE_URL, {
+		headers: { 'user-agent': 'agent-skill-harbor-setup-dev' },
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to download demo archive: ${response.status} ${response.statusText}`);
+	}
+
+	const archiveBuffer = Buffer.from(await response.arrayBuffer());
+	writeFileSync(archivePath, archiveBuffer);
+}
+
+function findExtractedRoot(extractDir: string) {
+	const extractedEntry = readdirSync(extractDir, { withFileTypes: true }).find((entry) => entry.isDirectory());
+	if (!extractedEntry) {
+		throw new Error('Failed to locate extracted demo archive root directory.');
+	}
+	return join(extractDir, extractedEntry.name);
+}
 
 console.log('\nSetting up local development environment...\n');
 
-// 1. .env
 if (!existsSync(join(projectRoot, '.env'))) {
 	copyFileSync(join(templatesDir, '.env.example'), join(projectRoot, '.env'));
-	console.log('  Created .env from cli/templates/init/.env.example');
+	logStep('Created .env from cli/templates/init/.env.example');
 } else {
-	console.log('  Skipped .env (already exists)');
+	logStep('Skipped .env (already exists)');
 }
 
-// 2. templates/config/
-cpSync(join(templatesDir, 'config'), join(projectRoot, 'config'), { recursive: true });
-console.log('  Copied templates/config/ → config/');
+const tempRoot = join(tmpdir(), `agent-skill-harbor-setup-dev-${process.pid}`);
+const archivePath = join(tempRoot, `${DEMO_REPO}.tar.gz`);
+const extractDir = join(tempRoot, 'extract');
 
-// 3. fixtures/config/ (overwrites with sample governance policies)
-cpSync(join(fixturesDir, 'config'), join(projectRoot, 'config'), { recursive: true });
-console.log('  Copied fixtures/config/ → config/');
+rmSync(tempRoot, { force: true, recursive: true });
+mkdirSync(extractDir, { recursive: true });
 
-// 4. fixtures/data/
-cpSync(join(fixturesDir, 'data'), join(projectRoot, 'data'), { recursive: true });
-console.log('  Copied fixtures/data/ → data/');
+try {
+	logStep(`Downloading demo archive from ${DEMO_OWNER}/${DEMO_REPO}@${DEMO_REF}`);
+	await downloadDemoArchive(archivePath);
 
-console.log('\nDone! Edit .env (uncomment and set GH_TOKEN, GH_ORG) and run:\n  pnpm collect\n  pnpm dev\n');
+	logStep('Extracting demo archive');
+	execFileSync('tar', ['-xzf', archivePath, '-C', extractDir], { stdio: 'inherit' });
+
+	const extractedRoot = findExtractedRoot(extractDir);
+	for (const dirName of DEMO_COPY_DIRS) {
+		const sourceDir = join(extractedRoot, dirName);
+		const destDir = join(projectRoot, dirName);
+		copyDirectory(sourceDir, destDir);
+		logStep(`Copied demo ${dirName}/ → ${dirName}/`);
+	}
+} finally {
+	rmSync(tempRoot, { force: true, recursive: true });
+}
+
+console.log(
+	'\nDone! Edit .env (uncomment and set GH_TOKEN, GH_ORG) and run from the repository root:\n' +
+		'  pnpm --dir cli build\n' +
+		'  GH_TOKEN=$(gh auth token) node cli/dist/bin/cli.js collect\n' +
+		'  node cli/dist/bin/cli.js post-collect --collect-id <collect_id>\n' +
+		'  tsx cli/bin/cli.ts dev\n',
+);

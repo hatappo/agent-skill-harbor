@@ -11,16 +11,23 @@
 	import FilterPanel from '$lib/components/FilterPanel.svelte';
 	import ViewTabs from '$lib/components/ViewTabs.svelte';
 	import type { ViewMode } from '$lib/components/ViewTabs.svelte';
-	import type { FlatSkillEntry, RepoInfo, UsagePolicy, Visibility } from '$lib/types';
+	import type { FlatSkillEntry, PluginFilterOption, RepoInfo, UsagePolicy, Visibility } from '$lib/types';
 	import { createSearchIndex, searchSkills } from '$lib/utils/search';
-	import { filterSkills, type FilterState, type OrgOwnership } from '$lib/utils/filter';
+	import { filterSkills, type FilterState, type OrgOwnership, type OriginPresence } from '$lib/utils/filter';
 	import { groupByOrigin } from '$lib/utils/origin';
+	import { getResolvedFromRepoLabel } from '$lib/utils/resolved-from';
 	import { t } from '$lib/i18n';
 
 	type GroupMode = 'none' | 'repo' | 'origin';
 
 	interface Props {
-		data: { skills: FlatSkillEntry[]; repos: RepoInfo[]; freshPeriodDays: number; orgName: string };
+		data: {
+			skills: FlatSkillEntry[];
+			repos: RepoInfo[];
+			freshPeriodDays: number;
+			orgName: string;
+			pluginFilterOptions?: PluginFilterOption[];
+		};
 	}
 
 	let { data }: Props = $props();
@@ -32,7 +39,13 @@
 
 	// Client-side state
 	let query = $state('');
-	let filters = $state<FilterState>({ statuses: [], visibilities: [], orgOwnerships: [] });
+	let filters = $state<FilterState>({
+		status: null,
+		visibility: null,
+		orgOwnership: null,
+		hasOrigin: null,
+		pluginLabels: {},
+	});
 	let view = $state<'card' | 'list'>('card');
 	let groupMode = $state<GroupMode>('none');
 
@@ -40,10 +53,17 @@
 	onMount(() => {
 		const params = new URLSearchParams(window.location.search);
 		query = params.get('q') ?? '';
+		const pluginLabels = Object.fromEntries(
+			(data.pluginFilterOptions ?? [])
+				.map((option) => [option.plugin_id, params.get(`plugin_${option.plugin_id}`)])
+				.filter((entry): entry is [string, string] => Boolean(entry[1])),
+		);
 		filters = {
-			statuses: (params.get('status')?.split(',').filter(Boolean) ?? []) as UsagePolicy[],
-			visibilities: (params.get('visibility')?.split(',').filter(Boolean) ?? []) as Visibility[],
-			orgOwnerships: (params.get('origin')?.split(',').filter(Boolean) ?? []) as OrgOwnership[],
+			status: (params.get('status') as UsagePolicy | null) ?? null,
+			visibility: (params.get('visibility') as Visibility | null) ?? null,
+			orgOwnership: (params.get('origin') as OrgOwnership | null) ?? null,
+			hasOrigin: (params.get('has_origin') as OriginPresence | null) ?? null,
+			pluginLabels,
 		};
 		const v = params.get('view');
 		view = v === 'list' ? 'list' : 'card';
@@ -62,11 +82,23 @@
 
 	let displayedRepos = $derived.by(() => {
 		const matchedRepoKeys = new Set(displayedSkills.map((s) => s.repoKey));
-		if (!query && !filters.statuses.length && !filters.visibilities.length && !filters.orgOwnerships.length) {
+		if (
+			!query &&
+			filters.status === null &&
+			filters.visibility === null &&
+			filters.orgOwnership === null &&
+			filters.hasOrigin === null &&
+			Object.keys(filters.pluginLabels).length === 0
+		) {
 			return allRepos;
 		}
 		return allRepos.filter((r) => matchedRepoKeys.has(r.repoKey));
 	});
+
+	let pluginFilterOptions = $derived(data.pluginFilterOptions ?? []);
+	let originBySkillKey = $derived.by(() =>
+		Object.fromEntries(allSkills.map((skill) => [skill.key, getResolvedFromRepoLabel(skill) ?? ''])),
+	);
 
 	function updateUrl(
 		newQuery: string,
@@ -77,9 +109,13 @@
 		if (!browser) return;
 		const params = new URLSearchParams();
 		if (newQuery) params.set('q', newQuery);
-		if (newFilters.statuses.length) params.set('status', newFilters.statuses.join(','));
-		if (newFilters.visibilities.length) params.set('visibility', newFilters.visibilities.join(','));
-		if (newFilters.orgOwnerships.length) params.set('origin', newFilters.orgOwnerships.join(','));
+		if (newFilters.status) params.set('status', newFilters.status);
+		if (newFilters.visibility) params.set('visibility', newFilters.visibility);
+		if (newFilters.orgOwnership) params.set('origin', newFilters.orgOwnership);
+		if (newFilters.hasOrigin) params.set('has_origin', newFilters.hasOrigin);
+		for (const [pluginId, label] of Object.entries(newFilters.pluginLabels)) {
+			params.set(`plugin_${pluginId}`, label);
+		}
 		if (newView === 'list') params.set('view', 'list');
 		if (newView === 'list' && newGroupMode === 'none') params.set('group', 'flat');
 		if (newView === 'list' && newGroupMode === 'repo') params.set('group', 'repo');
@@ -112,7 +148,12 @@
 	}
 
 	let hasFilters = $derived(
-		query !== '' || filters.statuses.length > 0 || filters.visibilities.length > 0 || filters.orgOwnerships.length > 0,
+		query !== '' ||
+			filters.status !== null ||
+			filters.visibility !== null ||
+			filters.orgOwnership !== null ||
+			filters.hasOrigin !== null ||
+			Object.keys(filters.pluginLabels).length > 0,
 	);
 
 	let originGroups = $derived.by(() => {
@@ -155,7 +196,7 @@
 	<div class="mb-6 space-y-4">
 		<SearchBar value={query} onchange={handleSearch} />
 		<div class="flex flex-wrap items-center gap-3">
-			<FilterPanel {filters} onchange={handleFilterChange} />
+			<FilterPanel {filters} {pluginFilterOptions} onchange={handleFilterChange} />
 			<span class="tabular-nums text-sm text-gray-500 dark:text-gray-400 sm:ml-auto">
 				{#if hasFilters}
 					<span class="font-semibold text-gray-900 dark:text-gray-100">{displayedSkills.length}</span> / {allSkills.length}
@@ -172,8 +213,8 @@
 	{:else if view === 'list' && groupMode === 'repo'}
 		<RepoTable repos={displayedRepos} skills={displayedSkills} {freshPeriodDays} />
 	{:else if view === 'list'}
-		<SkillTable skills={displayedSkills} {freshPeriodDays} />
+		<SkillTable skills={displayedSkills} {pluginFilterOptions} {freshPeriodDays} {originBySkillKey} />
 	{:else}
-		<SkillList skills={displayedSkills} {freshPeriodDays} />
+		<SkillList skills={displayedSkills} {freshPeriodDays} {originBySkillKey} />
 	{/if}
 </div>

@@ -43,7 +43,7 @@ export interface CategoryStats {
 }
 
 export interface CollectionEntry {
-	id?: string;
+	collect_id?: string;
 	collecting: {
 		collected_at: string;
 		duration_sec: number;
@@ -52,23 +52,54 @@ export interface CollectionEntry {
 		org: CategoryStats;
 		community: CategoryStats;
 	};
-	auditing?: {
-		audited_at: string;
-		duration_sec: number;
-		engines: string[];
-		skipped: boolean;
-		skip_reason?: string;
-	};
-	report?: {
-		org: {
-			processed: { pass: number; info: number; warn: number; fail: number };
-			skipped: { pass: number; info: number; warn: number; fail: number };
-		};
-		community: {
-			processed: { pass: number; info: number; warn: number; fail: number };
-			skipped: { pass: number; info: number; warn: number; fail: number };
-		};
-	};
+}
+
+export type LabelIntent = 'neutral' | 'info' | 'success' | 'warn' | 'danger';
+
+export interface PluginSkillResult {
+	label?: string;
+	raw?: string;
+	[key: string]: unknown;
+}
+
+export interface PluginOutputEntry {
+	plugin_id: string;
+	generated_at: string;
+	collect_id?: string;
+	summary?: string;
+	label_intents?: Record<string, LabelIntent>;
+	results?: Record<string, PluginSkillResult>;
+}
+
+export interface PluginFilterOption {
+	plugin_id: string;
+	labels: string[];
+	short_label?: string;
+	label_intents?: Record<string, LabelIntent>;
+}
+
+export interface PluginHistoryLabelCounts {
+	org: number;
+	community: number;
+}
+
+export interface PluginHistoryColumn {
+	plugin_id: string;
+	short_label?: string;
+	labels: string[];
+	intent_labels: string[];
+	label_intents?: Record<string, LabelIntent>;
+	label_abbreviations: Record<string, string>;
+}
+
+export interface PluginHistorySummary {
+	[pluginId: string]: Record<string, PluginHistoryLabelCounts>;
+}
+
+export interface PluginLabelEntry {
+	plugin_id: string;
+	label: string;
+	intent: LabelIntent;
 }
 
 export interface FlatSkillEntry {
@@ -91,4 +122,5 @@ export interface FlatSkillEntry {
 	tree_sha?: string | null;
 	is_fork?: boolean;
 	resolved_from?: string;
+	plugin_labels?: PluginLabelEntry[];
 }

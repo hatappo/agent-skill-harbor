@@ -4,11 +4,20 @@
 	import { base } from '$app/paths';
 	import { onMount } from 'svelte';
 	import StatCard from '$lib/components/StatCard.svelte';
+	import PluginTrendChart from '$lib/components/PluginTrendChart.svelte';
 	import TrendChart from '$lib/components/TrendChart.svelte';
 	import ViewTabs from '$lib/components/ViewTabs.svelte';
 	import GovernanceBadge from '$lib/components/GovernanceBadge.svelte';
 	import * as Select from '$lib/components/ui/select';
-	import type { CollectionEntry, FlatSkillEntry, RepoInfo, UsagePolicy } from '$lib/types';
+	import * as Tooltip from '$lib/components/ui/tooltip';
+	import type {
+		CollectionEntry,
+		FlatSkillEntry,
+		PluginHistoryColumn,
+		PluginHistorySummary,
+		RepoInfo,
+		UsagePolicy,
+	} from '$lib/types';
 	import { t, locale } from '$lib/i18n';
 
 	interface Props {
@@ -16,6 +25,8 @@
 			skills: FlatSkillEntry[];
 			repos: RepoInfo[];
 			collections: CollectionEntry[];
+			pluginHistoryColumns?: PluginHistoryColumn[];
+			pluginHistorySummaries?: Record<string, PluginHistorySummary>;
 		};
 	}
 
@@ -154,8 +165,9 @@
 
 	// Breakdown
 	let statusBreakdown = $derived.by(() => {
-		const counts: Record<string, number> = { recommended: 0, discouraged: 0, prohibited: 0, none: 0 };
+		const counts: Record<string, number> = { recommended: 0, discouraged: 0, prohibited: 0 };
 		for (const s of filteredSkills) {
+			if (s.usage_policy === 'none') continue;
 			counts[s.usage_policy] = (counts[s.usage_policy] ?? 0) + 1;
 		}
 		return counts;
@@ -180,7 +192,10 @@
 	});
 
 	let historyExpanded = $state(false);
-	let displayedHistory = $derived(historyExpanded ? data.collections : data.collections.slice(0, 10));
+	let displayedHistory = $derived(historyExpanded ? data.collections : data.collections.slice(0, 3));
+	let pluginHistoryColumns = $derived(data.pluginHistoryColumns ?? []);
+	let pluginHistorySummaries = $derived(data.pluginHistorySummaries ?? {});
+	const trendShapes = ['circle', 'square', 'diamond', 'triangle', 'cross'] as const;
 
 	function formatDuration(sec: number): string {
 		if (sec >= 60) {
@@ -202,34 +217,84 @@
 		});
 	}
 
-	function getAuditBucket(entry: CollectionEntry) {
-		if (!entry.report) return null;
-		if (ownerFilter === 'org') return entry.report.org;
-		if (ownerFilter === 'community') return entry.report.community;
-		return {
-			processed: {
-				pass: entry.report.org.processed.pass + entry.report.community.processed.pass,
-				info: entry.report.org.processed.info + entry.report.community.processed.info,
-				warn: entry.report.org.processed.warn + entry.report.community.processed.warn,
-				fail: entry.report.org.processed.fail + entry.report.community.processed.fail,
-			},
-			skipped: {
-				pass: entry.report.org.skipped.pass + entry.report.community.skipped.pass,
-				info: entry.report.org.skipped.info + entry.report.community.skipped.info,
-				warn: entry.report.org.skipped.warn + entry.report.community.skipped.warn,
-				fail: entry.report.org.skipped.fail + entry.report.community.skipped.fail,
-			},
-		};
+	function formatPluginHistoryCell(entry: CollectionEntry, pluginId: string): string {
+		return getPluginHistoryItems(entry, pluginId)
+			.map((item) => `${item.abbreviation}:${item.count}`)
+			.join(' ');
 	}
 
-	function formatAuditCounts(
-		label: string,
-		counts: { pass: number; info: number; warn: number; fail: number },
-	): string {
-		const total = counts.pass + counts.info + counts.warn + counts.fail;
-		if (total === 0) return `${label}: 0`;
-		return `${label}: P${counts.pass} I${counts.info} W${counts.warn} F${counts.fail}`;
+	function getPluginHistoryTooltip(entry: CollectionEntry, pluginId: string): string {
+		return getPluginHistoryItems(entry, pluginId)
+			.map((item) => `${item.label}: ${item.count}`)
+			.join('\n');
 	}
+
+	function getPluginHistoryItems(entry: CollectionEntry, pluginId: string): Array<{
+		label: string;
+		abbreviation: string;
+		count: number;
+	}> {
+		if (!entry.collect_id) return [];
+		const pluginSummary = pluginHistorySummaries[entry.collect_id]?.[pluginId];
+		const column = pluginHistoryColumns.find((item) => item.plugin_id === pluginId);
+		if (!pluginSummary || !column) return [];
+
+		return column.labels
+			.map((label) => {
+				const counts = pluginSummary[label] ?? { org: 0, community: 0 };
+				const count =
+					ownerFilter === 'org'
+						? counts.org
+						: ownerFilter === 'community'
+							? counts.community
+							: counts.org + counts.community;
+				const shouldShowZero = column.intent_labels.includes(label);
+				if (count <= 0 && !shouldShowZero) return null;
+				return {
+					label,
+					abbreviation: column.label_abbreviations[label] ?? label,
+					count,
+				};
+			})
+			.filter((value): value is { label: string; abbreviation: string; count: number } => value != null);
+	}
+
+	function formatTrendDate(iso: string): string {
+		const date = new Date(iso);
+		return `${date.getMonth() + 1}/${date.getDate()}`;
+	}
+
+	let pluginTrendSections = $derived.by(() =>
+		pluginHistoryColumns.map((column) => {
+			const labels = column.labels;
+			const canChart = labels.length > 0 && labels.length <= 5;
+			const series = canChart
+				? labels.map((label, index) => ({
+						label,
+						intent: column.label_intents?.[label] ?? 'neutral',
+						shape: trendShapes[index] ?? 'circle',
+						points: [...data.collections].reverse().map((entry) => {
+							const counts = entry.collect_id
+								? pluginHistorySummaries[entry.collect_id]?.[column.plugin_id]?.[label] ?? { org: 0, community: 0 }
+								: { org: 0, community: 0 };
+							const value =
+								ownerFilter === 'org'
+									? counts.org
+									: ownerFilter === 'community'
+										? counts.community
+										: counts.org + counts.community;
+							return { label: formatTrendDate(entry.collecting.collected_at), value };
+						}),
+					}))
+				: [];
+			return {
+				...column,
+				canChart,
+				series,
+			};
+		}),
+	);
+
 </script>
 
 <svelte:head>
@@ -275,14 +340,6 @@
 		<StatCard label={$t('stats.totalFiles')} value={totalFiles.toLocaleString()} />
 		<StatCard label={$t('stats.lastCollected')} value={lastCollectedFormatted} />
 	</div>
-
-	<!-- Trend Chart -->
-	{#if trendData.length > 0}
-		<div class="mb-8 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
-			<h2 class="mb-4 text-sm font-medium text-gray-500 dark:text-gray-400">{$t('stats.skillTrend')}</h2>
-			<TrendChart data={trendData} secondaryData={adoptionTrendData} secondaryLabel="%" />
-		</div>
-	{/if}
 
 	<!-- Breakdown -->
 	<div class="mb-8 grid gap-4 sm:grid-cols-3">
@@ -349,7 +406,7 @@
 	</div>
 
 	<!-- Collection History Table -->
-	<div class="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+	<div class="mt-8 rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
 		<div class="border-b border-gray-200 px-5 py-4 dark:border-gray-700">
 			<h2 class="text-sm font-medium text-gray-500 dark:text-gray-400">{$t('stats.collectHistory')}</h2>
 		</div>
@@ -387,17 +444,18 @@
 							>
 								{$t('stats.duration')}
 							</th>
-							<th
-								class="hidden px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 lg:table-cell"
-							>
-								{$t('stats.audit')}
-							</th>
+							{#each pluginHistoryColumns as column (column.plugin_id)}
+								<th
+									class="hidden px-5 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 lg:table-cell"
+								>
+									{column.short_label ?? column.plugin_id}
+								</th>
+							{/each}
 						</tr>
 					</thead>
 					<tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
-						{#each displayedHistory as entry, i (entry.id ?? entry.collecting.collected_at)}
+						{#each displayedHistory as entry, i (entry.collect_id ?? entry.collecting.collected_at)}
 							{@const prev = data.collections[i + 1]}
-							{@const auditBucket = getAuditBucket(entry)}
 							{@const s =
 								ownerFilter === 'org'
 									? entry.statistics.org
@@ -471,20 +529,26 @@
 								>
 									{formatDuration(entry.collecting.duration_sec)}
 								</td>
-								<td
-									class="hidden whitespace-nowrap px-5 py-3 text-left text-sm text-gray-500 dark:text-gray-400 lg:table-cell"
-								>
-									{#if entry.auditing?.skipped}
-										{$t('stats.auditSkipped')}
-									{:else if auditBucket}
-										<div>{formatAuditCounts($t('stats.auditProcessed'), auditBucket.processed)}</div>
-										<div class="text-xs text-gray-400 dark:text-gray-500">
-											{formatAuditCounts($t('stats.auditReused'), auditBucket.skipped)}
-										</div>
-									{:else}
-										—
-									{/if}
-								</td>
+								{#each pluginHistoryColumns as column (column.plugin_id)}
+									{@const pluginCell = formatPluginHistoryCell(entry, column.plugin_id)}
+									{@const pluginTooltip = getPluginHistoryTooltip(entry, column.plugin_id)}
+									<td
+										class="hidden whitespace-nowrap px-5 py-3 text-left tabular-nums text-sm text-gray-500 dark:text-gray-400 lg:table-cell"
+									>
+										{#if pluginCell}
+											<Tooltip.Root>
+												<Tooltip.Trigger>
+													<span class="cursor-help underline decoration-dotted underline-offset-2">
+														{pluginCell}
+													</span>
+												</Tooltip.Trigger>
+												<Tooltip.Content class="max-w-sm whitespace-pre-line text-sm">
+													{pluginTooltip}
+												</Tooltip.Content>
+											</Tooltip.Root>
+										{/if}
+									</td>
+								{/each}
 							</tr>
 						{/each}
 					</tbody>
@@ -502,4 +566,33 @@
 			{/if}
 		{/if}
 	</div>
+
+	<!-- Trend Chart -->
+	{#if trendData.length > 0}
+		<div class="mt-8 rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+			<h2 class="mb-4 text-sm font-medium text-gray-500 dark:text-gray-400">{$t('stats.skillTrend')}</h2>
+			<TrendChart data={trendData} secondaryData={adoptionTrendData} secondaryLabel="%" />
+		</div>
+	{/if}
+
+	{#if pluginTrendSections.length > 0}
+		<div class="mt-8 space-y-6">
+			{#each pluginTrendSections as section (section.plugin_id)}
+				<div class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-900">
+					<div class="mb-4">
+						<h2 class="text-sm font-medium text-gray-500 dark:text-gray-400">
+							{section.short_label ?? section.plugin_id}
+						</h2>
+					</div>
+					{#if section.canChart}
+						<PluginTrendChart series={section.series} />
+					{:else}
+						<p class="text-sm text-gray-500 dark:text-gray-400">
+							Too many labels to chart ({section.labels.length}).
+						</p>
+					{/if}
+				</div>
+			{/each}
+		</div>
+	{/if}
 </div>

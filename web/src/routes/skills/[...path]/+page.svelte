@@ -1,24 +1,37 @@
 <script lang="ts">
 	import GovernanceBadge from '$lib/components/GovernanceBadge.svelte';
+	import PluginLabelBadge from '$lib/components/PluginLabelBadge.svelte';
 	import FileTree from '$lib/components/FileTree.svelte';
 	import * as Tooltip from '$lib/components/ui/tooltip';
-	import type { FlatSkillEntry, UsagePolicy } from '$lib/types';
+	import type { FlatSkillEntry, LabelIntent, UsagePolicy } from '$lib/types';
 	import { t, locale } from '$lib/i18n';
 	import { dev } from '$app/environment';
 	import { base } from '$app/paths';
 	import GithubSlugger from 'github-slugger';
 	import { marked } from 'marked';
 	import DOMPurify from 'isomorphic-dompurify';
+	import { dump as yamlDump } from 'js-yaml';
 	import { getResolvedFrom, getResolvedFromUrl } from '$lib/utils/resolved-from';
 
 	interface Props {
-		data: { skill: FlatSkillEntry; allSkills: FlatSkillEntry[]; body: string; freshPeriodDays: number };
+		data: {
+			skill: FlatSkillEntry;
+			allSkills: FlatSkillEntry[];
+			body: string;
+			freshPeriodDays: number;
+			pluginOutputs: {
+				id: string;
+				labelIntents: Record<string, LabelIntent>;
+				result: Record<string, unknown> & { label?: string; raw?: string };
+			}[];
+		};
 	}
 
 	let { data }: Props = $props();
 	let skill = $derived(data.skill);
 	let body = $derived(data.body);
 	let freshPeriodDays = $derived(data.freshPeriodDays);
+	let pluginOutputs = $derived(data.pluginOutputs);
 	let isNew = $derived(
 		freshPeriodDays > 0 &&
 			!!skill.registered_at &&
@@ -72,6 +85,18 @@
 
 		const resolvedPath = segments.join('/');
 		return hash ? `${resolvedPath}#${hash}` : resolvedPath;
+	}
+
+	function getPluginExtraYaml(result: Record<string, unknown> & { label?: string; raw?: string }): string | null {
+		const extraEntries = Object.entries(result).filter(([key, value]) => {
+			if (key === 'label' || key === 'raw') return false;
+			return value !== undefined;
+		});
+		if (extraEntries.length === 0) return null;
+		return yamlDump(Object.fromEntries(extraEntries), {
+			noRefs: true,
+			lineWidth: 0
+		}).trim();
 	}
 
 	function renderSkillMarkdown(markdown: string, skill: FlatSkillEntry): string {
@@ -136,6 +161,7 @@
 		const skillName = dir ? dir.split('/').pop() : '';
 		return `https://skills.sh/${skill.owner}/${skill.repo}${skillName ? '/' + skillName : ''}`;
 	});
+
 </script>
 
 <svelte:head>
@@ -388,6 +414,44 @@
 			{/if}
 		</div>
 	</div>
+
+	{#if pluginOutputs.length > 0}
+		<div class="mb-8 rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+			<h2 class="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">Plugin Outputs</h2>
+			<div class="space-y-4">
+				{#each pluginOutputs as plugin}
+					{@const extraYaml = getPluginExtraYaml(plugin.result)}
+					<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+						<div class="flex items-center gap-3">
+							<code
+								class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-100"
+							>
+								{plugin.id}
+							</code>
+							{#if plugin.result.label}
+								<PluginLabelBadge
+									label={plugin.result.label}
+									intent={plugin.labelIntents[plugin.result.label] ?? 'neutral'}
+								/>
+							{/if}
+						</div>
+						{#if plugin.result.raw}
+							<div
+								class="mt-3 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 text-sm whitespace-pre-wrap text-gray-700 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-300"
+							>
+								{plugin.result.raw}
+							</div>
+						{/if}
+						{#if extraYaml}
+							<pre
+								class="mt-3 overflow-x-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs leading-6 text-gray-700 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-300"
+							><code>{extraYaml}</code></pre>
+						{/if}
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
 
 	<!-- Files -->
 	{#if skill.files && skill.files.length > 0}

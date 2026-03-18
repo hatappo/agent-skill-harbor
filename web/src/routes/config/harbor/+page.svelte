@@ -67,7 +67,7 @@
 <div class="space-y-8">
 	<section>
 		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			{$t('settings.collector.title')}
+			Collector
 		</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">
@@ -226,7 +226,7 @@
 
 	<section>
 		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			{$t('settings.audit.title')}
+			Post Collect
 		</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">
@@ -248,64 +248,25 @@
 					<tr>
 						<td class="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300">
 							<div class="flex items-center gap-1.5">
-								<span>{$t(getLabelKey('audit.exclude_community_repos'))}</span>
-								{@render yamlKeyHint('audit.exclude_community_repos')}
+								<span>{$t(getLabelKey('post_collect.plugins'))}</span>
+								{@render yamlKeyHint('post_collect.plugins')}
 							</div>
 						</td>
 						<td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-							{#if data.settings.audit.exclude_community_repos}
-								<span class="inline-flex items-center gap-1 text-green-600 dark:text-green-400">
-									<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-										<path
-											fill-rule="evenodd"
-											d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-											clip-rule="evenodd"
-										/>
-									</svg>
-									{$t('settings.enabled')}
-								</span>
-							{:else}
-								<span class="inline-flex items-center gap-1 text-gray-400 dark:text-gray-500">
-									<svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-										<path
-											d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"
-										/>
-									</svg>
-									{$t('settings.disabled')}
-								</span>
-							{/if}
-						</td>
-					</tr>
-					<tr>
-						<td class="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-							<div class="flex items-center gap-1.5">
-								<span>{$t(getLabelKey('audit.engines'))}</span>
-								{@render yamlKeyHint('audit.engines')}
-							</div>
-						</td>
-						<td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
-							{#if data.settings.audit.engines.length > 0}
+							{#if data.settings.post_collect.plugins.length > 0}
 								<div class="space-y-3">
-									{#each data.settings.audit.engines as engine}
+									{#each data.settings.post_collect.plugins as plugin}
 										<div class="rounded-md border border-gray-200 p-3 dark:border-gray-700">
-											<div class="flex flex-wrap items-center gap-2">
-												<code class="rounded bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-800">{engine.id}</code>
-												{#if engine.timeout_sec}
-													<span class="text-xs text-gray-500 dark:text-gray-400">
-														{$t('settings.audit.timeout_sec')}: {engine.timeout_sec}s
+											<div class="flex flex-wrap items-center gap-2 text-sm">
+												<code class="rounded bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-800">{plugin.id}</code>
+												{#if plugin.short_label}
+													<span
+														class="inline-flex items-center rounded-full border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-600 dark:border-gray-600 dark:text-gray-300"
+													>
+														{plugin.short_label}
 													</span>
 												{/if}
 											</div>
-											{#if engine.command}
-												<div class="mt-2">
-													<div class="mb-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-														{$t('settings.audit.command')}
-													</div>
-													<code class="block break-all rounded bg-gray-100 px-2 py-1.5 text-xs dark:bg-gray-800">
-														{engine.command.join(' ')}
-													</code>
-												</div>
-											{/if}
 										</div>
 									{/each}
 								</div>
@@ -321,7 +282,7 @@
 
 	<section>
 		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			{$t('settings.catalog.title')}
+			Catalog
 		</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">
@@ -358,7 +319,7 @@
 
 	<section>
 		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			{$t('settings.ui.title')}
+			UI
 		</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">

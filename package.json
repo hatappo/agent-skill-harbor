@@ -5,8 +5,8 @@
 	"packageManager": "pnpm@10.32.1",
 	"scripts": {
 		"setup:dev": "tsx scripts/setup-dev.ts",
-		"format": "prettier --write \"docs/**/*.md\" \"fixtures/**/*.{json,md,yaml,yml}\" \"*.{json,md,yaml,yml}\"",
-		"format:check": "prettier --check \"docs/**/*.md\" \"fixtures/**/*.{json,md,yaml,yml}\" \"*.{json,md,yaml,yml}\""
+		"format": "prettier --write \"docs/**/*.md\" \"*.{json,md,yaml,yml}\"",
+		"format:check": "prettier --check \"docs/**/*.md\" \"*.{json,md,yaml,yml}\""
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [

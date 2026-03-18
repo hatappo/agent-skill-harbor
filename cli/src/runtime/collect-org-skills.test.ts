@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { sanitizeCatalogForSave } from './collect-org-skills.js';
+import { sanitizeCatalogForSave } from './catalog-store.js';
+import { collectFromResolvedFrom } from './collect-org-skills.js';
 
 test('sanitizeCatalogForSave strips copied frontmatter from skills.yaml entries', () => {
 	assert.deepEqual(
@@ -49,4 +50,37 @@ test('sanitizeCatalogForSave strips copied frontmatter from skills.yaml entries'
 			},
 		},
 	);
+});
+
+test('collectFromResolvedFrom queues lock-derived origin repos', () => {
+	const queuedRepoKeys = new Set<string>();
+	const refs = collectFromResolvedFrom(
+		'github.com',
+		'github.com/example/origin',
+		new Set<string>(),
+		queuedRepoKeys,
+	);
+
+	assert.deepEqual(refs, [
+		{
+			owner: 'example',
+			repo: 'origin',
+			repoKey: 'github.com/example/origin',
+			sha: null,
+		},
+	]);
+	assert.equal(queuedRepoKeys.has('github.com/example/origin'), true);
+});
+
+test('collectFromResolvedFrom ignores already queued repos', () => {
+	const queuedRepoKeys = new Set<string>(['github.com/example/origin']);
+	const refs = collectFromResolvedFrom(
+		'github.com',
+		'github.com/example/origin@abc123',
+		new Set<string>(),
+		queuedRepoKeys,
+	);
+
+	assert.deepEqual(refs, []);
+	assert.equal(queuedRepoKeys.size, 1);
 });
