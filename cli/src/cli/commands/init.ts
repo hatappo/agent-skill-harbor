@@ -10,19 +10,19 @@ const cliPackageJson = JSON.parse(readFileSync(join(packageRoot, 'package.json')
 	version: string;
 	peerDependencies?: Record<string, string>;
 };
-const packageVersion = cliPackageJson.version;
+const packageRange = `>=${cliPackageJson.version} <1`;
 
-function getPeerDependencyVersion(packageName: string): string {
-	const version = cliPackageJson.peerDependencies?.[packageName];
-	if (!version) {
+function getPeerDependencyRange(packageName: string): string {
+	const range = cliPackageJson.peerDependencies?.[packageName];
+	if (!range) {
 		throw new Error(`Missing peer dependency version for ${packageName} in cli/package.json`);
 	}
-	return version;
+	return range;
 }
 
-const collectorVersion = getPeerDependencyVersion('agent-skill-harbor-collector');
-const postCollectVersion = getPeerDependencyVersion('agent-skill-harbor-post-collect');
-const webVersion = getPeerDependencyVersion('agent-skill-harbor-web');
+const collectorRange = getPeerDependencyRange('agent-skill-harbor-collector');
+const postCollectRange = getPeerDependencyRange('agent-skill-harbor-post-collect');
+const webRange = getPeerDependencyRange('agent-skill-harbor-web');
 
 console.log(`\nInitializing Agent Skill Harbor project: ${projectName}`);
 console.log(`  Directory: ${targetDir}\n`);
@@ -48,10 +48,10 @@ writeFileSync(
 	join(targetDir, 'package.json'),
 	pkgTemplate
 		.replace('{{PROJECT_NAME}}', projectName)
-		.replaceAll('{{PACKAGE_VERSION}}', packageVersion)
-		.replaceAll('{{COLLECTOR_VERSION}}', collectorVersion)
-		.replaceAll('{{POST_COLLECT_VERSION}}', postCollectVersion)
-		.replaceAll('{{WEB_VERSION}}', webVersion),
+		.replaceAll('{{PACKAGE_RANGE}}', packageRange)
+		.replaceAll('{{COLLECTOR_RANGE}}', collectorRange)
+		.replaceAll('{{POST_COLLECT_RANGE}}', postCollectRange)
+		.replaceAll('{{WEB_RANGE}}', webRange),
 );
 console.log('  Created package.json');
 
@@ -104,10 +104,10 @@ for (const templatePath of toolTemplateFiles) {
 	const source = join(templatesDir, templatePath);
 	const output = join(targetDir, templatePath.replace('.template', ''));
 	const content = readFileSync(source, 'utf-8')
-		.replaceAll('{{PACKAGE_VERSION}}', packageVersion)
-		.replaceAll('{{COLLECTOR_VERSION}}', collectorVersion)
-		.replaceAll('{{POST_COLLECT_VERSION}}', postCollectVersion)
-		.replaceAll('{{WEB_VERSION}}', webVersion);
+		.replaceAll('{{PACKAGE_RANGE}}', packageRange)
+		.replaceAll('{{COLLECTOR_RANGE}}', collectorRange)
+		.replaceAll('{{POST_COLLECT_RANGE}}', postCollectRange)
+		.replaceAll('{{WEB_RANGE}}', webRange);
 	mkdirSync(resolve(output, '..'), { recursive: true });
 	writeFileSync(output, content);
 }
