@@ -66,12 +66,15 @@ source リポジトリでビルド済み CLI を実行する場合は、`config/
 ### プロジェクト構成
 
 ```
+├── collector/             # 公開 collect runtime package
 ├── cli/
-│   ├── bin/              # CLI エントリポイント
-│   ├── src/cli/          # CLI コマンド (init, collect, build, dev, preview)
-│   └── templates/        # CLI パッケージに同梱されるプロジェクトテンプレート
+│   ├── bin/              # 薄い harbor wrapper
+│   ├── src/cli/          # init/gen と command dispatch
+│   └── templates/        # wrapper package に同梱されるプロジェクトテンプレート
+├── post-collect/         # 公開 post-collect runtime package
 ├── scripts/              # 開発用スクリプト (setup-dev, collect)
 ├── web/                  # SvelteKit フロントエンドアプリケーション
+│   ├── src/cli/          # build/dev/preview/deploy command entrypoints
 │   ├── src/lib/server/   # サーバーサイドデータ読み込み (catalog, docs)
 │   ├── src/routes/       # ページ (カタログ, スキル詳細, グラフ, ドキュメント)
 │   └── src/lib/i18n/     # 国際化 (en, ja)
@@ -90,13 +93,15 @@ source リポジトリでビルド済み CLI を実行する場合は、`config/
 
 ### パッケージ構成
 
-- **`agent-skill-harbor`**: `cli/` を root に持つ公開 CLI パッケージ。`harbor` 実行ファイル、プロジェクトテンプレート、collect ランタイムを含みます。
-- **`agent-skill-harbor-web`**: 公開される SvelteKit Web パッケージ。フロントエンドのソース、SvelteKit 設定、Web ビルド依存を含みます。
-- **実行時依存の向き**: CLI パッケージは `agent-skill-harbor-web` に依存し、`web/` を CLI tarball に同梱するのではなく、インストール済みの Web パッケージからビルドツール群を解決します。
-- **依存の管理責務**: Web UI と SvelteKit の依存は `web/package.json` を正とし、CLI/ランタイム依存は `cli/package.json` に置きます。ルート `package.json` は workspace 管理専用です。
+- **`agent-skill-harbor`**: `cli/` を root に持つ公開 wrapper package。`harbor` 実行ファイル、`init`、`gen`、templates、command dispatch を含みます。
+- **`agent-skill-harbor-collector`**: `collector/` を root に持つ公開 collect runtime package。
+- **`agent-skill-harbor-post-collect`**: `post-collect/` を root に持つ公開 post-collect runtime package。`promptfoo` など重い依存はここに閉じ込めます。
+- **`agent-skill-harbor-web`**: `web/` を root に持つ公開 SvelteKit Web package。`build`、`dev`、`preview`、`deploy` もここが担当します。
+- **install surface の分離**: 生成プロジェクトは `tools/harbor/collector`、`tools/harbor/post-collect`、`tools/harbor/web` を持ち、workflow ごとに必要な依存だけを install します。
+- **依存の管理責務**: Web UI と SvelteKit の依存は `web/package.json`、collect 専用依存は `collector/package.json`、post-collect 専用依存は `post-collect/package.json` に置きます。ルート `package.json` は workspace 管理専用です。
 
 ### リリース補足
 
 - 変更が入った package だけを release します。
-- 両 package を同時に release する場合は `agent-skill-harbor-web` を先、その後に `agent-skill-harbor` を publish します。
+- 複数 package を release する場合は `agent-skill-harbor-web`、`agent-skill-harbor-collector`、`agent-skill-harbor-post-collect`、`agent-skill-harbor` の順を推奨します。
 - 詳細なリリース手順は [92-release_ja.md](92-release_ja.md) を参照してください。

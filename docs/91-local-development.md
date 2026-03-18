@@ -66,12 +66,15 @@ When running the built CLI from the source repository, execute it from the repos
 ### Project Structure
 
 ```
+├── collector/             # Published collect runtime package
 ├── cli/
-│   ├── bin/              # CLI entry point
-│   ├── src/cli/          # CLI commands (init, collect, build, dev, preview)
-│   └── templates/        # Project scaffold templates bundled into the CLI package
+│   ├── bin/              # Thin harbor wrapper
+│   ├── src/cli/          # init/gen and command dispatch
+│   └── templates/        # Project scaffold templates bundled into the wrapper package
+├── post-collect/         # Published post-collect runtime package
 ├── scripts/              # Development scripts (setup-dev, collect)
 ├── web/                  # SvelteKit frontend application
+│   ├── src/cli/          # build/dev/preview/deploy command entrypoints
 │   ├── src/lib/server/   # Server-side data loading (catalog, docs)
 │   ├── src/routes/       # Pages (catalog, skill detail, graph, docs)
 │   └── src/lib/i18n/     # Internationalization (en, ja)
@@ -90,10 +93,12 @@ When running the built CLI from the source repository, execute it from the repos
 
 ### Package Layout
 
-- **`agent-skill-harbor`**: The published CLI package rooted at `cli/`. It contains the `harbor` executable, project templates, and collector runtime.
-- **`agent-skill-harbor-web`**: The published SvelteKit web package. It contains the frontend source, SvelteKit config, and web build dependencies.
-- **Runtime dependency direction**: The CLI package depends on `agent-skill-harbor-web` and resolves the web build toolchain from the installed web package instead of bundling `web/` into the CLI tarball.
-- **Dependency ownership**: Web UI and SvelteKit dependencies should be managed in `web/package.json`. CLI/runtime dependencies belong in `cli/package.json`, while the root `package.json` is workspace-only.
+- **`agent-skill-harbor`**: Thin published wrapper package rooted at `cli/`. It provides the `harbor` executable, `init`, `gen`, templates, and command dispatch.
+- **`agent-skill-harbor-collector`**: Published collect runtime package rooted at `collector/`.
+- **`agent-skill-harbor-post-collect`**: Published post-collect runtime package rooted at `post-collect/`. Heavy dependencies such as `promptfoo` live here.
+- **`agent-skill-harbor-web`**: Published SvelteKit web package rooted at `web/`. It also owns `build`, `dev`, `preview`, and `deploy`.
+- **Install surface split**: Generated projects keep `tools/harbor/collector`, `tools/harbor/post-collect`, and `tools/harbor/web` so workflows can install only the dependencies they need.
+- **Dependency ownership**: Web UI and SvelteKit dependencies belong in `web/package.json`. Collect-only runtime dependencies belong in `collector/package.json`. Post-collect-only runtime dependencies belong in `post-collect/package.json`. The root `package.json` is workspace-only.
 
 ### Release Notes
 
