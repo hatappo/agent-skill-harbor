@@ -27,19 +27,22 @@ pnpm preview      # ビルド結果をプレビュー
 git clone https://github.com/skill-mill/agent-skill-harbor.git
 cd agent-skill-harbor
 pnpm install
-pnpm setup:dev    # テンプレートとフィクスチャをコピー
+pnpm setup:dev    # .env を作成し、demo repo の config/data/guide を取得
 # .env を編集: GH_TOKEN, GH_ORG のコメントを外して設定
 tsx cli/bin/cli.ts dev
 ```
 
 開発サーバーは `http://localhost:5173` で起動します。
 
-`pnpm setup:dev` は以下をプロジェクトルートにコピーします（すべて gitignore 対象）:
+`pnpm setup:dev` は以下をプロジェクトルートに用意します（生成物はすべて gitignore 対象）:
 
 1. `cli/templates/init/.env.example` → `.env`
-2. `cli/templates/init/config/*` → `config/`
-3. `fixtures/config/*` → `config/`（サンプルのガバナンスポリシーで上書き）
-4. `fixtures/data/*` → `data/`（サンプルのカタログ、`collects.yaml`、スキルデータ）
+2. GitHub から `skill-mill/agent-skill-harbor-demo` の archive を取得
+3. demo repo の `config/` → `config/`
+4. demo repo の `data/` → `data/`
+5. demo repo の `guide/` → `guide/`
+
+このコマンドの実行にはネットワークアクセスが必要です。
 
 ### コマンド
 
@@ -53,10 +56,10 @@ pnpm format       # Prettier でフォーマット
 pnpm --dir cli build          # CLI パッケージをビルド（bin/ や src/ を変更した後に実行）
 GH_TOKEN=$(gh auth token) node cli/dist/bin/cli.js collect   # source からスキル収集
 node cli/dist/bin/cli.js post-collect --collect-id <collect_id>
-pnpm setup:dev                # テンプレートとフィクスチャを再コピー
+pnpm setup:dev                # ローカルの demo config/data/guide を更新
 ```
 
-ローカル開発用のサンプルデータには `data/collects.yaml` と `data/skills.yaml` が含まれます。sample plugin の出力は既定では含まれません。
+demo データには `data/collects.yaml`、`data/skills.yaml`、sample plugin の出力が含まれます。
 
 source リポジトリでビルド済み CLI を実行する場合は、`config/` と `data/` を正しく参照させるため、必ずリポジトリルートで実行してください。
 
@@ -72,9 +75,7 @@ source リポジトリでビルド済み CLI を実行する場合は、`config/
 │   ├── src/lib/server/   # サーバーサイドデータ読み込み (catalog, docs)
 │   ├── src/routes/       # ページ (カタログ, スキル詳細, グラフ, ドキュメント)
 │   └── src/lib/i18n/     # 国際化 (en, ja)
-├── fixtures/             # ローカル開発用サンプルデータ
-│   ├── config/           # サンプルのガバナンスポリシー
-│   └── data/             # サンプルのカタログ・スキルデータ
+├── guide/                # setup:dev で取得する demo guide コンテンツ
 ├── config/               # 設定ファイル（gitignore 対象、setup:dev で作成）
 ├── data/                 # 収集データ（gitignore 対象、setup:dev で作成）
 └── docs/                 # ドキュメント

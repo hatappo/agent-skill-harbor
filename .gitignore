@@ -7,12 +7,9 @@ build/
 !.env.example
 
 # Local development data (created by setup:dev)
-config/*
-!config/.gitkeep
-data/*
-!data/.gitkeep
-guide/*
-!guide/.gitkeep
+config/
+data/
+guide/
 plugins/*
 
 # SvelteKit

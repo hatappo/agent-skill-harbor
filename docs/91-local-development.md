@@ -27,19 +27,22 @@ These scripts call the `harbor` CLI under the hood.
 git clone https://github.com/skill-mill/agent-skill-harbor.git
 cd agent-skill-harbor
 pnpm install
-pnpm setup:dev    # Copy templates and fixtures
+pnpm setup:dev    # Create .env and pull demo config/data/guide
 # Edit .env: uncomment and set GH_TOKEN, GH_ORG
 tsx cli/bin/cli.ts dev
 ```
 
 The development server will start at `http://localhost:5173`.
 
-`pnpm setup:dev` copies the following into the project root (all gitignored):
+`pnpm setup:dev` prepares the project root as follows (all generated folders are gitignored):
 
 1. `cli/templates/init/.env.example` → `.env`
-2. `cli/templates/init/config/*` → `config/`
-3. `fixtures/config/*` → `config/` (overwrites with sample governance policies)
-4. `fixtures/data/*` → `data/` (sample catalog, `collects.yaml`, and skill data)
+2. Download the `skill-mill/agent-skill-harbor-demo` archive from GitHub
+3. Copy `config/` from the demo repo → `config/`
+4. Copy `data/` from the demo repo → `data/`
+5. Copy `guide/` from the demo repo → `guide/`
+
+This command requires network access.
 
 ### Commands
 
@@ -53,10 +56,10 @@ pnpm format       # Format all files with Prettier
 pnpm --dir cli build          # Build CLI package (after modifying bin/ or src/)
 GH_TOKEN=$(gh auth token) node cli/dist/bin/cli.js collect   # Collect skills from source
 node cli/dist/bin/cli.js post-collect --collect-id <collect_id>
-pnpm setup:dev                # Re-copy templates and fixtures
+pnpm setup:dev                # Refresh local demo config/data/guide
 ```
 
-The local sample data includes `data/collects.yaml` and `data/skills.yaml`. Sample plugin outputs are not included by default.
+The demo data includes `data/collects.yaml`, `data/skills.yaml`, and sample plugin outputs from the demo repository.
 
 When running the built CLI from the source repository, execute it from the repository root so `config/` and `data/` resolve correctly.
 
@@ -72,9 +75,7 @@ When running the built CLI from the source repository, execute it from the repos
 │   ├── src/lib/server/   # Server-side data loading (catalog, docs)
 │   ├── src/routes/       # Pages (catalog, skill detail, graph, docs)
 │   └── src/lib/i18n/     # Internationalization (en, ja)
-├── fixtures/             # Sample data for local development
-│   ├── config/           # Sample governance policies
-│   └── data/             # Sample catalog and skill data
+├── guide/                # Demo guide content pulled by setup:dev
 ├── config/               # Human-managed settings (gitignored, created by setup:dev)
 ├── data/                 # Machine-generated skill data (gitignored, created by setup:dev)
 └── docs/                 # Documentation
