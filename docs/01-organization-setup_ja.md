@@ -78,6 +78,8 @@ pnpm dev
 4. `CollectSkills` で `collect` と `post-collect` が別 step で実行されます
 5. `CollectSkills` 成功後、デプロイワークフローが自動実行されます
 
+plugin の設定方法や出力ファイルについては [Post-Collect Plugins](03-post-collect-plugins_ja.md) を参照してください。
+
 ## ステップ 7: ガバナンスポリシーの設定
 
 `config/governance.yaml` を編集して、組織のスキルポリシーを定義します:

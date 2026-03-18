@@ -31,6 +31,10 @@ Agent Skill Harbor catalogs every Agent Skill (SKILL.md) across your GitHub Orga
 - No backend — Frontend-only web app (SvelteKit, prerendered)
 - GitHub-native — GitHub Actions for collection, GitHub Pages or Cloudflare Pages for hosting
 
+Demo site:
+
+- https://skill-mill.github.io/agent-skill-harbor-demo/
+
 ## Quick Start
 
 ### Using npm package (Recommended)
@@ -87,9 +91,6 @@ harbor build --base=/my-repo-name
 6. `CollectSkills` will run `collect` and then `post-collect` as separate steps
 7. The deploy workflow will run automatically after `CollectSkills` succeeds
 
-User-defined post-collect plugins are discovered from `plugins/<id>/index.mjs`, then `index.js`, then `index.ts`.
-To generate the sample plugin scaffold, run `harbor gen sample-plugin`, then uncomment `sample_plugin` in `config/harbor.yaml`.
-
 See [Organization Setup Guide](docs/01-organization-setup.md) for detailed instructions.
 
 ## Project Structure (User Project)
@@ -122,6 +123,7 @@ See [Skill Catalog Guide](docs/02-skill-catalog.md) for catalog pages and proven
 
 - [Organization Setup](docs/01-organization-setup.md)
 - [Skill Catalog Guide](docs/02-skill-catalog.md)
+- [Post-Collect Plugins](docs/03-post-collect-plugins.md)
 - [Governance Guide](docs/04-governance-guide.md)
 - [Local Development](docs/91-local-development.md)
 - [Release](docs/92-release.md)

@@ -78,6 +78,8 @@ pnpm dev
 4. `CollectSkills` will run `collect` and `post-collect` as separate steps
 5. The deploy workflow will run automatically after `CollectSkills` succeeds
 
+For plugin configuration and output files, see [Post-Collect Plugins](03-post-collect-plugins.md).
+
 ## Step 7: Configure Governance Policies
 
 Edit `config/governance.yaml` to define your organization's skill policies:
