@@ -260,7 +260,11 @@
 											<div class="flex flex-wrap items-center gap-2 text-sm">
 												<code class="rounded bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-800">{plugin.id}</code>
 												{#if plugin.short_label}
-													<span class="text-gray-500 dark:text-gray-400">short label: {plugin.short_label}</span>
+													<span
+														class="inline-flex items-center rounded-full border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-600 dark:border-gray-600 dark:text-gray-300"
+													>
+														{plugin.short_label}
+													</span>
 												{/if}
 											</div>
 										</div>
