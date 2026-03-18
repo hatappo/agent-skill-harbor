@@ -234,3 +234,49 @@ test('runPostCollect logs plugin start, built-in summary and saved path', async 
 	assert.match(logs.join('\n'), /builtin\.detect-drift \(done\)/);
 	assert.match(logs.join('\n'), /saved: .*builtin\.detect-drift\.yaml/);
 });
+
+test('runPostCollect passes built-in config and stores unknown result when promptfoo model is missing', async () => {
+	const root = mkdtempSync(join(tmpdir(), 'post-collect-promptfoo-'));
+	mkdirSync(join(root, 'data'), { recursive: true });
+	writeSkill(root, 'github.com/example/demo', 'skills/example/SKILL.md', '# example');
+
+	const catalog = {
+		repositories: {
+			'github.com/example/demo': {
+				visibility: 'public',
+				skills: {
+					'skills/example/SKILL.md': {
+						tree_sha: 'tree',
+					},
+				},
+			},
+		},
+	};
+
+	const previousOrg = process.env.GH_ORG;
+	process.env.GH_ORG = 'unused-in-test';
+	try {
+		await runPostCollect({
+			projectRoot: root,
+			collectId: 'collect-security',
+			orgName: 'example',
+			catalog,
+			log: false,
+			plugins: [{ id: 'builtin.audit-promptfoo-security', config: {} }],
+		});
+	} finally {
+		if (previousOrg === undefined) {
+			delete process.env.GH_ORG;
+		} else {
+			process.env.GH_ORG = previousOrg;
+		}
+	}
+
+	const output = yamlLoad(
+		readFileSync(join(root, 'data', 'plugins', 'builtin.audit-promptfoo-security.yaml'), 'utf-8'),
+	) as {
+		results?: Record<string, { label?: string; raw?: string }>;
+	}[];
+	assert.equal(output[0].results?.['github.com/example/demo/skills/example/SKILL.md']?.label, 'Unknown');
+	assert.match(output[0].results?.['github.com/example/demo/skills/example/SKILL.md']?.raw ?? '', /model is not configured/i);
+});

@@ -35,6 +35,8 @@ export interface PostCollectPluginContext {
 	plugin_id: string;
 	project_root: string;
 	collect_id: string | null;
+	org_name?: string;
+	plugin_config?: Record<string, unknown>;
 	paths: {
 		data_dir: string;
 		catalog_yaml: string;
@@ -55,6 +57,7 @@ export interface BuiltinPostCollectPlugin extends PostCollectPluginModule {
 export interface PostCollectPluginConfig {
 	id: string;
 	short_label?: string;
+	config?: Record<string, unknown>;
 }
 
 export interface PostCollectSettings {

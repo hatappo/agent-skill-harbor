@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { tsImport } from 'tsx/esm/api';
 import { auditStaticPlugin } from './plugins/audit-static.js';
+import { auditPromptfooSecurityPlugin } from './plugins/audit-promptfoo-security.js';
 import { detectDriftPlugin } from './plugins/detect-drift.js';
 import type {
 	BuiltinPostCollectPlugin,
@@ -18,6 +19,7 @@ import type {
 const BUILTIN_PLUGINS = new Map<string, BuiltinPostCollectPlugin>([
 	[detectDriftPlugin.id, detectDriftPlugin],
 	[auditStaticPlugin.id, auditStaticPlugin],
+	[auditPromptfooSecurityPlugin.id, auditPromptfooSecurityPlugin],
 ]);
 
 interface RawSettings {
@@ -152,6 +154,7 @@ function savePluginOutput(projectRoot: string, pluginId: string, collectId: stri
 export interface RunPostCollectOptions {
 	projectRoot: string;
 	collectId?: string | null;
+	orgName?: string;
 	catalog: PostCollectCatalog;
 	log?: boolean;
 	plugins?: PostCollectPluginConfig[];
@@ -165,6 +168,7 @@ export async function runPostCollect(options: RunPostCollectOptions): Promise<vo
 		schema_version: 1,
 		project_root: options.projectRoot,
 		collect_id: options.collectId ?? null,
+		...(options.orgName ? { org_name: options.orgName } : {}),
 		paths: {
 			data_dir: join(options.projectRoot, 'data'),
 			catalog_yaml: join(options.projectRoot, 'data', 'skills.yaml'),
@@ -183,7 +187,11 @@ export async function runPostCollect(options: RunPostCollectOptions): Promise<vo
 
 	for (const plugin of plugins) {
 		const builtIn = BUILTIN_PLUGINS.get(plugin.id);
-		const context: PostCollectPluginContext = { ...contextBase, plugin_id: plugin.id };
+		const context: PostCollectPluginContext = {
+			...contextBase,
+			plugin_id: plugin.id,
+			...(plugin.config ? { plugin_config: plugin.config } : {}),
+		};
 		const outputPath = getPluginOutputPath(options.projectRoot, plugin.id);
 		if (log) console.log(`  -> ${plugin.id} (start)`);
 		const result = builtIn
