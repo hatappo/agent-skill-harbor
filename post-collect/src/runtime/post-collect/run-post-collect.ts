@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { tsImport } from 'tsx/esm/api';
 import { auditStaticPlugin } from './plugins/audit-static.js';
@@ -113,7 +114,7 @@ function resolveUserPluginPath(projectRoot: string, pluginId: string): string {
 
 async function loadUserPlugin(projectRoot: string, pluginId: string): Promise<PostCollectPluginModule> {
 	const modulePath = resolveUserPluginPath(projectRoot, pluginId);
-	const imported = (await tsImport(modulePath, import.meta.url)) as Partial<PostCollectPluginModule> & {
+	const imported = (await tsImport(modulePath, pathToFileURL(modulePath).href)) as Partial<PostCollectPluginModule> & {
 		default?: Partial<PostCollectPluginModule>;
 	};
 	const candidate = imported.default?.run ? imported.default : imported;
