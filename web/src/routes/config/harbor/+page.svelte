@@ -241,10 +241,11 @@
 						<td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
 							{#if data.settings.post_collect.plugins.length > 0}
 								<div class="space-y-3">
-									{#each data.settings.post_collect.plugins as plugin}
+									{#each data.settings.post_collect.plugins as plugin, index}
 										{@const configYaml = formatPluginConfig(plugin.config)}
 										<div class="rounded-md border border-gray-200 p-3 dark:border-gray-700">
 											<div class="flex flex-wrap items-center gap-2 text-sm">
+												<span class="text-xs font-medium text-gray-500 dark:text-gray-400">{index + 1}.</span>
 												<code class="rounded bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-800">{plugin.id}</code>
 												{#if plugin.short_label}
 													<span
