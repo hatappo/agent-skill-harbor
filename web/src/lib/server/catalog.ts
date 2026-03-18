@@ -559,6 +559,20 @@ export function loadPluginHistoryColumns(): PluginHistoryColumn[] {
 	const pluginSettings = new Map(configuredPlugins.map((plugin) => [plugin.id, plugin]));
 	const pluginOrder = new Map(configuredPlugins.map((plugin, index) => [plugin.id, index]));
 	const labelsByPlugin = new Map<string, Set<string>>();
+	const intentLabelsByPlugin = new Map<string, Set<string>>();
+
+	for (const output of loadPluginOutputHistory()) {
+		const labels = labelsByPlugin.get(output.plugin_id) ?? new Set<string>();
+		const intentLabels = intentLabelsByPlugin.get(output.plugin_id) ?? new Set<string>();
+		for (const label of Object.keys(output.label_intents ?? {})) {
+			if (label) {
+				labels.add(label);
+				intentLabels.add(label);
+			}
+		}
+		labelsByPlugin.set(output.plugin_id, labels);
+		intentLabelsByPlugin.set(output.plugin_id, intentLabels);
+	}
 
 	for (const collectSummary of Object.values(loadPluginHistorySummaries())) {
 		for (const [pluginId, labelCounts] of Object.entries(collectSummary)) {
@@ -571,10 +585,16 @@ export function loadPluginHistoryColumns(): PluginHistoryColumn[] {
 	cachedPluginHistoryColumns = [...labelsByPlugin.entries()]
 		.map(([plugin_id, labels]) => {
 			const shortLabel = pluginSettings.get(plugin_id)?.short_label;
+			const orderedLabels = [...labels].sort((a, b) => a.localeCompare(b));
+			const orderedIntentLabels = [...(intentLabelsByPlugin.get(plugin_id) ?? new Set<string>())].sort((a, b) =>
+				a.localeCompare(b),
+			);
 			return {
 				plugin_id,
 				...(shortLabel ? { short_label: shortLabel } : {}),
-				label_abbreviations: computeMinimalUniquePrefixes([...labels]),
+				labels: orderedLabels,
+				intent_labels: orderedIntentLabels,
+				label_abbreviations: computeMinimalUniquePrefixes(orderedLabels),
 			};
 		})
 		.sort((a, b) => {

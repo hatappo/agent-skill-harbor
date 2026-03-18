@@ -236,15 +236,17 @@
 		const column = pluginHistoryColumns.find((item) => item.plugin_id === pluginId);
 		if (!pluginSummary || !column) return [];
 
-		return Object.entries(pluginSummary)
-			.map(([label, counts]) => {
+		return column.labels
+			.map((label) => {
+				const counts = pluginSummary[label] ?? { org: 0, community: 0 };
 				const count =
 					ownerFilter === 'org'
 						? counts.org
 						: ownerFilter === 'community'
 							? counts.community
 							: counts.org + counts.community;
-				if (count <= 0) return null;
+				const shouldShowZero = column.intent_labels.includes(label);
+				if (count <= 0 && !shouldShowZero) return null;
 				return {
 					label,
 					abbreviation: column.label_abbreviations[label] ?? label,

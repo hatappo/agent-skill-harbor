@@ -86,6 +86,8 @@ export interface PluginHistoryLabelCounts {
 export interface PluginHistoryColumn {
 	plugin_id: string;
 	short_label?: string;
+	labels: string[];
+	intent_labels: string[];
 	label_abbreviations: Record<string, string>;
 }
 
