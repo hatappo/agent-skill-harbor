@@ -61,6 +61,9 @@ export interface SkillScannerJsonOutput {
 	max_severity?: string;
 	findings_count?: number;
 	analyzers_used?: string[];
+	findings?: Array<{
+		description?: string | null;
+	}>;
 }
 
 export interface SkillScannerRunFiles {
@@ -185,11 +188,11 @@ export function summarizeSkillScannerOutput(output: SkillScannerJsonOutput): Pos
 	return {
 		label,
 		raw: buildSkillScannerRaw(output),
-		findings_count: findingsCount,
-		...(typeof output.max_severity === 'string' && output.max_severity.length > 0
-			? { max_severity: output.max_severity }
+		...(Array.isArray(output.findings)
+			? {
+					findings: output.findings.map((finding) => finding.description?.trim() ?? ''),
+				}
 			: {}),
-		...(typeof output.is_safe === 'boolean' ? { is_safe: output.is_safe } : {}),
 	};
 }
 

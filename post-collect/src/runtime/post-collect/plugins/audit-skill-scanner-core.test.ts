@@ -42,12 +42,12 @@ test('summarizeSkillScannerOutput maps findings to max severity label', () => {
 		is_safe: true,
 		max_severity: 'MEDIUM',
 		findings_count: 1,
+		findings: [{ description: 'Only 76% of skill content could be analyzed.' }],
 	});
 
 	assert.equal(result.label, 'MEDIUM');
-	assert.equal(result.findings_count, 1);
-	assert.equal(result.is_safe, true);
 	assert.equal(result.raw, '1 finding, max severity MEDIUM (scanner safe=true)');
+	assert.deepEqual(result.findings, ['Only 76% of skill content could be analyzed.']);
 });
 
 test('summarizeSkillScannerOutput maps zero findings to safe', () => {
@@ -64,4 +64,19 @@ test('summarizeSkillScannerOutput maps zero findings to safe', () => {
 
 test('buildSkillScannerRaw omits severity when absent', () => {
 	assert.equal(buildSkillScannerRaw({ findings_count: 2, is_safe: false }), '2 findings (scanner safe=false)');
+});
+
+test('summarizeSkillScannerOutput preserves finding positions when descriptions are missing', () => {
+	const result = summarizeSkillScannerOutput({
+		findings_count: 3,
+		findings: [
+			{ description: 'First finding' },
+			{ description: ' First finding ' },
+			{ description: '' },
+			{},
+			{ description: 'Second finding' },
+		],
+	});
+
+	assert.deepEqual(result.findings, ['First finding', 'First finding', '', '', 'Second finding']);
 });

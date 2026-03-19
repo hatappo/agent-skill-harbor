@@ -336,7 +336,7 @@ test('runPostCollect runs skill-scanner for org-owned skills and stores sub arti
 			"writeFileSync(readArg('--output'), 'summary');",
 			"writeFileSync(readArg('--output-html'), '<html><body>ok</body></html>');",
 			"writeFileSync(readArg('--output-sarif'), JSON.stringify({ version: '2.1.0', runs: [] }));",
-			"writeFileSync(readArg('--output-json'), JSON.stringify({ is_safe: false, max_severity: 'LOW', findings_count: 2 }));",
+			"writeFileSync(readArg('--output-json'), JSON.stringify({ is_safe: false, max_severity: 'LOW', findings_count: 2, findings: [{ description: 'First issue' }, { description: 'Second issue' }] }));",
 		].join('\n'),
 	);
 	chmodSync(commandPath, 0o755);
@@ -373,15 +373,13 @@ test('runPostCollect runs skill-scanner for org-owned skills and stores sub arti
 
 	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'builtin.audit-skill-scanner.yaml'), 'utf-8')) as {
 		sub_artifacts?: string[];
-		results?: Record<string, { label?: string; raw?: string; findings_count?: number; is_safe?: boolean }>;
+		results?: Record<string, { label?: string; raw?: string; findings?: string[] }>;
 	}[];
 	assert.deepEqual(output[0].sub_artifacts, ['report.html', 'report.sarif.json', 'report.json']);
 	assert.deepEqual(output[0].results?.['github.com/example/demo/skills/example/SKILL.md'], {
 		label: 'LOW',
 		raw: '2 findings, max severity LOW (scanner safe=false)',
-		findings_count: 2,
-		max_severity: 'LOW',
-		is_safe: false,
+		findings: ['First issue', 'Second issue'],
 	});
 	assert.equal(output[0].results?.['github.com/community/demo/skills/other/SKILL.md'], undefined);
 });
