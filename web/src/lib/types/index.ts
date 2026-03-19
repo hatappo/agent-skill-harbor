@@ -77,6 +77,7 @@ export interface PluginFilterOption {
 	labels: string[];
 	short_label?: string;
 	label_intents?: Record<string, LabelIntent>;
+	counts?: Record<string, number>;
 }
 
 export interface PluginHistoryLabelCounts {
