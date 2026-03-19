@@ -4,7 +4,7 @@
 
 Post-collect runtime package for Agent Skill Harbor.
 
-This package contains the `post-collect` command implementation and built-in plugins such as `builtin.detect-drift`, `builtin.audit-static`, and `builtin.audit-promptfoo-security`.
+This package contains the `post-collect` command implementation and built-in plugins such as `builtin.detect-drift`, `builtin.audit-static`, `builtin.audit-promptfoo-security`, and `builtin.audit-skill-scanner`.
 
 ## Purpose
 
@@ -16,5 +16,6 @@ This package contains the `post-collect` command implementation and built-in plu
 
 - This package is primarily an internal runtime dependency of `agent-skill-harbor`
 - `builtin.audit-promptfoo-security` depends on `promptfoo` and may still perform network access required by promptfoo red-team execution
+- `builtin.audit-skill-scanner` requires Python 3.10+ and a preinstalled `skill-scanner` CLI
 - Publish `agent-skill-harbor-post-collect` before `agent-skill-harbor` when the wrapper depends on a newer post-collect version
 - For plugin behavior and output conventions, see [`docs/03-post-collect-plugins.md`](https://github.com/skill-mill/agent-skill-harbor/blob/main/docs/03-post-collect-plugins.md)

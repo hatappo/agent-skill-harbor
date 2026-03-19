@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 
 	/**
@@ -41,8 +41,8 @@
 	let springX = $state(0);
 	let springY = $state(0);
 
-	function generateStars(count, starColor) {
-		const shadows = [];
+	function generateStars(count: number, starColor: string): string {
+		const shadows: string[] = [];
 		for (let i = 0; i < count; i++) {
 			const x = Math.floor(Math.random() * FIELD_SIZE * 2) - FIELD_SIZE;
 			const y = Math.floor(Math.random() * FIELD_SIZE * 2) - FIELD_SIZE;
@@ -56,7 +56,7 @@
 		layerShadows = STAR_LAYERS.map((layer) => generateStars(layer.count, color));
 	}
 
-	function handleMouseMove(e) {
+	function handleMouseMove(e: MouseEvent) {
 		const centerX = window.innerWidth / 2;
 		const centerY = window.innerHeight / 2;
 		targetX = -(e.clientX - centerX) * factor;
@@ -83,10 +83,10 @@
 		});
 
 		// Spring physics loop
-		let animationId;
+		let animationId: number;
 		let lastTime = performance.now();
 
-		function tick(now) {
+		function tick(now: number) {
 			const dt = Math.min((now - lastTime) / 1000, 0.064); // cap at ~15fps min
 			lastTime = now;
 

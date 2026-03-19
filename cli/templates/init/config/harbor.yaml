@@ -11,6 +11,11 @@ post_collect:
   plugins:
     - id: builtin.detect-drift
       short_label: Drift
+  #   - id: builtin.audit-skill-scanner
+  #     short_label: Scanner
+  #     config:
+  #       command: skill-scanner
+  #       options: --policy balanced
   #   - id: builtin.audit-promptfoo-security
   #     short_label: Security
   #     config:

@@ -1,5 +1,22 @@
 # Changelog
 
+## [cli 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
+
+### Added
+
+- Added the built-in `builtin.audit-skill-scanner` post-collect plugin for org-owned skills, including local `skill-scanner` CLI execution, HTML/SARIF/JSON secondary artifacts, and skill detail links
+- Added top-level `sub_artifacts` support to plugin output so secondary files can be described once per plugin and linked from the web UI without per-skill path duplication
+
+### Changed
+
+- Moved `builtin.audit-promptfoo-security` secondary report links to the new `sub_artifacts` convention and aligned plugin detail rendering around artifact file names
+- Updated built-in plugin docs, init template examples, and package READMEs to document `skill-scanner`, secondary artifact conventions, and Python CLI requirements
+
+### Fixed
+
+- Excluded `docs/samples/` from workspace Prettier checks so local sample outputs do not fail repository formatting checks
+- Fixed implicit `any` types in `web/src/lib/components/StarsBackground.svelte` so `web check` passes again
+
 ## [cli 0.13.0] / [collector 0.13.0] / [post-collect 0.13.0] / [web 0.13.0] - 2026-03-19
 
 ### Added

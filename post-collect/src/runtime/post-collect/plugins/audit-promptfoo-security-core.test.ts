@@ -5,7 +5,6 @@ import { tmpdir } from 'node:os';
 import test from 'node:test';
 import {
 	buildPromptfooConfig,
-	buildReportPublicPath,
 	parsePromptfooSecurityConfig,
 	PROMPTFOO_SECURITY_LABEL_INTENTS,
 	readPromptfooOutput,
@@ -66,7 +65,6 @@ test('summarizePromptfooOutput maps failing plugin checks to Risk', () => {
 				],
 			},
 		},
-		reportPath: buildReportPublicPath('github.com/acme/repo/skills/foo/SKILL.md'),
 		riskThreshold: 1,
 		criticalThreshold: 3,
 	});
@@ -76,13 +74,11 @@ test('summarizePromptfooOutput maps failing plugin checks to Risk', () => {
 		'prompt-extraction': 1,
 		'prompt-injection': 1,
 	});
-	assert.equal(typeof result?.report_path, 'string');
 });
 
 test('summarizePromptfooOutput maps zero findings to Safe and exposes label intents', () => {
 	const result = summarizePromptfooOutput({
 		output: { results: { results: [] } },
-		reportPath: 'plugin-reports/example/index.html',
 		riskThreshold: 1,
 		criticalThreshold: 3,
 	});

@@ -26,6 +26,11 @@ post_collect:
           - policy-violation
         risk_threshold: 1
         critical_threshold: 3
+    - id: builtin.audit-skill-scanner
+      short_label: Scanner
+      config:
+        command: skill-scanner
+        options: --policy balanced
 ```
 
 Each `post_collect.plugins[]` entry supports these common fields:
@@ -73,6 +78,24 @@ Important notes:
 
 If you have strong supply-chain or outbound-network constraints, review whether this plugin belongs in your `post_collect.plugins` list before enabling it.
 
+### `builtin.audit-skill-scanner`
+
+Runs Cisco `skill-scanner` against org-owned skills and summarizes the maximum severity into Harbor labels.
+
+- Primary purpose: local skill security scanning without external LLM/API requirements
+- Typical output labels: `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`, `INFO`, `safe`, `unknown`
+- Recommended use: enable this when Python 3.10+ and `skill-scanner` are available and you want local static scanning
+
+Important notes:
+
+- It targets org-owned skills only
+- `command` defaults to `skill-scanner`
+- `options` is passed through as additional CLI flags, but Harbor reserves scan target and output flags
+- Harbor adds `--use-behavioral --use-trigger --lenient` by default
+- `--enable-meta` is not enabled by default because it requires an API key
+- It keeps `index.html`, `results.sarif.json`, and `results.json` under `data/plugin-reports/builtin.audit-skill-scanner/`
+- `skill-scanner` can still attempt outbound communication indirectly via LiteLLM during CLI startup/help flows
+
 ## User-Defined Plugins
 
 User plugins are optional and discovered from:
@@ -105,6 +128,7 @@ Output fields:
 
 - `summary`: human-readable summary of the plugin run
 - `label_intents`: maps each label to a visual intent used for coloring in the UI
+- `sub_artifacts`: plugin-level secondary artifact file names kept under `data/plugin-reports/<plugin-id>/<normalized-skill-key>/`
 - `results`: per-skill results keyed by skill path
 
 ### `label_intents` values
@@ -125,7 +149,6 @@ Within each skill result:
 
 `builtin.audit-promptfoo-security` may also write:
 
-- `report_path`: public path to the latest HTML report for that skill
 - `findings`: counts by vulnerability id
 - `reasons`: raw promptfoo reasons grouped by vulnerability id
 
@@ -137,7 +160,7 @@ If a plugin wants those files to be deployed with the web app, it should write t
 
 - `data/plugin-reports/<plugin-id>/...`
 
-Harbor does not manage these files as part of the plugin result schema. The plugin itself is responsible for creating and updating them using a stable path convention.
+Harbor stores file names in `sub_artifacts`, but the plugin itself is still responsible for creating and updating the files using the stable path convention above.
 
 During `harbor build`, Harbor copies `data/plugin-reports/` into the web build output so those files can be linked from the UI.
 
@@ -149,6 +172,7 @@ In generated projects, the build workflow installs only `tools/harbor/web`, but 
 - Stats reads plugin output history by `collect_id`
 - `short_label` is used for filter labels and table headers when configured
 - files under `data/plugin-reports/` are copied into the web build output during `harbor build`
+- skill detail pages build secondary artifact links from `plugin_id`, `skill.key`, and `sub_artifacts`
 
 ## Workflow
 

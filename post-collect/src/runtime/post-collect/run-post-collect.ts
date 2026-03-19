@@ -5,6 +5,7 @@ import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { tsImport } from 'tsx/esm/api';
 import { auditStaticPlugin } from './plugins/audit-static.js';
 import { auditPromptfooSecurityPlugin } from './plugins/audit-promptfoo-security.js';
+import { auditSkillScannerPlugin } from './plugins/audit-skill-scanner.js';
 import { detectDriftPlugin } from './plugins/detect-drift.js';
 import type {
 	BuiltinPostCollectPlugin,
@@ -21,6 +22,7 @@ const BUILTIN_PLUGINS = new Map<string, BuiltinPostCollectPlugin>([
 	[detectDriftPlugin.id, detectDriftPlugin],
 	[auditStaticPlugin.id, auditStaticPlugin],
 	[auditPromptfooSecurityPlugin.id, auditPromptfooSecurityPlugin],
+	[auditSkillScannerPlugin.id, auditSkillScannerPlugin],
 ]);
 
 interface RawSettings {
@@ -82,6 +84,11 @@ function normalizePluginResult(result: PostCollectPluginResult | null | undefine
 	if (result?.label_intents) {
 		next.label_intents = Object.fromEntries(
 			Object.entries(result.label_intents).map(([label, intent]) => [label, validateIntent(intent)]),
+		);
+	}
+	if (Array.isArray(result?.sub_artifacts)) {
+		next.sub_artifacts = result.sub_artifacts.filter(
+			(artifact): artifact is string => typeof artifact === 'string' && artifact.length > 0,
 		);
 	}
 	if (result?.results) {

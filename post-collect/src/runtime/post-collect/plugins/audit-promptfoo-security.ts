@@ -4,7 +4,6 @@ import type { BuiltinPostCollectPlugin, PostCollectPluginResult } from '../types
 import {
 	buildPromptfooConfig,
 	buildReportFsPath,
-	buildReportPublicPath,
 	buildSummary,
 	buildUnknownResult,
 	createPromptfooTempDir,
@@ -67,7 +66,6 @@ export const auditPromptfooSecurityPlugin: BuiltinPostCollectPlugin = {
 				}
 
 				const skillName = skillPath.replace(/\/SKILL\.md$/, '').split('/').pop() || 'skill';
-				const reportPath = buildReportPublicPath(skillKey);
 				const reportFsPath = buildReportFsPath(context.project_root, skillKey);
 				const tempDir = createPromptfooTempDir();
 				const jsonOutputPath = join(tempDir, 'results.json');
@@ -102,7 +100,6 @@ export const auditPromptfooSecurityPlugin: BuiltinPostCollectPlugin = {
 
 					const summary = summarizePromptfooOutput({
 						output: readPromptfooOutput(jsonOutputPath),
-						reportPath,
 						riskThreshold: config.risk_threshold,
 						criticalThreshold: config.critical_threshold,
 					});
@@ -128,6 +125,7 @@ export const auditPromptfooSecurityPlugin: BuiltinPostCollectPlugin = {
 		return {
 			summary: buildSummary(counts, scanned),
 			label_intents: PROMPTFOO_SECURITY_LABEL_INTENTS,
+			sub_artifacts: ['index.html'],
 			results,
 		};
 	},

@@ -1,5 +1,22 @@
 # 変更履歴
 
+## [cli 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
+
+### 追加
+
+- org-owned skill を対象にローカルの `skill-scanner` CLI を実行する built-in の `builtin.audit-skill-scanner` post-collect plugin を追加し、HTML / SARIF / JSON の副成果物とスキル詳細画面からのリンクに対応した
+- plugin 出力の top-level に `sub_artifacts` を追加し、副成果物ファイル名を plugin ごとに一度だけ記録して Web UI からリンクできるようにした
+
+### 変更
+
+- `builtin.audit-promptfoo-security` の副成果物リンク表現を新しい `sub_artifacts` 規約へ移行し、plugin 詳細画面の表示を副成果物ファイル名ベースに揃えた
+- built-in plugin のドキュメント、init template の設定例、package README を更新し、`skill-scanner`、副成果物規約、Python CLI 前提条件を明記した
+
+### 修正
+
+- `docs/samples/` を workspace の Prettier 対象から外し、ローカルのサンプル出力が repository 全体の format check を壊さないようにした
+- `web/src/lib/components/StarsBackground.svelte` の implicit `any` を修正し、`web check` が再び通るようにした
+
 ## [cli 0.13.0] / [collector 0.13.0] / [post-collect 0.13.0] / [web 0.13.0] - 2026-03-19
 
 ### 追加

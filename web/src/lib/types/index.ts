@@ -68,6 +68,7 @@ export interface PluginOutputEntry {
 	collect_id?: string;
 	summary?: string;
 	label_intents?: Record<string, LabelIntent>;
+	sub_artifacts?: string[];
 	results?: Record<string, PluginSkillResult>;
 }
 

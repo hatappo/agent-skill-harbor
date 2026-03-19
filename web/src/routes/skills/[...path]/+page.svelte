@@ -29,6 +29,7 @@
 			pluginOutputs: {
 				id: string;
 				labelIntents: Record<string, LabelIntent>;
+				subArtifacts: string[];
 				result: Record<string, unknown> & { label?: string; raw?: string; report_path?: string };
 			}[];
 		};
@@ -133,10 +134,44 @@
 		return `${repoUrl}/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
 	}
 
-	function getReportHref(result: Record<string, unknown> & { report_path?: string }): string | null {
-		return typeof result.report_path === 'string' && result.report_path.length > 0
-			? `${base}/${result.report_path}`.replace(/\/+/g, '/')
-			: null;
+	function normalizeSkillKeyForArtifactPath(skillKey: string): string {
+		return skillKey.replace(/[^a-zA-Z0-9_-]+/g, '__').replace(/^_+|_+$/g, '');
+	}
+
+	function getArtifactLabel(fileName: string): string {
+		if (fileName.endsWith('.html')) return $t('detail.viewHtmlReport');
+		if (fileName.endsWith('.sarif.json')) return 'SARIF';
+		if (fileName.endsWith('.json')) return 'JSON';
+		return fileName;
+	}
+
+	function getArtifactHref(pluginId: string, fileName: string): string {
+		return `${base}/plugin-reports/${pluginId}/${normalizeSkillKeyForArtifactPath(skill.key)}/${fileName}`.replace(/\/+/g, '/');
+	}
+
+	function getArtifactLinks(
+		plugin: {
+			id: string;
+			subArtifacts: string[];
+			result: Record<string, unknown> & { report_path?: string };
+		},
+	): { fileName: string; href: string; label: string }[] {
+		const links = plugin.subArtifacts.map((fileName) => ({
+			fileName,
+			href: getArtifactHref(plugin.id, fileName),
+			label: getArtifactLabel(fileName),
+		}));
+		if (links.length > 0) return links;
+		if (typeof plugin.result.report_path === 'string' && plugin.result.report_path.length > 0) {
+			return [
+				{
+					fileName: 'index.html',
+					href: `${base}/${plugin.result.report_path}`.replace(/\/+/g, '/'),
+					label: $t('detail.viewHtmlReport'),
+				},
+			];
+		}
+		return [];
 	}
 
 	function renderSkillMarkdown(markdown: string, skill: FlatSkillEntry): string {
@@ -432,7 +467,7 @@
 				{#each pluginOutputs as plugin}
 					{@const extraYaml = getPluginExtraYaml(plugin.result)}
 					{@const issueUrl = buildIssueUrl(plugin)}
-					{@const reportHref = getReportHref(plugin.result)}
+					{@const artifactLinks = getArtifactLinks(plugin)}
 					<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
 						<div class="flex items-center gap-3">
 							<code
@@ -457,17 +492,17 @@
 									Create Issue
 								</a>
 							{/if}
-							{#if reportHref}
+							{#each artifactLinks as artifact}
 								<a
-									href={reportHref}
+									href={artifact.href}
 									target="_blank"
 									rel="noopener noreferrer"
 									class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-0.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
 								>
 									<FileText class="h-3.5 w-3.5" />
-									{$t('detail.viewHtmlReport')}
+									{artifact.label}
 								</a>
-							{/if}
+							{/each}
 						</div>
 						{#if plugin.result.raw}
 							<div
