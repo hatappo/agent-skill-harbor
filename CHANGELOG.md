@@ -11,6 +11,7 @@
 
 - Moved `builtin.audit-promptfoo-security` secondary report links to the new `sub_artifacts` convention and aligned plugin detail rendering around artifact file names
 - Updated built-in plugin docs, init template examples, and package READMEs to document `skill-scanner`, secondary artifact conventions, and Python CLI requirements
+- Removed the older `builtin.audit-static` built-in plugin now that `builtin.audit-skill-scanner` covers the security-audit role more clearly
 
 ### Fixed
 

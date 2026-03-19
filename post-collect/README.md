@@ -4,7 +4,7 @@
 
 Post-collect runtime package for Agent Skill Harbor.
 
-This package contains the `post-collect` command implementation and built-in plugins such as `builtin.detect-drift`, `builtin.audit-static`, `builtin.audit-promptfoo-security`, and `builtin.audit-skill-scanner`.
+This package contains the `post-collect` command implementation and built-in plugins such as `builtin.detect-drift`, `builtin.audit-promptfoo-security`, and `builtin.audit-skill-scanner`.
 
 ## Purpose
 

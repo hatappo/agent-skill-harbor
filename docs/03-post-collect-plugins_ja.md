@@ -4,7 +4,7 @@ Agent Skill Harbor では、各 `collect` の後に plugin を実行できます
 
 ## ビルトインプラグイン
 
-現在のビルトインプラグインは次の 4 つです。
+現在のビルトインプラグインは次の 3 つです。
 
 `config/harbor.yaml` で設定します。
 
@@ -13,8 +13,6 @@ post_collect:
   plugins:
     - id: builtin.detect-drift
       short_label: Drift
-    - id: builtin.audit-static
-      short_label: Audit
     - id: builtin.audit-promptfoo-security
       short_label: Security
       config:
@@ -50,16 +48,6 @@ post_collect:
 - 向いている用途: copy/import した skill を使っていて upstream 変更を追いたい場合
 
 この plugin は軽量で、収集済み catalog データと保存済み skill ファイルだけを使います。
-
-### `builtin.audit-static`
-
-キャッシュ済み markdown とメタデータに対して軽量な static audit を行います。
-
-- 主目的: ルールベースの lint / リスク検出
-- 代表的なラベル: `Pass`, `Info`, `Warn`, `Fail`
-- 向いている用途: LLM コストなしで安価なチェックを入れたい場合
-
-この plugin は外部 LLM API を呼びません。ローカルのキャッシュファイルだけを走査します。
 
 ### `builtin.audit-promptfoo-security`
 

@@ -13,8 +13,6 @@ post_collect:
   plugins:
     - id: builtin.detect-drift
       short_label: Drift
-    - id: builtin.audit-static
-      short_label: Audit
     - id: builtin.audit-promptfoo-security
       short_label: Security
       config:
@@ -50,16 +48,6 @@ Detects whether collected skills have drifted from their recorded upstream origi
 - Recommended use: enable this when you rely on copied or imported skills and want to know when upstream changed
 
 This plugin is lightweight and uses only collected catalog data plus saved skill files.
-
-### `builtin.audit-static`
-
-Runs a lightweight static audit against cached markdown and metadata.
-
-- Primary purpose: rule-based linting / risk spotting
-- Typical output labels: `Pass`, `Info`, `Warn`, `Fail`
-- Recommended use: enable this when you want cheap checks without LLM cost
-
-This plugin does not call external LLM APIs. It scans local cached files only.
 
 ### `builtin.audit-promptfoo-security`
 

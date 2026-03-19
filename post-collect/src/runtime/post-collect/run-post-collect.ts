@@ -3,7 +3,6 @@ import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { dump as yamlDump, load as yamlLoad } from 'js-yaml';
 import { tsImport } from 'tsx/esm/api';
-import { auditStaticPlugin } from './plugins/audit-static.js';
 import { auditPromptfooSecurityPlugin } from './plugins/audit-promptfoo-security.js';
 import { auditSkillScannerPlugin } from './plugins/audit-skill-scanner.js';
 import { detectDriftPlugin } from './plugins/detect-drift.js';
@@ -20,7 +19,6 @@ import type {
 
 const BUILTIN_PLUGINS = new Map<string, BuiltinPostCollectPlugin>([
 	[detectDriftPlugin.id, detectDriftPlugin],
-	[auditStaticPlugin.id, auditStaticPlugin],
 	[auditPromptfooSecurityPlugin.id, auditPromptfooSecurityPlugin],
 	[auditSkillScannerPlugin.id, auditSkillScannerPlugin],
 ]);

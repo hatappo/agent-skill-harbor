@@ -11,6 +11,7 @@
 
 - `builtin.audit-promptfoo-security` の副成果物リンク表現を新しい `sub_artifacts` 規約へ移行し、plugin 詳細画面の表示を副成果物ファイル名ベースに揃えた
 - built-in plugin のドキュメント、init template の設定例、package README を更新し、`skill-scanner`、副成果物規約、Python CLI 前提条件を明記した
+- `builtin.audit-skill-scanner` でセキュリティ監査の役割をより明確に担えるようになったため、旧 `builtin.audit-static` built-in plugin を削除した
 
 ### 修正
 

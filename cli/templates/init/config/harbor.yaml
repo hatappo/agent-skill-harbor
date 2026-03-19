@@ -30,9 +30,6 @@ post_collect:
   #       risk_threshold: 1
   #       critical_threshold: 3
 
-  #   - id: builtin.audit-static
-  #     short_label: Audit
-
   #   - id: sample_plugin
   #     short_label: Sample
   # Generate the sample plugin first: harbor gen sample-plugin

@@ -4,7 +4,7 @@
 
 Agent Skill Harbor の post-collect ランタイムパッケージです。
 
-このパッケージには、`post-collect` コマンドの実装と、`builtin.detect-drift`、`builtin.audit-static`、`builtin.audit-promptfoo-security`、`builtin.audit-skill-scanner` などの built-in plugin が含まれます。
+このパッケージには、`post-collect` コマンドの実装と、`builtin.detect-drift`、`builtin.audit-promptfoo-security`、`builtin.audit-skill-scanner` などの built-in plugin が含まれます。
 
 ## 目的
 
