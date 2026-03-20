@@ -4,6 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
+import { packageRoot } from '../paths.js';
 import { runCommand } from './init.js';
 
 class ExitSignal extends Error {
@@ -63,7 +64,12 @@ test('harbor init scaffolds a new project into an empty directory', async () => 
 	assert.equal(result.status, 0, result.errors.join('\n'));
 	assert.equal(existsSync(join(target, 'package.json')), true);
 	assert.equal(existsSync(join(target, '.github', 'workflows', 'collect-skills.yml')), true);
-	assert.match(readFileSync(join(target, 'package.json'), 'utf-8'), /"agent-skill-harbor": ">=0\.13\.0 <1"/);
+	const cliVersion = JSON.parse(readFileSync(join(packageRoot, 'package.json'), 'utf-8')).version as string;
+	const escapedCliVersion = cliVersion.replaceAll('.', '\\.');
+	assert.match(
+		readFileSync(join(target, 'package.json'), 'utf-8'),
+		new RegExp(`"agent-skill-harbor": ">=${escapedCliVersion} <1"`),
+	);
 	assert.match(
 		readFileSync(join(target, '.github', 'workflows', 'collect-skills.yml'), 'utf-8'),
 		/collect\.yml@wf-v0/,

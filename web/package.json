@@ -20,7 +20,7 @@
 	"files": [
 		"guide/",
 		"src/",
-		"static/",
+		"static/.nojekyll",
 		"templates/",
 		"package.json",
 		"svelte.config.js",

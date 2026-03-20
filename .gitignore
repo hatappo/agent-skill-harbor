@@ -1,20 +1,18 @@
-node_modules/
-dist/
-cli/dist/
-cli/node_modules/
-collector/dist/
-collector/node_modules/
-post-collect/dist/
-post-collect/node_modules/
-web/dist/
-web/node_modules/
-web/static/assets/
+# Built artifacts and installed dependencies
+agent-skill-harbor-*.tgz
 build/
+dist/
+node_modules/
+*/dist/
+*/node_modules/
+web/static/assets/
+
+# Environments
 .env
 .env.*
 !.env.example
 
-# Local development data (created by setup:dev)
+# Local development data (initially created by setup:dev)
 /config/
 /data/
 /guide/
@@ -33,9 +31,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-
-# Release artifacts
-agent-skill-harbor-*.tgz
 
 # AI
 AGENTS.md
