@@ -4,6 +4,7 @@
 	import { page } from '$app/stores';
 	import { t } from '$lib/i18n';
 	import ThemeToggle from './ThemeToggle.svelte';
+	import BackgroundToggle from './BackgroundToggle.svelte';
 	import LocaleToggle from './LocaleToggle.svelte';
 
 	interface Props {
@@ -65,6 +66,7 @@
 			{/if}
 			<LocaleToggle />
 			<ThemeToggle />
+			<BackgroundToggle />
 		</nav>
 	</div>
 </header>

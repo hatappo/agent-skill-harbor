@@ -6,6 +6,7 @@
 
 - Added the built-in `builtin.audit-skill-scanner` post-collect plugin for org-owned skills, including local `skill-scanner` CLI execution, HTML/SARIF/JSON secondary artifacts, and skill detail links
 - Added top-level `sub_artifacts` support to plugin output so secondary files can be described once per plugin and linked from the web UI without per-skill path duplication
+- Added a WebGL water ripple background effect as a switchable alternative to the existing starfield, with a three-way toggle (none / stars / ripples) in the header that persists via localStorage
 
 ### Changed
 

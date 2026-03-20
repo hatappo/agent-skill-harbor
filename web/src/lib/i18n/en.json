@@ -56,6 +56,11 @@
 		"dark": "Dark",
 		"system": "System"
 	},
+	"background": {
+		"none": "No background effect",
+		"stars": "Stars background",
+		"ripples": "Water ripple background"
+	},
 	"catalog": {
 		"title": "Skills",
 		"pageTitle": "Agent Skill Harbor",

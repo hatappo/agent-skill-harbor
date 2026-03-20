@@ -6,6 +6,7 @@
 
 - org-owned skill を対象にローカルの `skill-scanner` CLI を実行する built-in の `builtin.audit-skill-scanner` post-collect plugin を追加し、HTML / SARIF / JSON の副成果物とスキル詳細画面からのリンクに対応した
 - plugin 出力の top-level に `sub_artifacts` を追加し、副成果物ファイル名を plugin ごとに一度だけ記録して Web UI からリンクできるようにした
+- WebGL 水面リップル背景エフェクトを追加し、ヘッダーの 3 段トグル（なし / 星空 / リップル）で切り替え可能にした（localStorage で永続化）
 
 ### 変更
 

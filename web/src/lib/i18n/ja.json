@@ -56,6 +56,11 @@
 		"dark": "ダーク",
 		"system": "システム"
 	},
+	"background": {
+		"none": "背景エフェクトなし",
+		"stars": "星空背景",
+		"ripples": "水面リップル背景"
+	},
 	"catalog": {
 		"title": "Skills",
 		"pageTitle": "Agent Skill Harbor",
