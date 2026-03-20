@@ -1,6 +1,6 @@
 # Changelog
 
-## [cli 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
+## [cli 0.14.0] / [collector 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
 
 ### Added
 
