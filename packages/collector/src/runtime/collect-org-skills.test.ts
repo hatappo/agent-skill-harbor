@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { sanitizeCatalogForSave } from './catalog-store.js';
+import { sanitizeCatalogForSave } from 'agent-skill-harbor-shared-internal/catalog-store';
 import { collectFromResolvedFrom } from './collect-org-skills.js';
 
 test('sanitizeCatalogForSave strips copied frontmatter from skills.yaml entries', () => {

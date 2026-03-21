@@ -4,21 +4,21 @@ import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createCollectEntry, prependCollectEntry, type CategoryStats, type CollectEntry } from './collects.js';
 import {
 	loadCatalog,
 	saveCatalog,
 	type CatalogRepositoryEntry as RepositoryEntry,
 	type CatalogSkillEntry as SkillEntry,
 	type CatalogYaml,
-} from './catalog-store.js';
+} from 'agent-skill-harbor-shared-internal/catalog-store';
 import {
 	normalizeResolvedFromFrontmatter,
 	normalizeResolvedFromSkillsLock,
 	parseProjectSkillsLock,
 	resolveSkillLookupName,
 	type ProjectSkillsLockEntry,
-} from './resolved-from.js';
+} from 'agent-skill-harbor-shared-internal/resolved-from';
+import { createCollectEntry, prependCollectEntry, type CategoryStats, type CollectEntry } from './collects.js';
 
 interface SettingsConfig {
 	collector?: {

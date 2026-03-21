@@ -5,7 +5,7 @@ import {
 	normalizeResolvedFromSkillsLock,
 	parseProjectSkillsLock,
 	resolveSkillLookupName,
-} from './resolved-from.js';
+} from 'agent-skill-harbor-shared-internal/resolved-from';
 
 test('normalizeResolvedFromFrontmatter adds the github.com platform prefix', () => {
 	assert.equal(

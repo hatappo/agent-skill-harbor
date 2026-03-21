@@ -56,6 +56,9 @@ importers:
       '@octokit/rest':
         specifier: ^21.1.1
         version: 21.1.1
+      agent-skill-harbor-shared-internal:
+        specifier: workspace:*
+        version: link:../shared-internal
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -84,6 +87,9 @@ importers:
 
   packages/post-collect:
     dependencies:
+      agent-skill-harbor-shared-internal:
+        specifier: workspace:*
+        version: link:../shared-internal
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -93,6 +99,31 @@ importers:
       tsx:
         specifier: ^4.19.0
         version: 4.21.0
+    devDependencies:
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/node':
+        specifier: ^22.15.0
+        version: 22.19.11
+      eslint:
+        specifier: ^9.18.0
+        version: 9.39.3(jiti@2.6.1)
+      tsup:
+        specifier: 8.5.1
+        version: 8.5.1(@swc/core@1.15.18(@swc/helpers@0.5.19))(jiti@2.6.1)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      typescript-eslint:
+        specifier: ^8.20.0
+        version: 8.56.1(eslint@9.39.3(jiti@2.6.1))(typescript@5.9.3)
+
+  packages/shared-internal:
+    dependencies:
+      js-yaml:
+        specifier: ^4.1.0
+        version: 4.1.1
     devDependencies:
       '@types/js-yaml':
         specifier: ^4.0.9

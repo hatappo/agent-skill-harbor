@@ -26,6 +26,7 @@
 	},
 	"dependencies": {
 		"@octokit/rest": "^21.1.1",
+		"agent-skill-harbor-shared-internal": "workspace:*",
 		"js-yaml": "^4.1.0"
 	},
 	"devDependencies": {

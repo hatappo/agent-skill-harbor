@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { load as yamlLoad } from 'js-yaml';
-import { resolveSkillLookupName, type ProjectSkillsLockEntry } from '../../resolved-from.js';
+import { resolveSkillLookupName, type ProjectSkillsLockEntry } from 'agent-skill-harbor-shared-internal/resolved-from';
 import type { BuiltinPostCollectPlugin, PostCollectCatalog, PostCollectPluginResult } from '../types.js';
 
 function parseFrontmatter(content: string): Record<string, unknown> {

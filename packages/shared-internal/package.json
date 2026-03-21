@@ -1,8 +1,8 @@
 {
-	"name": "agent-skill-harbor-post-collect",
+	"name": "agent-skill-harbor-shared-internal",
+	"private": true,
 	"version": "0.14.0",
 	"type": "module",
-	"description": "Post-collect runtime package for Agent Skill Harbor.",
 	"license": "MIT",
 	"packageManager": "pnpm@10.32.1",
 	"engines": {
@@ -12,7 +12,8 @@
 		"dist/"
 	],
 	"exports": {
-		"./post-collect": "./dist/src/cli/commands/post-collect.js"
+		"./catalog-store": "./dist/src/catalog-store.js",
+		"./resolved-from": "./dist/src/resolved-from.js"
 	},
 	"scripts": {
 		"format": "prettier --write \"src/**/*.{js,ts,mjs,cjs,mts,cts}\" \"*.{json,md}\"",
@@ -20,15 +21,12 @@
 		"lint": "eslint --fix src",
 		"lint:check": "eslint src",
 		"check": "tsc --noEmit -p tsconfig.json",
-		"test": "node --import tsx --test \"src/**/*.test.ts\"",
 		"build": "tsup",
+		"test": "node -e \"console.log('No tests configured for agent-skill-harbor-shared-internal')\"",
 		"verify": "pnpm run format:check && pnpm run lint:check && pnpm run check && pnpm run test"
 	},
 	"dependencies": {
-		"agent-skill-harbor-shared-internal": "workspace:*",
-		"js-yaml": "^4.1.0",
-		"promptfoo": "0.121.2",
-		"tsx": "^4.19.0"
+		"js-yaml": "^4.1.0"
 	},
 	"devDependencies": {
 		"@types/js-yaml": "^4.0.9",

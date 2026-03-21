@@ -1,6 +1,6 @@
 import { execSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
-import { loadCatalog } from './catalog-store.js';
+import { loadCatalog } from 'agent-skill-harbor-shared-internal/catalog-store';
 import { runPostCollect } from './post-collect/run-post-collect.js';
 
 function getProjectRoot(): string {
