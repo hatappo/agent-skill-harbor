@@ -29,14 +29,20 @@
 1. 今回 release する package を決める。
 2. その package の `package.json` だけを bump する。
 3. 必要に応じて changelog を更新する。
+4. `collector` または `post-collect` を release する前に、npm には publish しない内部 package である `packages/shared-internal/` を検証する。
+
+```bash
+pnpm --dir packages/shared-internal verify
+pnpm --dir packages/shared-internal build
+```
 
 ### `agent-skill-harbor-web` を release するとき
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir web verify
-pnpm --dir web build
-cd web
+pnpm --dir packages/web verify
+pnpm --dir packages/web build
+cd packages/web
 # npm pack  # `files` / README / package 構成を変更したときのみ
 npm publish --access public
 cd ..
@@ -47,11 +53,9 @@ git tag web-v<version>
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir collector lint:check
-pnpm --dir collector check
-pnpm --dir collector test
-pnpm --dir collector build
-cd collector
+pnpm --dir packages/collector verify
+pnpm --dir packages/collector build
+cd packages/collector
 npm publish --access public
 cd ..
 git tag collector-v<version>
@@ -61,11 +65,9 @@ git tag collector-v<version>
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir post-collect lint:check
-pnpm --dir post-collect check
-pnpm --dir post-collect test
-pnpm --dir post-collect build
-cd post-collect
+pnpm --dir packages/post-collect verify
+pnpm --dir packages/post-collect build
+cd packages/post-collect
 npm publish --access public
 cd ..
 git tag post-collect-v<version>
@@ -75,10 +77,10 @@ git tag post-collect-v<version>
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir cli verify
-pnpm --dir cli build
-node cli/dist/bin/cli.js build
-cd cli
+pnpm --dir packages/cli verify
+pnpm --dir packages/cli build
+node packages/cli/dist/bin/cli.js build
+cd packages/cli
 # npm pack  # `files` / bin / templates / README を変更したときのみ
 npm publish --access public
 cd ..
@@ -108,16 +110,41 @@ git tag cli-v<version>
 - `wf-v0` は後方互換を保てる範囲の変更だけで動かすようにします。
 - caller 側との互換性期待が大きく変わる場合だけ、新しい major workflow tag を作ります。
 
+## Workflow Action Pin 更新
+
+- Harbor では、reusable workflow と生成される deploy workflow template の外部 GitHub Action を commit SHA で pin します。
+- まず更新候補を dry-run で確認します:
+  - `pnpm actions:check` では、生成される `CollectSkills` caller workflow に対する ref 更新候補も表示されることがあります。
+  - その reusable workflow ref 更新は無視してください。template は意図的に `@wf-v0` を維持しており、`actions:pin` 実行後にその ref を元へ戻します。
+
+```bash
+pnpm actions:check
+```
+
+- 差分をレビューして問題なければ反映します:
+
+```bash
+pnpm actions:pin
+```
+
+- 現在の更新フローは意図的にハイブリッドです。
+  - `actions-up` が大半の外部 action を `--mode minor` と `--min-age 7` 付きで更新します。
+  - `pnpm/action-setup` だけは、この repository では `actions-up` が安定して追跡できないため、手動更新の対象として扱います。
+- `actions/upload-artifact` と `actions/download-artifact` は、手動確認のうえで現在の新しい major line に pin してあり、今後の自動確認もその major line から継続します。
+- `pnpm actions:check` は、手動確認用に `pnpm/action-setup` の最新 v4 release も表示します。
+- `pnpm/action-setup` を更新するときは、意図して current major line のまま保ちつつ、release を確認してから pinned SHA を手動で置き換えてください。
+
 ## バージョニング方針
 
-- `cli/package.json`、`collector/package.json`、`post-collect/package.json`、`web/package.json` は独立して version を管理します。
-- `cli/templates/init/package.template.json` と `cli/templates/init/tools/harbor/*/package.template.json` は、publish したい package version と整合するよう保ちます。
+- `packages/cli/package.json`、`packages/collector/package.json`、`packages/post-collect/package.json`、`packages/web/package.json` は公開 package として独立して version を管理します。
+- `packages/shared-internal/package.json` は非公開の内部 package です。monorepo 内では version を揃えますが、npm には publish しません。
+- `packages/cli/templates/init/package.template.json` と `packages/cli/templates/init/tools/harbor/*/package.template.json` は、publish したい package version と整合するよう保ちます。
 
 ## 補足
 
-- Web の実行時依存は `web/package.json` に置きます。
-- wrapper 専用の実行時依存は `cli/package.json` に置きます。
-- collect 専用の実行時依存は `collector/package.json` に置きます。
-- post-collect 専用の実行時依存は `post-collect/package.json` に置きます。
+- Web の実行時依存は `packages/web/package.json` に置きます。
+- wrapper 専用の実行時依存は `packages/cli/package.json` に置きます。
+- collect 専用の実行時依存は `packages/collector/package.json` に置きます。
+- post-collect 専用の実行時依存は `packages/post-collect/package.json` に置きます。
 - この workspace では package ごとの release に対して `pnpm publish` が安定して動かなかったため、現時点では各 package directory に移動して `npm publish` を直接実行するワークアラウンドを採用します。
 - Vite の chunk size warning は現状では既知のものとして扱います。手動で chunk を分ける検証により、残っている重さの主因は `three` だと分かったため、graph 実装をさらに深く最適化しない限り、追加の chunk 分割設定は常用しません。

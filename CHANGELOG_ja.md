@@ -1,5 +1,28 @@
 # 変更履歴
 
+## [未リリース]
+
+### 追加
+
+- Web UI に skill title、ページ間の view tabs、Owner フィルターの View Transition を追加し、card / list / stats / graph 間の遷移でも文脈がつながるようにした
+- ヘッダーの animated icon、共通 `ToggleGroup`、共通 `OwnerFilter` / `PillSelectFilter` を追加し、Web 側で重複していた UI ロジックを整理した
+
+### 変更
+
+- monorepo の package を `packages/{cli,collector,post-collect,shared-internal,web}` 配下へ再配置し、workspace 設定、repository 内パス、template、関連ドキュメントを新しい構成に合わせて更新した
+- package script を `format` / `format:check` / `lint` / `lint:check` / `check` / `test` / `build` / `verify` に統一し、package ローカルの保守フローを揃えた
+- Harbor の reusable workflow と生成される deploy workflow template の外部 GitHub Action を commit SHA で pin し、artifact 系 action は手動確認のうえで新しい major line へ更新した。あわせて更新運用として `actions-up` による minor-safe な更新を使いつつ、`pnpm/action-setup` だけは手動確認対象として扱うフローを導入した
+- 古い CLI runtime wrapper と重複実装を削除し、stats 集計ロジックを helper に寄せ、theme / background / locale などの Web 状態には小さな persistent store helper を導入した
+- TypeScript 向け ESLint 設定を root の共有 helper に集約し、package ごとに同じ設定を重複して持たないよう整理した
+- `packages/shared-internal/` を非公開 workspace package として追加し、`collector` と `post-collect` で重複していた `catalog-store` と `resolved-from` を単一の実装へ集約した
+- `packages/shared-internal/`、package ローカルの `verify` フロー、現在の monorepo 境界が分かるようにローカル開発・リリースのドキュメントを更新した
+
+### 修正
+
+- CLI の package root 解決を修正し、インストール済みの `init` / `gen` が source 実行と build 後の `dist/` 実行の両方で正しく template を見つけられるようにした
+- package tarball の内容と release ドキュメントを修正し、publish 内容が不要ファイルを含まず、現在の package 別 publish 手順に一致するようにした
+- ブラウザの別タブに移っている間は ripple background の生成を停止し、タブ復帰時に波紋が一気に溜まって見える不具合を修正した
+
 ## [cli 0.14.0] / [collector 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
 
 ### 追加
@@ -84,13 +107,13 @@
 
 ### 変更
 
-- root workspace の formatter 対象を repository 共通ファイルのみに絞り、package ローカルの整形は `cli/` と `web/` 側に委ねる構成へ整理
+- root workspace の formatter 対象を repository 共通ファイルのみに絞り、package ローカルの整形は `packages/cli/` と `packages/web/` 側に委ねる構成へ整理
 
 ## [cli 0.10.1] / [web 0.9.1] - 2026-03-14
 
 ### 変更
 
-- `cli/` と `web/` の両 package に、package ローカルで使える `format` / `format:check` / `lint` / `lint:check` / `verify` を追加し、workspace root に依存せず検査と自動修正ができるよう整理
+- `packages/cli/` と `packages/web/` の両 package に、package ローカルで使える `format` / `format:check` / `lint` / `lint:check` / `verify` を追加し、workspace root に依存せず検査と自動修正ができるよう整理
 - release ドキュメントを、package ごとの `verify` 手順、任意の `pack` 指針、package 専用 git tag (`cli-vX.Y.Z`, `web-vX.Y.Z`) に合わせて更新
 - package ローカルの format 対象を調整し、新しい静的検査で見つかった CLI / web の小さな問題を修正
 - コントリビューター向けドキュメントと README 補足を、独立 package の release フローに合わせて更新
@@ -112,8 +135,8 @@
 
 ### 変更
 
-- 公開 CLI パッケージを `cli/` に移し、リポジトリ構成を `cli/` / `web/` の対称な package root に整理
-- ルート workspace の script をリポジトリ管理用に絞り、コントリビューター向けドキュメントを `cli/` / `web/` 単位の実行方法へ更新
+- 公開 CLI パッケージを `packages/cli/` に移し、リポジトリ構成を `packages/cli/` / `packages/web/` の対称な package root に整理
+- ルート workspace の script をリポジトリ管理用に絞り、コントリビューター向けドキュメントを `packages/cli/` / `packages/web/` 単位の実行方法へ更新
 - CLI パッケージの build script を `build` に整理し、init template は同期対象ではなくプレースホルダ検証対象として扱うよう version フックを簡素化
 
 ## [0.8.7] - 2026-03-14
