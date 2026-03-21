@@ -36,8 +36,10 @@
 pnpm install --no-frozen-lockfile
 pnpm --dir web verify
 pnpm --dir web build
-# pnpm --filter agent-skill-harbor-web pack  # `files` / README / package 構成を変更したときのみ
-pnpm --filter agent-skill-harbor-web publish --access public
+cd web
+# npm pack  # `files` / README / package 構成を変更したときのみ
+npm publish --access public
+cd ..
 git tag web-v<version>
 ```
 
@@ -49,7 +51,9 @@ pnpm --dir collector lint:check
 pnpm --dir collector check
 pnpm --dir collector test
 pnpm --dir collector build
-pnpm --filter agent-skill-harbor-collector publish --access public
+cd collector
+npm publish --access public
+cd ..
 git tag collector-v<version>
 ```
 
@@ -61,7 +65,9 @@ pnpm --dir post-collect lint:check
 pnpm --dir post-collect check
 pnpm --dir post-collect test
 pnpm --dir post-collect build
-pnpm --filter agent-skill-harbor-post-collect publish --access public
+cd post-collect
+npm publish --access public
+cd ..
 git tag post-collect-v<version>
 ```
 
@@ -72,8 +78,10 @@ pnpm install --no-frozen-lockfile
 pnpm --dir cli verify
 pnpm --dir cli build
 node cli/dist/bin/cli.js build
-# pnpm --filter agent-skill-harbor pack  # `files` / bin / templates / README を変更したときのみ
-pnpm --filter agent-skill-harbor publish --access public
+cd cli
+# npm pack  # `files` / bin / templates / README を変更したときのみ
+npm publish --access public
+cd ..
 git tag cli-v<version>
 ```
 
@@ -111,4 +119,5 @@ git tag cli-v<version>
 - wrapper 専用の実行時依存は `cli/package.json` に置きます。
 - collect 専用の実行時依存は `collector/package.json` に置きます。
 - post-collect 専用の実行時依存は `post-collect/package.json` に置きます。
+- この workspace では package ごとの release に対して `pnpm publish` が安定して動かなかったため、現時点では各 package directory に移動して `npm publish` を直接実行するワークアラウンドを採用します。
 - Vite の chunk size warning は現状では既知のものとして扱います。手動で chunk を分ける検証により、残っている重さの主因は `three` だと分かったため、graph 実装をさらに深く最適化しない限り、追加の chunk 分割設定は常用しません。

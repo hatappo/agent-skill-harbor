@@ -36,8 +36,10 @@ Recommended order when several packages changed:
 pnpm install --no-frozen-lockfile
 pnpm --dir web verify
 pnpm --dir web build
-# pnpm --filter agent-skill-harbor-web pack  # Only when changing files/README/package contents
-pnpm --filter agent-skill-harbor-web publish --access public
+cd web
+# npm pack  # Only when changing files/README/package contents
+npm publish --access public
+cd ..
 git tag web-v<version>
 ```
 
@@ -49,7 +51,9 @@ pnpm --dir collector lint:check
 pnpm --dir collector check
 pnpm --dir collector test
 pnpm --dir collector build
-pnpm --filter agent-skill-harbor-collector publish --access public
+cd collector
+npm publish --access public
+cd ..
 git tag collector-v<version>
 ```
 
@@ -61,7 +65,9 @@ pnpm --dir post-collect lint:check
 pnpm --dir post-collect check
 pnpm --dir post-collect test
 pnpm --dir post-collect build
-pnpm --filter agent-skill-harbor-post-collect publish --access public
+cd post-collect
+npm publish --access public
+cd ..
 git tag post-collect-v<version>
 ```
 
@@ -72,8 +78,10 @@ pnpm install --no-frozen-lockfile
 pnpm --dir cli verify
 pnpm --dir cli build
 node cli/dist/bin/cli.js build
-# pnpm --filter agent-skill-harbor pack  # Only when changing files/bin/templates/README
-pnpm --filter agent-skill-harbor publish --access public
+cd cli
+# npm pack  # Only when changing files/bin/templates/README
+npm publish --access public
+cd ..
 git tag cli-v<version>
 ```
 
@@ -111,4 +119,5 @@ git tag cli-v<version>
 - Wrapper-only runtime dependencies belong in `cli/package.json`.
 - Collect-only runtime dependencies belong in `collector/package.json`.
 - Post-collect-only runtime dependencies belong in `post-collect/package.json`.
+- In this workspace, `pnpm publish` did not behave reliably for per-package releases, so the current workaround is to run `npm publish` directly from each package directory.
 - The Vite chunk-size warning is currently expected. A manual chunking experiment showed that most of the remaining weight comes from `three`, so we are not keeping extra chunk-splitting config unless we decide to optimize the graph implementation more deeply.
