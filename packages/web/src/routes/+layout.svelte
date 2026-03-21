@@ -8,9 +8,12 @@
 	import { initTheme } from '$lib/stores/theme';
 	import { background, initBackground } from '$lib/stores/background';
 	import { initLocale } from '$lib/i18n';
+	import { setupViewTransition } from 'sveltekit-view-transition';
 	import { onMount } from 'svelte';
 
 	let { data, children } = $props();
+
+	setupViewTransition();
 
 	onMount(() => {
 		initTheme();

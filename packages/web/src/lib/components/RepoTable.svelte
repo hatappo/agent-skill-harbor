@@ -6,6 +6,8 @@
 	import { t } from '$lib/i18n';
 	import { base } from '$app/paths';
 	import { isSkillNew } from '$lib/utils/skills';
+	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
+	import { setupViewTransition } from 'sveltekit-view-transition';
 
 	interface Props {
 		repos: RepoInfo[];
@@ -14,6 +16,7 @@
 	}
 
 	let { repos, skills, freshPeriodDays = 0 }: Props = $props();
+	const { transition: viewTransition } = setupViewTransition();
 
 	let expanded = new SvelteSet<string>();
 
@@ -81,28 +84,39 @@
 							: repo.visibility === 'internal'
 								? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
 								: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'}
-					<tr
-						class="cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
-						onclick={() => toggleRepo(repo.repoKey)}
-					>
+					<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
 						<td class="px-2 py-3 text-center text-gray-400 dark:text-gray-500">
-							<svg
-								class="inline-block h-3 w-3 transition-transform {isExpanded ? 'rotate-90' : ''}"
-								viewBox="0 0 20 20"
-								fill="currentColor"
+							<button
+								type="button"
+								class="inline-flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+								aria-label={isExpanded ? 'Collapse repository' : 'Expand repository'}
+								aria-expanded={isExpanded}
+								onclick={() => toggleRepo(repo.repoKey)}
 							>
-								<path
-									fill-rule="evenodd"
-									d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-									clip-rule="evenodd"
-								/>
-							</svg>
+								<svg
+									class="inline-block h-3 w-3 transition-transform {isExpanded ? 'rotate-90' : ''}"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</button>
 						</td>
 						<td class="px-4 py-3">
 							<div class="flex items-center gap-2">
-								<span class="font-medium text-gray-900 dark:text-gray-100">
+								<button
+									type="button"
+									class="font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
+									aria-label={isExpanded ? 'Collapse repository' : 'Expand repository'}
+									aria-expanded={isExpanded}
+									onclick={() => toggleRepo(repo.repoKey)}
+								>
 									{repo.owner}/{repo.repo}
-								</span>
+								</button>
 								{#if repo.is_fork}
 									<span
 										class="inline-flex items-center rounded bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400"
@@ -156,7 +170,10 @@
 											<a
 												href="{base}/skills/{skill.key}"
 												class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
-												onclick={(e) => e.stopPropagation()}
+												use:viewTransition={{
+													name: getSkillTitleTransitionName(skill.key),
+													applyImmediately: true,
+												}}
 											>
 												{skillName}
 											</a>

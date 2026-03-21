@@ -6,6 +6,8 @@
 	import { t } from '$lib/i18n';
 	import { base } from '$app/paths';
 	import { isSkillNew } from '$lib/utils/skills';
+	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
+	import { setupViewTransition } from 'sveltekit-view-transition';
 
 	interface Props {
 		groups: OriginGroup[];
@@ -13,6 +15,7 @@
 	}
 
 	let { groups, freshPeriodDays = 0 }: Props = $props();
+	const { transition: viewTransition } = setupViewTransition();
 
 	let expanded = new SvelteSet<string>();
 
@@ -60,39 +63,50 @@
 			<tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
 				{#each groups as group (group.originKey)}
 					{@const isExpanded = expanded.has(group.originKey)}
-					<tr
-						class="cursor-pointer transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50"
-						onclick={() => toggleGroup(group.originKey)}
-					>
+					<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
 						<td class="px-2 py-3 text-center text-gray-400 dark:text-gray-500">
-							<svg
-								class="inline-block h-3 w-3 transition-transform {isExpanded ? 'rotate-90' : ''}"
-								viewBox="0 0 20 20"
-								fill="currentColor"
+							<button
+								type="button"
+								class="inline-flex h-6 w-6 items-center justify-center rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+								aria-label={isExpanded ? 'Collapse origin group' : 'Expand origin group'}
+								aria-expanded={isExpanded}
+								onclick={() => toggleGroup(group.originKey)}
 							>
-								<path
-									fill-rule="evenodd"
-									d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
-									clip-rule="evenodd"
-								/>
-							</svg>
+								<svg
+									class="inline-block h-3 w-3 transition-transform {isExpanded ? 'rotate-90' : ''}"
+									viewBox="0 0 20 20"
+									fill="currentColor"
+								>
+									<path
+										fill-rule="evenodd"
+										d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+										clip-rule="evenodd"
+									/>
+								</svg>
+							</button>
 						</td>
 						<td class="px-4 py-3">
 							<div class="flex items-center gap-2">
 								{#if group.isExternal}
-									<a
-										href="https://github.com/{group.originKey}"
-										target="_blank"
-										rel="noopener noreferrer"
-										class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-										onclick={(e) => e.stopPropagation()}
+									<button
+										type="button"
+										class="font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
+										aria-label={isExpanded ? 'Collapse origin group' : 'Expand origin group'}
+										aria-expanded={isExpanded}
+										onclick={() => toggleGroup(group.originKey)}
 									>
 										{group.originKey}
-									</a>
+									</button>
 								{:else}
-									<span class="font-medium text-gray-900 dark:text-gray-100">
+									<button
+										type="button"
+										class="font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
+										aria-label={isExpanded ? 'Collapse origin group' : 'Expand origin group'}
+										aria-expanded={isExpanded}
+										onclick={() => toggleGroup(group.originKey)}
+									>
 										{group.originKey}
-									</span>
+									</button>
 								{/if}
 							</div>
 						</td>
@@ -130,6 +144,10 @@
 											<a
 												href="{base}/skills/{row.origin.key}"
 												class="text-sm font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
+												use:viewTransition={{
+													name: getSkillTitleTransitionName(row.origin.key),
+													applyImmediately: true,
+												}}
 											>
 												{row.skillName}
 											</a>

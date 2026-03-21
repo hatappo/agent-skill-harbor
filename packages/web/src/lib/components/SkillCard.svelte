@@ -5,6 +5,8 @@
 	import { t } from '$lib/i18n';
 	import { base } from '$app/paths';
 	import { isSkillNew } from '$lib/utils/skills';
+	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
+	import { setupViewTransition } from 'sveltekit-view-transition';
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import Globe from '@lucide/svelte/icons/globe';
 
@@ -30,6 +32,7 @@
 	let skillDescription = $derived(String(skill.frontmatter.description ?? ''));
 	let metadata = $derived((skill.frontmatter.metadata ?? {}) as Record<string, unknown>);
 	let showOrigin = $derived(!!origin);
+	const { transition: viewTransition } = setupViewTransition();
 </script>
 
 <a
@@ -41,7 +44,14 @@
 	<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 		<div class="min-w-0 flex-1">
 			<h3 class="truncate text-lg font-semibold text-gray-900 dark:text-gray-100">
-				{skillName}
+				<span
+					use:viewTransition={{
+						name: getSkillTitleTransitionName(skill.key),
+						applyImmediately: true,
+					}}
+				>
+					{skillName}
+				</span>
 			</h3>
 			<p class="mt-1 line-clamp-2 text-sm text-gray-600 dark:text-gray-400">
 				{skillDescription}

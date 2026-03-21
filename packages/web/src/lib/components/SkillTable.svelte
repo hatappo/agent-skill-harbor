@@ -6,6 +6,8 @@
 	import { t } from '$lib/i18n';
 	import { base } from '$app/paths';
 	import { isSkillNew } from '$lib/utils/skills';
+	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
+	import { setupViewTransition } from 'sveltekit-view-transition';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 
@@ -17,6 +19,7 @@
 	}
 
 	let { skills, pluginFilterOptions = [], freshPeriodDays = 0, originBySkillKey = {} }: Props = $props();
+	const { transition: viewTransition } = setupViewTransition();
 
 	type SortKey = 'name' | 'status' | 'visibility' | 'owner' | 'repo';
 	let sortKey = $state<SortKey | null>(null);
@@ -150,6 +153,10 @@
 									href="{base}/skills/{skill.key}"
 									class="truncate font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
 									title={skillName}
+									use:viewTransition={{
+										name: getSkillTitleTransitionName(skill.key),
+										applyImmediately: true,
+									}}
 								>
 									{skillName}
 								</a>

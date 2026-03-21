@@ -13,6 +13,8 @@
 	import DOMPurify from 'isomorphic-dompurify';
 	import { dump as yamlDump } from 'js-yaml';
 	import { getResolvedFrom, getResolvedFromUrl } from '$lib/utils/resolved-from';
+	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
+	import { setupViewTransition } from 'sveltekit-view-transition';
 	import FileText from '@lucide/svelte/icons/file-text';
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import Globe from '@lucide/svelte/icons/globe';
@@ -36,6 +38,7 @@
 	}
 
 	let { data }: Props = $props();
+	const { transition: viewTransition } = setupViewTransition();
 	let skill = $derived(data.skill);
 	let body = $derived(data.body);
 	let freshPeriodDays = $derived(data.freshPeriodDays);
@@ -268,7 +271,15 @@
 	<!-- Header -->
 	<div class="mb-8">
 		<div class="flex items-start justify-between gap-4">
-			<h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{skillName}</h1>
+			<h1
+				class="text-3xl font-bold text-gray-900 dark:text-gray-100"
+				use:viewTransition={{
+					name: getSkillTitleTransitionName(skill.key),
+					applyImmediately: true,
+				}}
+			>
+				{skillName}
+			</h1>
 			<div class="flex shrink-0 items-center gap-2">
 				{#if isNew}
 					<span
