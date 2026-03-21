@@ -54,12 +54,11 @@ This command requires network access.
 node packages/cli/dist/bin/cli.js dev       # Start development server
 node packages/cli/dist/bin/cli.js build     # Build the catalog site via CLI
 node packages/cli/dist/bin/cli.js preview   # Preview built site
-cd packages/web && pnpm check          # Type check web package
-cd packages/web && pnpm lint           # Lint web package
+pnpm --dir packages/web verify         # Format check, lint, type check, and tests for web
 pnpm format       # Format all files with Prettier
-pnpm --dir packages/collector build    # Rebuild collect package after changing packages/collector/
-pnpm --dir packages/post-collect build # Rebuild post-collect package after changing packages/post-collect/
-pnpm --dir packages/cli build          # Rebuild wrapper CLI after changing packages/cli/
+pnpm --dir packages/collector verify   # Run package checks for packages/collector/
+pnpm --dir packages/post-collect verify # Run package checks for packages/post-collect/
+pnpm --dir packages/cli verify         # Run package checks for packages/cli/
 pnpm --dir packages/web build          # Rebuild web package after changing packages/web/
 GH_TOKEN=$(gh auth token) node packages/cli/dist/bin/cli.js collect
 node packages/cli/dist/bin/cli.js post-collect --collect-id <collect_id>
@@ -76,9 +75,10 @@ When running the built CLI from the source repository, execute it from the repos
 cd /Users/fumi/ws/hobby/agent-skill-harbor
 pnpm install
 pnpm setup:dev
-pnpm --dir packages/collector build
-pnpm --dir packages/post-collect build
-pnpm --dir packages/cli build
+pnpm --dir packages/shared-internal verify
+pnpm --dir packages/collector verify
+pnpm --dir packages/post-collect verify
+pnpm --dir packages/cli verify
 pnpm --dir packages/web build
 
 GH_TOKEN=$(gh auth token) node packages/cli/dist/bin/cli.js collect --force
@@ -120,6 +120,7 @@ Current limitation:
 │   ├── src/cli/          # init/gen and command dispatch
 │   └── templates/        # Project scaffold templates bundled into the wrapper package
 ├── packages/post-collect/         # Published post-collect runtime package
+├── packages/shared-internal/     # Private shared utilities (not published)
 ├── scripts/              # Development scripts (setup-dev, collect)
 ├── packages/web/         # SvelteKit frontend application
 │   ├── src/cli/          # build/dev/preview/deploy command entrypoints
@@ -145,6 +146,7 @@ Current limitation:
 - **`agent-skill-harbor-collector`**: Published collect runtime package rooted at `packages/collector/`.
 - **`agent-skill-harbor-post-collect`**: Published post-collect runtime package rooted at `packages/post-collect/`. Heavy dependencies such as `promptfoo` live here.
 - **`agent-skill-harbor-web`**: Published SvelteKit web package rooted at `packages/web/`. It also owns `build`, `dev`, `preview`, and `deploy`.
+- **`agent-skill-harbor-shared-internal`**: Private internal package rooted at `packages/shared-internal/`. Contains shared utilities (`catalog-store`, `resolved-from`) used by both `collector` and `post-collect`. Not published to npm.
 - **Install surface split**: Generated projects keep `tools/harbor/collector`, `tools/harbor/post-collect`, and `tools/harbor/web` so workflows can install only the dependencies they need.
 - **Dependency ownership**: Web UI and SvelteKit dependencies belong in `packages/web/package.json`. Collect-only runtime dependencies belong in `packages/collector/package.json`. Post-collect-only runtime dependencies belong in `packages/post-collect/package.json`. Wrapper-only runtime dependencies belong in `packages/cli/package.json`. The root `package.json` is workspace-only.
 

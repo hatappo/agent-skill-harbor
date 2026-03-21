@@ -54,12 +54,11 @@ node packages/cli/dist/bin/cli.js dev
 node packages/cli/dist/bin/cli.js dev       # 開発サーバーの起動
 node packages/cli/dist/bin/cli.js build     # CLI 経由でカタログサイトをビルド
 node packages/cli/dist/bin/cli.js preview   # ビルド結果のプレビュー
-cd packages/web && pnpm check          # web package の型チェック
-cd packages/web && pnpm lint           # web package のリント
+pnpm --dir packages/web verify         # web package の format/lint/check/test
 pnpm format       # Prettier でフォーマット
-pnpm --dir packages/collector build    # packages/collector/ を変更した後に再ビルド
-pnpm --dir packages/post-collect build # packages/post-collect/ を変更した後に再ビルド
-pnpm --dir packages/cli build          # packages/cli/ を変更した後に再ビルド
+pnpm --dir packages/collector verify   # packages/collector/ の検査一式
+pnpm --dir packages/post-collect verify # packages/post-collect/ の検査一式
+pnpm --dir packages/cli verify         # packages/cli/ の検査一式
 pnpm --dir packages/web build          # packages/web/ を変更した後に再ビルド
 GH_TOKEN=$(gh auth token) node packages/cli/dist/bin/cli.js collect
 node packages/cli/dist/bin/cli.js post-collect --collect-id <collect_id>
@@ -76,9 +75,10 @@ source リポジトリでビルド済み CLI を実行する場合は、`config/
 cd /Users/fumi/ws/hobby/agent-skill-harbor
 pnpm install
 pnpm setup:dev
-pnpm --dir packages/collector build
-pnpm --dir packages/post-collect build
-pnpm --dir packages/cli build
+pnpm --dir packages/shared-internal verify
+pnpm --dir packages/collector verify
+pnpm --dir packages/post-collect verify
+pnpm --dir packages/cli verify
 pnpm --dir packages/web build
 
 GH_TOKEN=$(gh auth token) node packages/cli/dist/bin/cli.js collect --force
@@ -120,6 +120,7 @@ wrapper 経由の `harbor dev` は、Vite 起動前に `data/assets/` を `packa
 │   ├── src/cli/          # init/gen と command dispatch
 │   └── templates/        # wrapper package に同梱されるプロジェクトテンプレート
 ├── packages/post-collect/         # 公開 post-collect runtime package
+├── packages/shared-internal/     # 非公開の内部共有ユーティリティ
 ├── scripts/              # 開発用スクリプト (setup-dev, collect)
 ├── packages/web/         # SvelteKit フロントエンドアプリケーション
 │   ├── src/cli/          # build/dev/preview/deploy command entrypoints
@@ -145,6 +146,7 @@ wrapper 経由の `harbor dev` は、Vite 起動前に `data/assets/` を `packa
 - **`agent-skill-harbor-collector`**: `packages/collector/` を root に持つ公開 collect runtime package。
 - **`agent-skill-harbor-post-collect`**: `packages/post-collect/` を root に持つ公開 post-collect runtime package。`promptfoo` など重い依存はここに閉じ込めます。
 - **`agent-skill-harbor-web`**: `packages/web/` を root に持つ公開 SvelteKit Web package。`build`、`dev`、`preview`、`deploy` もここが担当します。
+- **`agent-skill-harbor-shared-internal`**: `packages/shared-internal/` を root に持つ非公開の内部パッケージ。`collector` と `post-collect` が共有するユーティリティ（`catalog-store`、`resolved-from`）を提供します。npm には publish されません。
 - **install surface の分離**: 生成プロジェクトは `tools/harbor/collector`、`tools/harbor/post-collect`、`tools/harbor/web` を持ち、workflow ごとに必要な依存だけを install します。
 - **依存の管理責務**: Web UI と SvelteKit の依存は `packages/web/package.json`、collect 専用依存は `packages/collector/package.json`、post-collect 専用依存は `packages/post-collect/package.json`、wrapper 専用依存は `packages/cli/package.json` に置きます。ルート `package.json` は workspace 管理専用です。
 

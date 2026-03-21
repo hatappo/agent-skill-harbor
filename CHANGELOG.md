@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Added `packages/shared-internal/` as a private workspace package so `collector` and `post-collect` share `catalog-store` and `resolved-from` from one source instead of keeping duplicate runtime copies
+- Updated local development and release docs to cover `packages/shared-internal/`, package-local `verify` flows, and the current monorepo package boundaries more clearly
+
 ## [cli 0.14.0] / [collector 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
 
 ### Added

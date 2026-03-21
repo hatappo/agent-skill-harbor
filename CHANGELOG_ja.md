@@ -1,5 +1,12 @@
 # 変更履歴
 
+## [未リリース]
+
+### 変更
+
+- `packages/shared-internal/` を非公開 workspace package として追加し、`collector` と `post-collect` で重複していた `catalog-store` と `resolved-from` を単一の実装へ集約した
+- `packages/shared-internal/`、package ローカルの `verify` フロー、現在の monorepo 境界が分かるようにローカル開発・リリースのドキュメントを更新した
+
 ## [cli 0.14.0] / [collector 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
 
 ### 追加

@@ -29,6 +29,12 @@ Recommended order when several packages changed:
 1. Decide which package is being released.
 2. Bump only that package version in its own `package.json`.
 3. Update changelog entries as needed.
+4. Verify `packages/shared-internal/` before releasing `collector` or `post-collect`, because both public packages depend on it even though it is not published to npm.
+
+```bash
+pnpm --dir packages/shared-internal verify
+pnpm --dir packages/shared-internal build
+```
 
 ### Releasing `agent-skill-harbor-web`
 
@@ -47,9 +53,7 @@ git tag web-v<version>
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir packages/collector lint:check
-pnpm --dir packages/collector check
-pnpm --dir packages/collector test
+pnpm --dir packages/collector verify
 pnpm --dir packages/collector build
 cd packages/collector
 npm publish --access public
@@ -61,9 +65,7 @@ git tag collector-v<version>
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir packages/post-collect lint:check
-pnpm --dir packages/post-collect check
-pnpm --dir packages/post-collect test
+pnpm --dir packages/post-collect verify
 pnpm --dir packages/post-collect build
 cd packages/post-collect
 npm publish --access public
@@ -110,7 +112,8 @@ git tag cli-v<version>
 
 ## Versioning Notes
 
-- `packages/cli/package.json`, `packages/collector/package.json`, `packages/post-collect/package.json`, and `packages/web/package.json` version independently.
+- `packages/cli/package.json`, `packages/collector/package.json`, `packages/post-collect/package.json`, and `packages/web/package.json` version independently as public packages.
+- `packages/shared-internal/package.json` is a private internal package. Keep its version aligned within the monorepo, but do not publish it to npm.
 - `packages/cli/templates/init/package.template.json` and `packages/cli/templates/init/tools/harbor/*/package.template.json` must stay aligned with the package versions you intend to publish.
 
 ## Notes

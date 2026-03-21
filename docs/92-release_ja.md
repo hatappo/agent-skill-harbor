@@ -29,6 +29,12 @@
 1. 今回 release する package を決める。
 2. その package の `package.json` だけを bump する。
 3. 必要に応じて changelog を更新する。
+4. `collector` または `post-collect` を release する前に、npm には publish しない内部 package である `packages/shared-internal/` を検証する。
+
+```bash
+pnpm --dir packages/shared-internal verify
+pnpm --dir packages/shared-internal build
+```
 
 ### `agent-skill-harbor-web` を release するとき
 
@@ -47,9 +53,7 @@ git tag web-v<version>
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir packages/collector lint:check
-pnpm --dir packages/collector check
-pnpm --dir packages/collector test
+pnpm --dir packages/collector verify
 pnpm --dir packages/collector build
 cd packages/collector
 npm publish --access public
@@ -61,9 +65,7 @@ git tag collector-v<version>
 
 ```bash
 pnpm install --no-frozen-lockfile
-pnpm --dir packages/post-collect lint:check
-pnpm --dir packages/post-collect check
-pnpm --dir packages/post-collect test
+pnpm --dir packages/post-collect verify
 pnpm --dir packages/post-collect build
 cd packages/post-collect
 npm publish --access public
@@ -110,7 +112,8 @@ git tag cli-v<version>
 
 ## バージョニング方針
 
-- `packages/cli/package.json`、`packages/collector/package.json`、`packages/post-collect/package.json`、`packages/web/package.json` は独立して version を管理します。
+- `packages/cli/package.json`、`packages/collector/package.json`、`packages/post-collect/package.json`、`packages/web/package.json` は公開 package として独立して version を管理します。
+- `packages/shared-internal/package.json` は非公開の内部 package です。monorepo 内では version を揃えますが、npm には publish しません。
 - `packages/cli/templates/init/package.template.json` と `packages/cli/templates/init/tools/harbor/*/package.template.json` は、publish したい package version と整合するよう保ちます。
 
 ## 補足
