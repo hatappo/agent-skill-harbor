@@ -61,8 +61,7 @@
 
 		const plottedSeries = series.map((item) => {
 			const points = item.points.map((point, index) => {
-				const x =
-					padding.left + (pointCount > 1 ? (index / (pointCount - 1)) * innerWidth : innerWidth / 2);
+				const x = padding.left + (pointCount > 1 ? (index / (pointCount - 1)) * innerWidth : innerWidth / 2);
 				const y = padding.top + innerHeight - ((point.value - minVal) / range) * innerHeight;
 				return { ...point, x, y };
 			});
@@ -75,8 +74,7 @@
 		});
 
 		const labels = series[0].points.map((point, index) => {
-			const x =
-				padding.left + (pointCount > 1 ? (index / (pointCount - 1)) * innerWidth : innerWidth / 2);
+			const x = padding.left + (pointCount > 1 ? (index / (pointCount - 1)) * innerWidth : innerWidth / 2);
 			return { x, label: point.label };
 		});
 
@@ -189,7 +187,15 @@
 					{#if item.shape === 'circle'}
 						<circle cx={point.x} cy={point.y} r="5" fill={item.color} opacity="0.9" />
 					{:else if item.shape === 'ring'}
-						<circle cx={point.x} cy={point.y} r="5.1" fill="none" stroke={item.color} stroke-width="2.5" opacity="0.95" />
+						<circle
+							cx={point.x}
+							cy={point.y}
+							r="5.1"
+							fill="none"
+							stroke={item.color}
+							stroke-width="2.5"
+							opacity="0.95"
+						/>
 					{:else if item.shape === 'cross' || item.shape === 'plus'}
 						<path
 							d={shapePath(item.shape, point.x, point.y, markerSize(item.shape, 5))}
@@ -246,7 +252,12 @@
 							{#if item.shape === 'circle'}
 								<circle cx="6" cy="6" r="3.5" fill={item.color} />
 							{:else if item.shape === 'cross'}
-								<path d={shapePath(item.shape, 6, 6, 3)} stroke={item.color} stroke-width="1.75" stroke-linecap="round" />
+								<path
+									d={shapePath(item.shape, 6, 6, 3)}
+									stroke={item.color}
+									stroke-width="1.75"
+									stroke-linecap="round"
+								/>
 							{:else}
 								<path d={shapePath(item.shape, 6, 6, 3)} fill={item.color} />
 							{/if}

@@ -8,13 +8,7 @@
 	 * and renders refraction + specular highlights over a gradient background texture.
 	 */
 
-	let {
-		resolution = 768,
-		dropRadius = 20,
-		perturbance = 0.03,
-		class: className = '',
-		children,
-	} = $props();
+	let { resolution = 768, dropRadius = 20, perturbance = 0.03, class: className = '', children } = $props();
 
 	const COLORS = {
 		darkStart: '#0a1628',
@@ -273,10 +267,7 @@
 			const elHeight = canvas.height;
 			const longestSide = Math.max(elWidth, elHeight);
 
-			const dropPosition = new Float32Array([
-				(2 * x - elWidth) / longestSide,
-				(elHeight - 2 * y) / longestSide,
-			]);
+			const dropPosition = new Float32Array([(2 * x - elWidth) / longestSide, (elHeight - 2 * y) / longestSide]);
 
 			gl!.viewport(0, 0, resolution, resolution);
 			gl!.bindFramebuffer(gl!.FRAMEBUFFER, framebuffers[writeIdx]);
@@ -444,11 +435,7 @@
 	class="relative size-full overflow-hidden {className}"
 	style:background={glSupported ? 'transparent' : bgStyle}
 >
-	<canvas
-		bind:this={canvas}
-		class="fixed inset-0 h-screen w-screen"
-		style:pointer-events="none"
-	></canvas>
+	<canvas bind:this={canvas} class="fixed inset-0 h-screen w-screen" style:pointer-events="none"></canvas>
 	{#if children}
 		<div class="relative z-10">
 			{@render children()}

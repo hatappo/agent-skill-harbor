@@ -15,11 +15,14 @@
 		"./collect": "./dist/src/cli/commands/collect.js"
 	},
 	"scripts": {
+		"format": "prettier --write \"src/**/*.{js,ts,mjs,cjs,mts,cts}\" \"*.{json,md}\"",
+		"format:check": "prettier --check \"src/**/*.{js,ts,mjs,cjs,mts,cts}\" \"*.{json,md}\"",
 		"lint": "eslint --fix src",
 		"lint:check": "eslint src",
-		"test": "node --import tsx --test \"src/**/*.test.ts\"",
 		"check": "tsc --noEmit -p tsconfig.json",
-		"build": "tsup"
+		"test": "node --import tsx --test \"src/**/*.test.ts\"",
+		"build": "tsup",
+		"verify": "pnpm run format:check && pnpm run lint:check && pnpm run check && pnpm run test"
 	},
 	"dependencies": {
 		"@octokit/rest": "^21.1.1",

@@ -28,14 +28,14 @@
 		"templates/"
 	],
 	"scripts": {
-		"format": "prettier --write \"bin/**/*.{js,ts,mjs,cjs,mts,cts}\" \"src/cli/gen.ts\" \"src/cli/paths.ts\" \"src/cli/commands/{gen,init}.ts\" \"*.{js,ts,mjs,cjs,mts,cts,json,md}\"",
-		"format:check": "prettier --check \"bin/**/*.{js,ts,mjs,cjs,mts,cts}\" \"src/cli/gen.ts\" \"src/cli/paths.ts\" \"src/cli/commands/{gen,init}.ts\" \"*.{js,ts,mjs,cjs,mts,cts,json,md}\"",
-		"lint": "eslint --fix bin/cli.ts src/cli/paths.ts src/cli/gen.ts src/cli/commands/init.ts src/cli/commands/gen.ts",
-		"lint:check": "eslint bin/cli.ts src/cli/paths.ts src/cli/gen.ts src/cli/commands/init.ts src/cli/commands/gen.ts",
-		"test": "node --import tsx --test \"src/cli/**/*.test.ts\"",
 		"check": "tsc --noEmit -p tsconfig.json",
-		"verify": "pnpm format:check && pnpm lint:check && pnpm check",
-		"build": "tsup"
+		"build": "tsup",
+		"format": "prettier --write \"bin/**/*.{js,ts,mjs,cjs,mts,cts}\" \"src/**/*.{js,ts,mjs,cjs,mts,cts}\" \"*.{js,ts,mjs,cjs,mts,cts,json,md}\"",
+		"format:check": "prettier --check \"bin/**/*.{js,ts,mjs,cjs,mts,cts}\" \"src/**/*.{js,ts,mjs,cjs,mts,cts}\" \"*.{js,ts,mjs,cjs,mts,cts,json,md}\"",
+		"lint": "eslint --fix bin src",
+		"lint:check": "eslint bin src",
+		"test": "node --import tsx --test \"src/cli/**/*.test.ts\"",
+		"verify": "pnpm run format:check && pnpm run lint:check && pnpm run check && pnpm run test"
 	},
 	"peerDependencies": {
 		"agent-skill-harbor-collector": ">=0.14.0 <1",

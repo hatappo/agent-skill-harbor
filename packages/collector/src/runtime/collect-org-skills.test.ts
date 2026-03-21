@@ -54,12 +54,7 @@ test('sanitizeCatalogForSave strips copied frontmatter from skills.yaml entries'
 
 test('collectFromResolvedFrom queues lock-derived origin repos', () => {
 	const queuedRepoKeys = new Set<string>();
-	const refs = collectFromResolvedFrom(
-		'github.com',
-		'github.com/example/origin',
-		new Set<string>(),
-		queuedRepoKeys,
-	);
+	const refs = collectFromResolvedFrom('github.com', 'github.com/example/origin', new Set<string>(), queuedRepoKeys);
 
 	assert.deepEqual(refs, [
 		{

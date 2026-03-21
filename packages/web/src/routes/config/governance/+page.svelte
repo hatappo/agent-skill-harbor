@@ -21,9 +21,7 @@
 <ConfigRawPanel path="config/governance.yaml" content={data.rawConfigs.governance} />
 
 <section>
-	<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-		Governance Policies
-	</h2>
+	<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Governance Policies</h2>
 	{#if Object.keys(data.governance.policies).length > 0}
 		<div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">

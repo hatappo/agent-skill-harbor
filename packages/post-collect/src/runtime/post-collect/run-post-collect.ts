@@ -91,7 +91,10 @@ function normalizePluginResult(result: PostCollectPluginResult | null | undefine
 	}
 	if (result?.results) {
 		next.results = Object.fromEntries(
-			Object.entries(result.results).map(([skillKey, value]) => [skillKey, value && typeof value === 'object' ? value : {}]),
+			Object.entries(result.results).map(([skillKey, value]) => [
+				skillKey,
+				value && typeof value === 'object' ? value : {},
+			]),
 		);
 	}
 	return next;
@@ -140,7 +143,12 @@ function loadPluginOutputHistory(projectRoot: string, pluginId: string): SavedPl
 	}
 }
 
-function savePluginOutput(projectRoot: string, pluginId: string, collectId: string | null, result: PostCollectPluginResult): void {
+function savePluginOutput(
+	projectRoot: string,
+	pluginId: string,
+	collectId: string | null,
+	result: PostCollectPluginResult,
+): void {
 	const outputPath = getPluginOutputPath(projectRoot, pluginId);
 	const historyLimit = loadHistoryLimit(projectRoot);
 	mkdirSync(dirname(outputPath), { recursive: true });

@@ -35,15 +35,16 @@
 		"./preview": "./src/cli/commands/preview.js"
 	},
 	"scripts": {
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"dev": "vite dev",
+		"build": "vite build",
 		"format": "prettier --write \"src/**/*.{js,ts,mjs,cjs,mts,cts,svelte}\" \"guide/**/*.md\" \"*.{js,ts,mjs,cjs,mts,cts,json,md}\"",
 		"format:check": "prettier --check \"src/**/*.{js,ts,mjs,cjs,mts,cts,svelte}\" \"guide/**/*.md\" \"*.{js,ts,mjs,cjs,mts,cts,json,md}\"",
 		"lint": "eslint --fix .",
 		"lint:check": "eslint .",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"verify": "pnpm format:check && pnpm lint:check && pnpm check",
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview"
+		"test": "node -e \"console.log('No tests configured for agent-skill-harbor-web')\"",
+		"preview": "vite preview",
+		"verify": "pnpm run format:check && pnpm run lint:check && pnpm run check && pnpm run test"
 	},
 	"dependencies": {
 		"3d-force-graph": "1.79.1",

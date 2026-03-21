@@ -41,7 +41,6 @@
 	function isNew(skill: FlatSkillEntry): boolean {
 		return isSkillNew(skill, freshPeriodDays);
 	}
-
 </script>
 
 {#if repos.length === 0}

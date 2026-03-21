@@ -95,7 +95,9 @@
 		return hash ? `${resolvedPath}#${hash}` : resolvedPath;
 	}
 
-	function getPluginExtraYaml(result: Record<string, unknown> & { label?: string; raw?: string; report_path?: string }): string | null {
+	function getPluginExtraYaml(
+		result: Record<string, unknown> & { label?: string; raw?: string; report_path?: string },
+	): string | null {
 		const extraEntries = Object.entries(result).filter(([key, value]) => {
 			if (key === 'label' || key === 'raw' || key === 'report_path') return false;
 			return value !== undefined;
@@ -103,27 +105,28 @@
 		if (extraEntries.length === 0) return null;
 		return yamlDump(Object.fromEntries(extraEntries), {
 			noRefs: true,
-			lineWidth: 0
+			lineWidth: 0,
 		}).trim();
 	}
 
 	const ACTIONABLE_INTENTS: Set<string> = new Set(['warn', 'danger', 'info']);
 
-	function buildIssueUrl(
-		plugin: {
-			id: string;
-			labelIntents: Record<string, LabelIntent>;
-			result: Record<string, unknown> & { label?: string; raw?: string; report_path?: string };
-			subArtifacts: string[];
-		},
-	): string | null {
+	function buildIssueUrl(plugin: {
+		id: string;
+		labelIntents: Record<string, LabelIntent>;
+		result: Record<string, unknown> & { label?: string; raw?: string; report_path?: string };
+		subArtifacts: string[];
+	}): string | null {
 		if (!skill.repoKey.startsWith('github.com/')) return null;
 		const intent = plugin.labelIntents[plugin.result.label ?? ''];
 		if (!intent || !ACTIONABLE_INTENTS.has(intent)) return null;
 
 		const repoUrl = `https://${skill.repoKey}`;
 		const pluginLabel = plugin.id.replace(/^[^.]*\./, '');
-		const title = `${pluginLabel} result: ${(plugin.result.raw ?? plugin.result.label ?? '').slice(0, 220)}`.slice(0, 256);
+		const title = `${pluginLabel} result: ${(plugin.result.raw ?? plugin.result.label ?? '').slice(0, 220)}`.slice(
+			0,
+			256,
+		);
 
 		const bodyParts: string[] = [];
 		bodyParts.push(`This issue was created from Agent Skill Harbor.\n${$page.url.href}`);
@@ -156,16 +159,17 @@
 	}
 
 	function getArtifactHref(pluginId: string, fileName: string): string {
-		return `${base}/assets/plugins/${pluginId}/${normalizeSkillKeyForArtifactPath(skill.key)}/${fileName}`.replace(/\/+/g, '/');
+		return `${base}/assets/plugins/${pluginId}/${normalizeSkillKeyForArtifactPath(skill.key)}/${fileName}`.replace(
+			/\/+/g,
+			'/',
+		);
 	}
 
-	function getArtifactLinks(
-		plugin: {
-			id: string;
-			subArtifacts: string[];
-			result: Record<string, unknown> & { report_path?: string };
-		},
-	): { fileName: string; href: string; label: string }[] {
+	function getArtifactLinks(plugin: {
+		id: string;
+		subArtifacts: string[];
+		result: Record<string, unknown> & { report_path?: string };
+	}): { fileName: string; href: string; label: string }[] {
 		const links = plugin.subArtifacts.map((fileName) => ({
 			fileName,
 			href: getArtifactHref(plugin.id, fileName),
@@ -246,7 +250,6 @@
 		const skillName = dir ? dir.split('/').pop() : '';
 		return `https://skills.sh/${skill.owner}/${skill.repo}${skillName ? '/' + skillName : ''}`;
 	});
-
 </script>
 
 <svelte:head>
@@ -481,9 +484,7 @@
 					<div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
 						<div class="space-y-2">
 							<div class="flex flex-wrap items-center gap-3">
-								<code
-									class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-100"
-								>
+								<code class="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700 dark:bg-gray-800 dark:text-gray-100">
 									{plugin.id}
 								</code>
 								{#if plugin.result.label}
@@ -529,8 +530,9 @@
 						{/if}
 						{#if extraYaml}
 							<pre
-								class="mt-3 overflow-x-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs leading-6 text-gray-700 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-300"
-							><code>{extraYaml}</code></pre>
+								class="mt-3 overflow-x-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs leading-6 text-gray-700 dark:border-gray-700 dark:bg-gray-950/60 dark:text-gray-300"><code
+									>{extraYaml}</code
+								></pre>
 						{/if}
 					</div>
 				{/each}

@@ -30,7 +30,7 @@
 		if (!config || Object.keys(config).length === 0) return null;
 		return yamlDump(config, {
 			noRefs: true,
-			lineWidth: 0
+			lineWidth: 0,
 		}).trim();
 	}
 </script>
@@ -72,9 +72,7 @@
 
 <div class="space-y-8">
 	<section>
-		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			Collector
-		</h2>
+		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Collector</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">
 				<thead class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">
@@ -211,9 +209,7 @@
 	</section>
 
 	<section>
-		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			Post Collect
-		</h2>
+		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Post Collect</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">
 				<thead class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">
@@ -257,8 +253,9 @@
 											</div>
 											{#if configYaml}
 												<pre
-													class="mt-3 overflow-x-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"
-												><code>{configYaml}</code></pre>
+													class="mt-3 overflow-x-auto rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200"><code
+														>{configYaml}</code
+													></pre>
 											{/if}
 										</div>
 									{/each}
@@ -274,9 +271,7 @@
 	</section>
 
 	<section>
-		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			Catalog
-		</h2>
+		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">Catalog</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">
 				<thead class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">
@@ -311,9 +306,7 @@
 	</section>
 
 	<section>
-		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-			UI
-		</h2>
+		<h2 class="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">UI</h2>
 		<div class="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
 			<table class="w-full">
 				<thead class="border-b border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-800/50">

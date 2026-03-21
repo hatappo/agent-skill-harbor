@@ -15,12 +15,7 @@ import {
 test('parsePromptfooSecurityConfig applies defaults', () => {
 	const config = parsePromptfooSecurityConfig(undefined);
 	assert.equal(config.model, undefined);
-	assert.deepEqual(config.vulnerabilities, [
-		'prompt-injection',
-		'prompt-extraction',
-		'jailbreak',
-		'policy-violation',
-	]);
+	assert.deepEqual(config.vulnerabilities, ['prompt-injection', 'prompt-extraction', 'jailbreak', 'policy-violation']);
 	assert.equal(config.risk_threshold, 1);
 	assert.equal(config.critical_threshold, 3);
 });

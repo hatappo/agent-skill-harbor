@@ -6,14 +6,7 @@
 	 * Ported from bundui.io/motion/backgrounds/stars (React + Framer Motion).
 	 */
 
-	let {
-		factor = 0.05,
-		speed = 50,
-		stiffness = 50,
-		damping = 20,
-		class: className = '',
-		children,
-	} = $props();
+	let { factor = 0.05, speed = 50, stiffness = 50, damping = 20, class: className = '', children } = $props();
 
 	const STAR_LAYERS = [
 		{ count: 700, size: 1, speedMultiplier: 1 },
@@ -93,7 +86,7 @@
 			// Critically-damped spring approximation
 			const dx = targetX - springX;
 			const dy = targetY - springY;
-			const spring = 1 - Math.exp(-stiffness * dt / damping);
+			const spring = 1 - Math.exp((-stiffness * dt) / damping);
 			springX += dx * spring;
 			springY += dy * spring;
 
@@ -115,21 +108,11 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div
-	class="relative size-full overflow-hidden {className}"
-	style:background={bgStyle}
-	onmousemove={handleMouseMove}
->
-	<div
-		class="stars-parallax-wrapper"
-		style:transform="translate({springX}px, {springY}px)"
-	>
+<div class="relative size-full overflow-hidden {className}" style:background={bgStyle} onmousemove={handleMouseMove}>
+	<div class="stars-parallax-wrapper" style:transform="translate({springX}px, {springY}px)">
 		{#each STAR_LAYERS as layer, i}
 			{@const duration = speed * layer.speedMultiplier}
-			<div
-				class="stars-layer"
-				style:--stars-duration="{duration}s"
-			>
+			<div class="stars-layer" style:--stars-duration="{duration}s">
 				<div
 					class="stars-field"
 					style:width="{layer.size}px"

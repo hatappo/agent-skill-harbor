@@ -150,9 +150,7 @@
 			<!-- Search + Filter (left) -->
 			<div class="pointer-events-auto flex flex-wrap items-center gap-2">
 				<div class="relative">
-					<Search
-						class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
-					/>
+					<Search class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
 					<input
 						type="text"
 						bind:value={searchQuery}

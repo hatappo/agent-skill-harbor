@@ -50,9 +50,7 @@ test('runPostCollect saves detect-drift output', async () => {
 		plugins: [{ id: 'builtin.detect-drift' }],
 	});
 
-	const output = yamlLoad(
-		readFileSync(join(root, 'data', 'plugins', 'builtin.detect-drift.yaml'), 'utf-8'),
-	) as {
+	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'builtin.detect-drift.yaml'), 'utf-8')) as {
 		collect_id?: string;
 		results: Record<string, { label?: string }>;
 	}[];
@@ -68,10 +66,10 @@ test('runPostCollect loads local ts plugin with tsx', async () => {
 	writeFileSync(
 		join(root, 'plugins', 'example-user-defined-plugin', 'index.ts'),
 		[
-			"export async function run(context) {",
-			"  return {",
-			"    summary: `checked ${Object.keys(context.catalog.repositories).length} repo(s)`,",
-			"    results: {",
+			'export async function run(context) {',
+			'  return {',
+			'    summary: `checked ${Object.keys(context.catalog.repositories).length} repo(s)`,',
+			'    results: {',
 			"      'github.com/example/demo/tools/SKILL.md': { label: 'Reviewed', raw: 'plugin ok' }",
 			'    }',
 			'  };',
@@ -117,30 +115,15 @@ test('runPostCollect prefers mjs over js and ts for local plugins', async () => 
 
 	writeFileSync(
 		join(root, 'plugins', 'example-user-defined-plugin', 'index.ts'),
-		[
-			"export async function run() {",
-			"  return { results: { 'skill': { label: 'ts' } } };",
-			'}',
-			'',
-		].join('\n'),
+		['export async function run() {', "  return { results: { 'skill': { label: 'ts' } } };", '}', ''].join('\n'),
 	);
 	writeFileSync(
 		join(root, 'plugins', 'example-user-defined-plugin', 'index.js'),
-		[
-			'export async function run() {',
-			"  return { results: { 'skill': { label: 'js' } } };",
-			'}',
-			'',
-		].join('\n'),
+		['export async function run() {', "  return { results: { 'skill': { label: 'js' } } };", '}', ''].join('\n'),
 	);
 	writeFileSync(
 		join(root, 'plugins', 'example-user-defined-plugin', 'index.mjs'),
-		[
-			'export async function run() {',
-			"  return { results: { 'skill': { label: 'mjs' } } };",
-			'}',
-			'',
-		].join('\n'),
+		['export async function run() {', "  return { results: { 'skill': { label: 'mjs' } } };", '}', ''].join('\n'),
 	);
 
 	await runPostCollect({
@@ -169,7 +152,7 @@ test('runPostCollect replaces same collect_id and respects history limit', async
 			'let count = 0;',
 			'export async function run() {',
 			'  count += 1;',
-			"  return { results: { skill: { label: `run-${count}` } } };",
+			'  return { results: { skill: { label: `run-${count}` } } };',
 			'}',
 			'',
 		].join('\n'),
@@ -204,9 +187,7 @@ test('runPostCollect replaces same collect_id and respects history limit', async
 		plugins: [{ id: 'example-user-defined-plugin' }],
 	});
 
-	const output = yamlLoad(
-		readFileSync(join(root, 'data', 'plugins', 'example-user-defined-plugin.yaml'), 'utf-8'),
-	) as {
+	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'example-user-defined-plugin.yaml'), 'utf-8')) as {
 		collect_id?: string;
 		results?: Record<string, { label?: string }>;
 	}[];
@@ -306,7 +287,10 @@ test('runPostCollect passes built-in config and stores unknown result when promp
 	}[];
 	assert.deepEqual(output[0].sub_artifacts, ['report.html']);
 	assert.equal(output[0].results?.['github.com/example/demo/skills/example/SKILL.md']?.label, 'Unknown');
-	assert.match(output[0].results?.['github.com/example/demo/skills/example/SKILL.md']?.raw ?? '', /model is not configured/i);
+	assert.match(
+		output[0].results?.['github.com/example/demo/skills/example/SKILL.md']?.raw ?? '',
+		/model is not configured/i,
+	);
 });
 
 test('runPostCollect runs skill-scanner for org-owned skills and stores sub artifacts', async () => {
@@ -332,7 +316,7 @@ test('runPostCollect runs skill-scanner for org-owned skills and stores sub arti
 			"for (const filePath of [readArg('--output'), readArg('--output-html'), readArg('--output-sarif'), readArg('--output-json')]) {",
 			'  if (!filePath) continue;',
 			'  mkdirSync(dirname(filePath), { recursive: true });',
-			"}",
+			'}',
 			"writeFileSync(readArg('--output'), 'summary');",
 			"writeFileSync(readArg('--output-html'), '<html><body>ok</body></html>');",
 			"writeFileSync(readArg('--output-sarif'), JSON.stringify({ version: '2.1.0', runs: [] }));",

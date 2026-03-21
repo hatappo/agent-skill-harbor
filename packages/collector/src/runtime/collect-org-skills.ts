@@ -4,12 +4,7 @@ import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import {
-	createCollectEntry,
-	prependCollectEntry,
-	type CategoryStats,
-	type CollectEntry,
-} from './collects.js';
+import { createCollectEntry, prependCollectEntry, type CategoryStats, type CollectEntry } from './collects.js';
 import {
 	loadCatalog,
 	saveCatalog,
@@ -106,7 +101,11 @@ function countFilesRecursive(dir: string): number {
 	return count;
 }
 
-function computeStatistics(projectRoot: string, catalog: CatalogYaml, org: string): { org: CategoryStats; community: CategoryStats } {
+function computeStatistics(
+	projectRoot: string,
+	catalog: CatalogYaml,
+	org: string,
+): { org: CategoryStats; community: CategoryStats } {
 	const skillsDir = join(projectRoot, 'data', 'skills');
 	const stats = {
 		org: { repos: 0, repos_with_skills: 0, skills: 0, files: 0 },
@@ -574,7 +573,7 @@ async function collectRepoSkills(
 				const content = await fetchFileContent(octokit, target.owner, target.repo, filePath);
 				saveFile(repoDir, filePath, content);
 				counts.collectedFileCount++;
-			console.log(`  [collected:${target.source}] ${target.owner}/${target.repo} -> ${filePath}`);
+				console.log(`  [collected:${target.source}] ${target.owner}/${target.repo} -> ${filePath}`);
 				if (filePath === skill.skillPath) {
 					collectedFrontmatter = parseFrontmatter(content);
 				}

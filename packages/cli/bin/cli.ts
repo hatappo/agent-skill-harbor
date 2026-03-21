@@ -41,11 +41,7 @@ function extractProjectRoot(argv: string[]): { projectRoot: string | null; argv:
 	return { projectRoot, argv: nextArgv };
 }
 
-async function importCommand(
-	moduleName: string,
-	packageName: string,
-	exportName = 'runCommand',
-): Promise<void> {
+async function importCommand(moduleName: string, packageName: string, exportName = 'runCommand'): Promise<void> {
 	try {
 		const mod = await import(moduleName);
 		const run = mod[exportName];
@@ -55,8 +51,7 @@ async function importCommand(
 		await run(process.argv.slice(3));
 	} catch (error) {
 		if (error && typeof error === 'object' && 'code' in error && error.code === 'ERR_MODULE_NOT_FOUND') {
-			const message =
-				error instanceof Error ? error.message : String(error);
+			const message = error instanceof Error ? error.message : String(error);
 			if (message.includes(packageName)) {
 				console.error(`Error: ${packageName} is required for this command.`);
 				console.error(`  Install it in this environment and try again.`);

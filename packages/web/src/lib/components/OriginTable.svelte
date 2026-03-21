@@ -27,7 +27,6 @@
 	function isNew(skill: FlatSkillEntry): boolean {
 		return isSkillNew(skill, freshPeriodDays);
 	}
-
 </script>
 
 {#if groups.length === 0}

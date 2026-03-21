@@ -70,10 +70,7 @@ test('harbor init scaffolds a new project into an empty directory', async () => 
 		readFileSync(join(target, 'package.json'), 'utf-8'),
 		new RegExp(`"agent-skill-harbor": ">=${escapedCliVersion} <1"`),
 	);
-	assert.match(
-		readFileSync(join(target, '.github', 'workflows', 'collect-skills.yml'), 'utf-8'),
-		/collect\.yml@wf-v0/,
-	);
+	assert.match(readFileSync(join(target, '.github', 'workflows', 'collect-skills.yml'), 'utf-8'), /collect\.yml@wf-v0/);
 });
 
 test('harbor init --workflows replaces the workflow directory contents', async () => {

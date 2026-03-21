@@ -11,9 +11,7 @@ const STAGED_MARKER_FILE = '.skill-harbor-staged';
  * @returns {number}
  */
 export function getExitCode(error) {
-	return typeof error === 'object' && error && 'status' in error && typeof error.status === 'number'
-		? error.status
-		: 1;
+	return typeof error === 'object' && error && 'status' in error && typeof error.status === 'number' ? error.status : 1;
 }
 
 /**

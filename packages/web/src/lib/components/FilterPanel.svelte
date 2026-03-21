@@ -1,11 +1,6 @@
 <script lang="ts">
 	import type { LabelIntent, PluginFilterOption, UsagePolicy, Visibility } from '$lib/types';
-	import {
-		PLUGIN_NO_LABEL_VALUE,
-		type FilterState,
-		type OrgOwnership,
-		type OriginPresence,
-	} from '$lib/utils/filter';
+	import { PLUGIN_NO_LABEL_VALUE, type FilterState, type OrgOwnership, type OriginPresence } from '$lib/utils/filter';
 	import { t } from '$lib/i18n';
 	import * as Tooltip from '$lib/components/ui/tooltip';
 	import * as Select from '$lib/components/ui/select';

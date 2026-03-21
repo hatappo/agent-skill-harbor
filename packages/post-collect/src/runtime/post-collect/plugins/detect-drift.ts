@@ -1,14 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { load as yamlLoad } from 'js-yaml';
-import {
-	resolveSkillLookupName,
-	type ProjectSkillsLockEntry,
-} from '../../resolved-from.js';
-import type {
-	BuiltinPostCollectPlugin,
-	PostCollectCatalog,
-	PostCollectPluginResult,
-} from '../types.js';
+import { resolveSkillLookupName, type ProjectSkillsLockEntry } from '../../resolved-from.js';
+import type { BuiltinPostCollectPlugin, PostCollectCatalog, PostCollectPluginResult } from '../types.js';
 
 function parseFrontmatter(content: string): Record<string, unknown> {
 	if (!content.startsWith('---')) return {};
@@ -16,7 +9,7 @@ function parseFrontmatter(content: string): Record<string, unknown> {
 	if (!match) return {};
 	try {
 		const parsed = yamlLoad(match[1]);
-		return parsed && typeof parsed === 'object' ? ({ ...(parsed as Record<string, unknown>) }) : {};
+		return parsed && typeof parsed === 'object' ? { ...(parsed as Record<string, unknown>) } : {};
 	} catch {
 		return {};
 	}
@@ -50,7 +43,10 @@ function findOriginSkillPath(
 	for (const originSkillPath of Object.keys(originRepo.skills)) {
 		const cacheKey = `${repoKey}:${originSkillPath}`;
 		if (!skillIdentityCache.has(cacheKey)) {
-			skillIdentityCache.set(cacheKey, readSkillIdentity(buildSkillFilePath(repoKey, originSkillPath), originSkillPath));
+			skillIdentityCache.set(
+				cacheKey,
+				readSkillIdentity(buildSkillFilePath(repoKey, originSkillPath), originSkillPath),
+			);
 		}
 		if (skillIdentityCache.get(cacheKey) === identity) return originSkillPath;
 	}

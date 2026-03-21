@@ -108,7 +108,11 @@
 	});
 	let skillChange = $derived.by(() => {
 		if (!previous) return undefined;
-		const prevSkills = sumOwnerValues(previous.statistics.org.skills, previous.statistics.community.skills, ownerFilter);
+		const prevSkills = sumOwnerValues(
+			previous.statistics.org.skills,
+			previous.statistics.community.skills,
+			ownerFilter,
+		);
 		return totalSkills - prevSkills;
 	});
 	let repoChange = $derived.by(() => {
@@ -219,7 +223,10 @@
 			.join('\n');
 	}
 
-	function getPluginHistoryItems(entry: CollectionEntry, pluginId: string): Array<{
+	function getPluginHistoryItems(
+		entry: CollectionEntry,
+		pluginId: string,
+	): Array<{
 		label: string;
 		abbreviation: string;
 		count: number;
@@ -265,7 +272,7 @@
 						shape: trendShapes[index] ?? 'circle',
 						points: [...data.collections].reverse().map((entry) => {
 							const counts = entry.collect_id
-								? pluginHistorySummaries[entry.collect_id]?.[column.plugin_id]?.[label] ?? { org: 0, community: 0 }
+								? (pluginHistorySummaries[entry.collect_id]?.[column.plugin_id]?.[label] ?? { org: 0, community: 0 })
 								: { org: 0, community: 0 };
 							const value =
 								ownerFilter === 'org'
@@ -284,7 +291,6 @@
 			};
 		}),
 	);
-
 </script>
 
 <svelte:head>

@@ -50,9 +50,7 @@ export function parsePromptfooSecurityConfig(config: Record<string, unknown> | u
 		? config.vulnerabilities.filter((value): value is string => typeof value === 'string' && value.length > 0)
 		: [...DEFAULT_VULNERABILITIES];
 	const riskThreshold =
-		typeof config?.risk_threshold === 'number' && Number.isFinite(config.risk_threshold)
-			? config.risk_threshold
-			: 1;
+		typeof config?.risk_threshold === 'number' && Number.isFinite(config.risk_threshold) ? config.risk_threshold : 1;
 	const criticalThreshold =
 		typeof config?.critical_threshold === 'number' && Number.isFinite(config.critical_threshold)
 			? config.critical_threshold
@@ -167,7 +165,8 @@ export function summarizePromptfooOutput(params: {
 	}
 
 	const hitPlugins = Object.keys(findings).sort((a, b) => a.localeCompare(b));
-	const label = totalFindings >= params.criticalThreshold ? 'Critical' : totalFindings >= params.riskThreshold ? 'Risk' : 'Safe';
+	const label =
+		totalFindings >= params.criticalThreshold ? 'Critical' : totalFindings >= params.riskThreshold ? 'Risk' : 'Safe';
 
 	return {
 		label,
@@ -177,7 +176,10 @@ export function summarizePromptfooOutput(params: {
 	};
 }
 
-export function buildSummary(counts: Record<'Safe' | 'Risk' | 'Critical' | 'Unknown', number>, scanned: number): string {
+export function buildSummary(
+	counts: Record<'Safe' | 'Risk' | 'Critical' | 'Unknown', number>,
+	scanned: number,
+): string {
 	return `${scanned} skill(s) scanned (${counts.Safe} safe, ${counts.Risk} risk, ${counts.Critical} critical, ${counts.Unknown} unknown)`;
 }
 

@@ -166,7 +166,8 @@ export function parseSkillScannerConfig(config: Record<string, unknown> | undefi
 }
 
 export function buildSkillScannerRaw(output: SkillScannerJsonOutput): string {
-	const findingsCount = typeof output.findings_count === 'number' && Number.isFinite(output.findings_count) ? output.findings_count : 0;
+	const findingsCount =
+		typeof output.findings_count === 'number' && Number.isFinite(output.findings_count) ? output.findings_count : 0;
 	const findingLabel = findingsCount === 1 ? 'finding' : 'findings';
 	const safeText = typeof output.is_safe === 'boolean' ? ` (scanner safe=${String(output.is_safe)})` : '';
 	if (findingsCount <= 0) return `0 findings${safeText}`;
@@ -177,7 +178,8 @@ export function buildSkillScannerRaw(output: SkillScannerJsonOutput): string {
 }
 
 export function summarizeSkillScannerOutput(output: SkillScannerJsonOutput): PostCollectSkillResult {
-	const findingsCount = typeof output.findings_count === 'number' && Number.isFinite(output.findings_count) ? output.findings_count : 0;
+	const findingsCount =
+		typeof output.findings_count === 'number' && Number.isFinite(output.findings_count) ? output.findings_count : 0;
 	const label =
 		findingsCount <= 0
 			? 'safe'
@@ -214,7 +216,12 @@ export async function ensureSkillScannerAvailable(command: string): Promise<void
 	}
 }
 
-export async function runSkillScannerScan(command: string, skillDir: string, files: SkillScannerRunFiles, options: string[]): Promise<void> {
+export async function runSkillScannerScan(
+	command: string,
+	skillDir: string,
+	files: SkillScannerRunFiles,
+	options: string[],
+): Promise<void> {
 	mkdirSync(dirname(files.htmlPath), { recursive: true });
 	const args = [
 		'scan',

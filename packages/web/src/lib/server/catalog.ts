@@ -404,9 +404,7 @@ export function loadPluginOutputHistory(): PluginOutputEntry[] {
 		}
 	}
 	outputs.sort((a, b) =>
-		a.plugin_id === b.plugin_id
-			? b.generated_at.localeCompare(a.generated_at)
-			: a.plugin_id.localeCompare(b.plugin_id),
+		a.plugin_id === b.plugin_id ? b.generated_at.localeCompare(a.generated_at) : a.plugin_id.localeCompare(b.plugin_id),
 	);
 	cachedPluginOutputs = outputs;
 	return cachedPluginOutputs;
@@ -552,16 +550,18 @@ export function loadPluginHistorySummaries(): Record<string, PluginHistorySummar
 	}
 
 	cachedPluginHistorySummaries = Object.fromEntries(
-		Object.entries(summaries).sort((a, b) => b[0].localeCompare(a[0])).map(([collectId, collectSummary]) => [
-			collectId,
-			Object.fromEntries(
-				Object.entries(collectSummary).sort(([pluginA], [pluginB]) => {
-					const orderA = pluginOrder.get(pluginA) ?? Number.MAX_SAFE_INTEGER;
-					const orderB = pluginOrder.get(pluginB) ?? Number.MAX_SAFE_INTEGER;
-					return orderA === orderB ? pluginA.localeCompare(pluginB) : orderA - orderB;
-				}),
-			),
-		]),
+		Object.entries(summaries)
+			.sort((a, b) => b[0].localeCompare(a[0]))
+			.map(([collectId, collectSummary]) => [
+				collectId,
+				Object.fromEntries(
+					Object.entries(collectSummary).sort(([pluginA], [pluginB]) => {
+						const orderA = pluginOrder.get(pluginA) ?? Number.MAX_SAFE_INTEGER;
+						const orderB = pluginOrder.get(pluginB) ?? Number.MAX_SAFE_INTEGER;
+						return orderA === orderB ? pluginA.localeCompare(pluginB) : orderA - orderB;
+					}),
+				),
+			]),
 	);
 
 	return cachedPluginHistorySummaries;
@@ -612,9 +612,7 @@ export function loadPluginHistoryColumns(): PluginHistoryColumn[] {
 				...(shortLabel ? { short_label: shortLabel } : {}),
 				labels: orderedLabels,
 				intent_labels: orderedIntentLabels,
-				...(Object.keys(labelIntents ?? {}).length > 0
-					? { label_intents: labelIntents }
-					: {}),
+				...(Object.keys(labelIntents ?? {}).length > 0 ? { label_intents: labelIntents } : {}),
 				label_abbreviations: computeMinimalUniquePrefixes(orderedLabels),
 			};
 		})

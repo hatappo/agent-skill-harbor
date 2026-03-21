@@ -35,7 +35,8 @@ export const auditSkillScannerPlugin: BuiltinPostCollectPlugin = {
 			force: true,
 		});
 
-		const getArtifactDir = (skillKey: string) => getPluginArtifactFsDir(context.project_root, SKILL_SCANNER_PLUGIN_ID, skillKey);
+		const getArtifactDir = (skillKey: string) =>
+			getPluginArtifactFsDir(context.project_root, SKILL_SCANNER_PLUGIN_ID, skillKey);
 
 		for (const [repoKey, repoEntry] of Object.entries(context.catalog.repositories)) {
 			for (const skillPath of Object.keys(repoEntry.skills)) {
@@ -70,7 +71,9 @@ export const auditSkillScannerPlugin: BuiltinPostCollectPlugin = {
 				} catch (error) {
 					rmSync(artifactDir, { recursive: true, force: true });
 					results[skillKey] = buildUnknownResult(
-						error instanceof Error ? `skill-scanner execution failed: ${error.message}` : 'skill-scanner execution failed.',
+						error instanceof Error
+							? `skill-scanner execution failed: ${error.message}`
+							: 'skill-scanner execution failed.',
 						'unknown',
 					);
 					counts.unknown += 1;
