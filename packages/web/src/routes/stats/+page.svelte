@@ -19,6 +19,22 @@
 		UsagePolicy,
 	} from '$lib/types';
 	import { t, locale } from '$lib/i18n';
+	import {
+		buildAdoptionTrendData,
+		buildSkillTrendData,
+		getFilteredRepos,
+		getHistoryRowMetrics,
+		getRepoAdoptionPct,
+		getRepoChange,
+		getReposWithSkills,
+		getSkillChange,
+		getTotalFiles,
+		getTotalRepos,
+		matchesOwnerFilter,
+		parseOwnerFilterValue,
+		sumOwnerValues,
+		type OwnerFilter,
+	} from '$lib/utils/stats';
 
 	interface Props {
 		data: {
@@ -57,23 +73,7 @@
 		updateUrl();
 	}
 
-	function parseOwnerFilterValue(value: string): 'org' | 'community' | null {
-		if (value === 'org' || value === 'community') return value;
-		return null;
-	}
-
 	let ownerFilter = $derived(parseOwnerFilterValue(ownerFilterValue));
-
-	function matchesOwnerFilter(isOrgOwned: boolean, filter: 'org' | 'community' | null): boolean {
-		if (!filter) return true;
-		return filter === 'org' ? isOrgOwned : !isOrgOwned;
-	}
-
-	function sumOwnerValues(org: number, community: number, filter: 'org' | 'community' | null): number {
-		if (filter === 'org') return org;
-		if (filter === 'community') return community;
-		return org + community;
-	}
 
 	// Filtered data
 	let filteredSkills = $derived.by(() => {
@@ -81,7 +81,7 @@
 	});
 
 	let filteredRepos = $derived.by(() => {
-		return data.repos.filter((repo) => matchesOwnerFilter(repo.isOrgOwned, ownerFilter));
+		return getFilteredRepos(data.repos, ownerFilter);
 	});
 
 	let latest = $derived(data.collections[0] ?? null);
@@ -90,41 +90,18 @@
 	// KPI values
 	let totalSkills = $derived(filteredSkills.length);
 	let totalRepos = $derived.by(() => {
-		if (!latest) return filteredRepos.length;
-		return sumOwnerValues(latest.statistics.org.repos, latest.statistics.community.repos, ownerFilter);
+		return getTotalRepos(latest, filteredRepos, ownerFilter);
 	});
 	let reposWithSkills = $derived.by(() => {
-		if (!latest) return filteredRepos.filter((r) => r.skillCount > 0).length;
-		return sumOwnerValues(
-			latest.statistics.org.repos_with_skills,
-			latest.statistics.community.repos_with_skills,
-			ownerFilter,
-		);
+		return getReposWithSkills(latest, filteredRepos, ownerFilter);
 	});
-	let repoAdoptionPct = $derived(totalRepos > 0 ? Math.round((reposWithSkills / totalRepos) * 100) : 0);
+	let repoAdoptionPct = $derived(getRepoAdoptionPct(reposWithSkills, totalRepos));
 	let totalFiles = $derived.by(() => {
-		if (!latest) return 0;
-		return sumOwnerValues(latest.statistics.org.files, latest.statistics.community.files, ownerFilter);
+		return getTotalFiles(latest, ownerFilter);
 	});
-	let skillChange = $derived.by(() => {
-		if (!previous) return undefined;
-		const prevSkills = sumOwnerValues(
-			previous.statistics.org.skills,
-			previous.statistics.community.skills,
-			ownerFilter,
-		);
-		return totalSkills - prevSkills;
-	});
+	let skillChange = $derived.by(() => getSkillChange(totalSkills, previous, ownerFilter));
 	let repoChange = $derived.by(() => {
-		if (!previous) return undefined;
-		const prevReposWithSkills = sumOwnerValues(
-			previous.statistics.org.repos_with_skills,
-			previous.statistics.community.repos_with_skills,
-			ownerFilter,
-		);
-		const prevRepos = sumOwnerValues(previous.statistics.org.repos, previous.statistics.community.repos, ownerFilter);
-		const prevPct = prevRepos > 0 ? Math.round((prevReposWithSkills / prevRepos) * 100) : 0;
-		return repoAdoptionPct - prevPct;
+		return getRepoChange(repoAdoptionPct, previous, ownerFilter);
 	});
 
 	let lastCollectedFormatted = $derived.by(() => {
@@ -134,28 +111,10 @@
 	});
 
 	// Trend chart data (oldest first)
-	let trendData = $derived.by(() => {
-		const reversed = [...data.collections].reverse();
-		return reversed.map((c) => {
-			const d = new Date(c.collecting.collected_at);
-			const value = sumOwnerValues(c.statistics.org.skills, c.statistics.community.skills, ownerFilter);
-			return { label: `${d.getMonth() + 1}/${d.getDate()}`, value };
-		});
-	});
+	let trendData = $derived(buildSkillTrendData(data.collections, ownerFilter));
 
 	// Adoption rate trend data (oldest first)
-	let adoptionTrendData = $derived.by(() => {
-		const reversed = [...data.collections].reverse();
-		return reversed.map((c) => {
-			const repos = sumOwnerValues(c.statistics.org.repos, c.statistics.community.repos, ownerFilter);
-			const withSkills = sumOwnerValues(
-				c.statistics.org.repos_with_skills,
-				c.statistics.community.repos_with_skills,
-				ownerFilter,
-			);
-			return { label: '', value: repos > 0 ? Math.round((withSkills / repos) * 100) : 0 };
-		});
-	});
+	let adoptionTrendData = $derived(buildAdoptionTrendData(data.collections, ownerFilter));
 
 	// Breakdown
 	let statusBreakdown = $derived.by(() => {
@@ -259,6 +218,10 @@
 	function formatTrendDate(iso: string): string {
 		const date = new Date(iso);
 		return `${date.getMonth() + 1}/${date.getDate()}`;
+	}
+
+	function getHistoryMetrics(entry: CollectionEntry, previous: CollectionEntry | null) {
+		return getHistoryRowMetrics(entry, previous, ownerFilter as OwnerFilter);
 	}
 
 	let pluginTrendSections = $derived.by(() =>
@@ -452,73 +415,46 @@
 					<tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
 						{#each displayedHistory as entry, i (entry.collect_id ?? entry.collecting.collected_at)}
 							{@const prev = data.collections[i + 1]}
-							{@const s =
-								ownerFilter === 'org'
-									? entry.statistics.org
-									: ownerFilter === 'community'
-										? entry.statistics.community
-										: {
-												repos: entry.statistics.org.repos + entry.statistics.community.repos,
-												repos_with_skills:
-													entry.statistics.org.repos_with_skills + entry.statistics.community.repos_with_skills,
-												skills: entry.statistics.org.skills + entry.statistics.community.skills,
-												files: entry.statistics.org.files + entry.statistics.community.files,
-											}}
-							{@const ps = prev
-								? ownerFilter === 'org'
-									? prev.statistics.org
-									: ownerFilter === 'community'
-										? prev.statistics.community
-										: {
-												repos: prev.statistics.org.repos + prev.statistics.community.repos,
-												repos_with_skills:
-													prev.statistics.org.repos_with_skills + prev.statistics.community.repos_with_skills,
-												skills: prev.statistics.org.skills + prev.statistics.community.skills,
-											}
-								: null}
-							{@const skillDiff = ps ? s.skills - ps.skills : 0}
-							{@const adoptionPct = s.repos > 0 ? Math.round((s.repos_with_skills / s.repos) * 100) : 0}
-							{@const prevAdoptionPct = ps && ps.repos > 0 ? Math.round((ps.repos_with_skills / ps.repos) * 100) : 0}
-							{@const repoDiff = ps ? adoptionPct - prevAdoptionPct : 0}
+							{@const metrics = getHistoryMetrics(entry, prev)}
 							<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
 								<td class="whitespace-nowrap px-5 py-3 text-sm text-gray-900 dark:text-gray-100">
 									{formatDate(entry.collecting.collected_at)}
 								</td>
 								<td class="whitespace-nowrap px-5 py-3 text-right text-sm">
-									{#if skillDiff !== 0}
+									{#if metrics.skillDiff !== 0}
 										<span
-											class="mr-1 text-xs {skillDiff > 0
+											class="mr-1 text-xs {metrics.skillDiff > 0
 												? 'text-emerald-600 dark:text-emerald-400'
 												: 'text-red-600 dark:text-red-400'}"
 										>
-											{skillDiff > 0 ? '+' : ''}{skillDiff}
+											{metrics.skillDiff > 0 ? '+' : ''}{metrics.skillDiff}
 										</span>
 									{/if}
 									<span class="tabular-nums font-medium text-gray-900 dark:text-gray-100">
-										{s.skills}
+										{metrics.stats.skills}
 									</span>
 								</td>
 								<td class="hidden whitespace-nowrap px-5 py-3 text-right text-sm sm:table-cell">
-									{#if repoDiff !== 0}
+									{#if metrics.repoDiff !== 0}
 										<span
-											class="mr-1 text-xs {repoDiff > 0
+											class="mr-1 text-xs {metrics.repoDiff > 0
 												? 'text-emerald-600 dark:text-emerald-400'
 												: 'text-red-600 dark:text-red-400'}"
 										>
-											{repoDiff > 0 ? '+' : ''}{repoDiff}pt
+											{metrics.repoDiff > 0 ? '+' : ''}{metrics.repoDiff}pt
 										</span>
 									{/if}
 									<span class="tabular-nums font-medium text-gray-900 dark:text-gray-100">
-										{adoptionPct}%
+										{metrics.adoptionPct}%
 									</span>
 									<span class="tabular-nums text-gray-400 dark:text-gray-500">
-										({s.repos_with_skills}/{s.repos})
+										({metrics.stats.repos_with_skills}/{metrics.stats.repos})
 									</span>
 								</td>
 								<td
 									class="hidden whitespace-nowrap px-5 py-3 text-right tabular-nums text-sm text-gray-500 dark:text-gray-400 md:table-cell"
 								>
-									{s.files}
+									{metrics.stats.files}
 								</td>
 								<td
 									class="hidden whitespace-nowrap px-5 py-3 text-right tabular-nums text-sm text-gray-500 dark:text-gray-400 md:table-cell"
