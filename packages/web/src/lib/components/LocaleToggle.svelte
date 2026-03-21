@@ -3,8 +3,8 @@
 	import ToggleGroup from '$lib/components/ToggleGroup.svelte';
 
 	const locales: { value: Locale; label: string }[] = [
-		{ value: 'en', label: 'EN' },
 		{ value: 'ja', label: 'JA' },
+		{ value: 'en', label: 'EN' },
 	];
 </script>
 

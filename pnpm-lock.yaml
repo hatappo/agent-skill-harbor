@@ -149,6 +149,9 @@ importers:
       3d-force-graph:
         specifier: 1.79.1
         version: 1.79.1
+      '@jis3r/icons':
+        specifier: 2.7.0
+        version: 2.7.0(svelte@5.53.3)
       '@lucide/svelte':
         specifier: ^0.561.0
         version: 0.561.0(svelte@5.53.3)
@@ -1314,6 +1317,11 @@ packages:
   '@isaacs/fs-minipass@4.0.1':
     resolution: {integrity: sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==}
     engines: {node: '>=18.0.0'}
+
+  '@jis3r/icons@2.7.0':
+    resolution: {integrity: sha512-RXee+W1AoWFHtFliLZ7SQxVopAezmCH0xU45HKTvvpDQ+6Y3g6tUHvKOK16J52TM8YsN4WDnsiOmcwau+bHmwg==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -7334,6 +7342,10 @@ snapshots:
     dependencies:
       minipass: 7.1.3
     optional: true
+
+  '@jis3r/icons@2.7.0(svelte@5.53.3)':
+    dependencies:
+      svelte: 5.53.3
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:

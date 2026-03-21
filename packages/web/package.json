@@ -47,13 +47,14 @@
 		"verify": "pnpm run format:check && pnpm run lint:check && pnpm run check && pnpm run test"
 	},
 	"dependencies": {
-		"3d-force-graph": "1.79.1",
+		"@jis3r/icons": "2.7.0",
 		"@lucide/svelte": "^0.561.0",
 		"@sveltejs/adapter-static": "^3.0.8",
 		"@sveltejs/kit": "^2.16.0",
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@tailwindcss/typography": "0.5.19",
 		"@tailwindcss/vite": "^4.0.0",
+		"3d-force-graph": "1.79.1",
 		"bits-ui": "2.16.2",
 		"clsx": "2.1.1",
 		"fuse.js": "^7.1.0",
