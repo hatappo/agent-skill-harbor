@@ -1,16 +1,4 @@
 import tseslint from 'typescript-eslint';
+import { createTypeScriptEslintConfig } from '../../eslint.shared.js';
 
-export default tseslint.config(
-	{
-		ignores: ['dist/**'],
-	},
-	...tseslint.configs.recommended,
-	{
-		files: ['src/**/*.ts'],
-		rules: {
-			'no-unused-vars': 'off',
-			'@typescript-eslint/no-unused-vars': 'off',
-			'@typescript-eslint/no-explicit-any': 'off',
-		},
-	},
-);
+export default createTypeScriptEslintConfig(tseslint, ['src/**/*.ts']);
