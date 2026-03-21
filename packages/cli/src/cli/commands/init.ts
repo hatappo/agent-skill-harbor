@@ -223,7 +223,6 @@ export async function runCommand(argv = process.argv.slice(3)): Promise<void> {
 		console.error(error instanceof Error ? error.message : String(error));
 		console.error(INIT_USAGE);
 		process.exit(1);
-		return;
 	}
 
 	const projectName = basename(options.targetDir);

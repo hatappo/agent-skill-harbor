@@ -7,7 +7,6 @@ export async function runCommand(argv = process.argv.slice(3)): Promise<void> {
 	if (target !== 'example-user-defined-plugin') {
 		console.error('Usage: harbor gen example-user-defined-plugin');
 		process.exit(1);
-		return;
 	}
 
 	try {
