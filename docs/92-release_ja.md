@@ -110,6 +110,30 @@ git tag cli-v<version>
 - `wf-v0` は後方互換を保てる範囲の変更だけで動かすようにします。
 - caller 側との互換性期待が大きく変わる場合だけ、新しい major workflow tag を作ります。
 
+## Workflow Action Pin 更新
+
+- Harbor では、reusable workflow と生成される deploy workflow template の外部 GitHub Action を commit SHA で pin します。
+- まず更新候補を dry-run で確認します:
+  - `pnpm actions:check` では、生成される `CollectSkills` caller workflow に対する ref 更新候補も表示されることがあります。
+  - その reusable workflow ref 更新は無視してください。template は意図的に `@wf-v0` を維持しており、`actions:pin` 実行後にその ref を元へ戻します。
+
+```bash
+pnpm actions:check
+```
+
+- 差分をレビューして問題なければ反映します:
+
+```bash
+pnpm actions:pin
+```
+
+- 現在の更新フローは意図的にハイブリッドです。
+  - `actions-up` が大半の外部 action を `--mode minor` と `--min-age 7` 付きで更新します。
+  - `pnpm/action-setup` だけは、この repository では `actions-up` が安定して追跡できないため、手動更新の対象として扱います。
+- `actions/upload-artifact` と `actions/download-artifact` は、手動確認のうえで現在の新しい major line に pin してあり、今後の自動確認もその major line から継続します。
+- `pnpm actions:check` は、手動確認用に `pnpm/action-setup` の最新 v4 release も表示します。
+- `pnpm/action-setup` を更新するときは、意図して current major line のまま保ちつつ、release を確認してから pinned SHA を手動で置き換えてください。
+
 ## バージョニング方針
 
 - `packages/cli/package.json`、`packages/collector/package.json`、`packages/post-collect/package.json`、`packages/web/package.json` は公開 package として独立して version を管理します。

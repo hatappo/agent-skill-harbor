@@ -2,10 +2,26 @@
 
 ## [未リリース]
 
+### 追加
+
+- Web UI に skill title、ページ間の view tabs、Owner フィルターの View Transition を追加し、card / list / stats / graph 間の遷移でも文脈がつながるようにした
+- ヘッダーの animated icon、共通 `ToggleGroup`、共通 `OwnerFilter` / `PillSelectFilter` を追加し、Web 側で重複していた UI ロジックを整理した
+
 ### 変更
 
+- monorepo の package を `packages/{cli,collector,post-collect,shared-internal,web}` 配下へ再配置し、workspace 設定、repository 内パス、template、関連ドキュメントを新しい構成に合わせて更新した
+- package script を `format` / `format:check` / `lint` / `lint:check` / `check` / `test` / `build` / `verify` に統一し、package ローカルの保守フローを揃えた
+- Harbor の reusable workflow と生成される deploy workflow template の外部 GitHub Action を commit SHA で pin し、artifact 系 action は手動確認のうえで新しい major line へ更新した。あわせて更新運用として `actions-up` による minor-safe な更新を使いつつ、`pnpm/action-setup` だけは手動確認対象として扱うフローを導入した
+- 古い CLI runtime wrapper と重複実装を削除し、stats 集計ロジックを helper に寄せ、theme / background / locale などの Web 状態には小さな persistent store helper を導入した
+- TypeScript 向け ESLint 設定を root の共有 helper に集約し、package ごとに同じ設定を重複して持たないよう整理した
 - `packages/shared-internal/` を非公開 workspace package として追加し、`collector` と `post-collect` で重複していた `catalog-store` と `resolved-from` を単一の実装へ集約した
 - `packages/shared-internal/`、package ローカルの `verify` フロー、現在の monorepo 境界が分かるようにローカル開発・リリースのドキュメントを更新した
+
+### 修正
+
+- CLI の package root 解決を修正し、インストール済みの `init` / `gen` が source 実行と build 後の `dist/` 実行の両方で正しく template を見つけられるようにした
+- package tarball の内容と release ドキュメントを修正し、publish 内容が不要ファイルを含まず、現在の package 別 publish 手順に一致するようにした
+- ブラウザの別タブに移っている間は ripple background の生成を停止し、タブ復帰時に波紋が一気に溜まって見える不具合を修正した
 
 ## [cli 0.14.0] / [collector 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
 

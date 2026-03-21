@@ -2,10 +2,26 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added shared view transitions in the web UI for skill titles, cross-page view tabs, and the owner filter so navigation between card/list/stats/graph views keeps more visual context
+- Added animated header toggle icons, a shared `ToggleGroup` implementation, and shared `OwnerFilter` / `PillSelectFilter` components to reduce duplicated UI logic in the web app
+
 ### Changed
 
+- Moved the monorepo packages under `packages/{cli,collector,post-collect,shared-internal,web}` and updated workspace scripts, repository paths, templates, and docs to match the new layout
+- Standardized package scripts around `format`, `format:check`, `lint`, `lint:check`, `check`, `test`, `build`, and `verify` so package-local maintenance flows are consistent across the repository
+- Pinned external GitHub Actions in Harbor's reusable workflow and generated deploy workflow templates by commit SHA, moved artifact actions onto their reviewed newer major lines, and introduced an update flow that uses `actions-up` for minor-safe action bumps while keeping `pnpm/action-setup` as an explicit manual review item
+- Removed stale CLI runtime wrappers and duplicated runtime code, refactored stats aggregation into shared helpers, and introduced a small persistent-store helper for web state such as theme/background/locale
+- Centralized repeated TypeScript ESLint settings in a shared root config helper instead of maintaining identical per-package configs
 - Added `packages/shared-internal/` as a private workspace package so `collector` and `post-collect` share `catalog-store` and `resolved-from` from one source instead of keeping duplicate runtime copies
 - Updated local development and release docs to cover `packages/shared-internal/`, package-local `verify` flows, and the current monorepo package boundaries more clearly
+
+### Fixed
+
+- Fixed CLI package-root detection so installed `init` / `gen` commands resolve templates correctly from both source execution and built `dist/` output
+- Fixed package tarball contents and release docs so package publishes stay clean and current package-specific publish steps are documented accurately
+- Fixed the ripple background so ambient ripple generation pauses while the browser tab is hidden instead of bursting on return
 
 ## [cli 0.14.0] / [collector 0.14.0] / [post-collect 0.14.0] / [web 0.14.0] - 2026-03-20
 

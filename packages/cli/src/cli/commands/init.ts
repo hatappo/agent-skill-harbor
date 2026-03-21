@@ -142,7 +142,7 @@ function writeGitignore(targetDir: string): void {
 }
 
 function writeWorkflows(targetDir: string): void {
-	cpSync(join(templatesDir, '.github'), join(targetDir, '.github'), { recursive: true });
+	cpSync(join(templatesDir, '.github', 'workflows'), join(targetDir, '.github', 'workflows'), { recursive: true });
 	console.log('  Created .github/workflows/collect-skills.yml');
 	console.log('  Created .github/workflows/deploy-cloudflare-pages.yml');
 	console.log('  Created .github/workflows/deploy-github-pages.yml');

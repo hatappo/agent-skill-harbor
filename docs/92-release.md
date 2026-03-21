@@ -110,6 +110,30 @@ git tag cli-v<version>
 - Move `wf-v0` only for non-breaking workflow changes.
 - Create a new major workflow tag only when caller compatibility expectations change materially.
 
+## Workflow Action Pins
+
+- Harbor keeps external GitHub Actions pinned by commit SHA in both the reusable workflow and the generated deploy workflow templates.
+- Before updating those pins, run:
+  - `pnpm actions:check` may also show a proposed ref bump for the generated `CollectSkills` caller workflow.
+  - Ignore that reusable-workflow ref update. The template intentionally stays on `@wf-v0`, and `actions:pin` restores it after running `actions-up`.
+
+```bash
+pnpm actions:check
+```
+
+- Apply the updates only after reviewing the proposed diff:
+
+```bash
+pnpm actions:pin
+```
+
+- The current update flow is intentionally hybrid:
+  - `actions-up` updates most external actions with `--mode minor` and `--min-age 7`.
+  - `pnpm/action-setup` remains a documented manual follow-up, because `actions-up` does not track that action reliably in this repository.
+- `actions/upload-artifact` and `actions/download-artifact` are intentionally pinned on their current newer major lines after manual review, so future automated checks continue from those majors.
+- `pnpm actions:check` also prints the latest `pnpm/action-setup` v4 release so you can decide whether the manually pinned SHA should be updated.
+- When you update `pnpm/action-setup`, keep it on the current major line intentionally and replace the pinned SHA by hand after reviewing the release.
+
 ## Versioning Notes
 
 - `packages/cli/package.json`, `packages/collector/package.json`, `packages/post-collect/package.json`, and `packages/web/package.json` version independently as public packages.

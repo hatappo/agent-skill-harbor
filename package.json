@@ -6,7 +6,9 @@
 	"scripts": {
 		"setup:dev": "tsx scripts/setup-dev.ts",
 		"format": "prettier --write \"docs/**/*.md\" \"*.{json,md,yaml,yml}\"",
-		"format:check": "prettier --check \"docs/**/*.md\" \"*.{json,md,yaml,yml}\""
+		"format:check": "prettier --check \"docs/**/*.md\" \"*.{json,md,yaml,yml}\"",
+		"actions:pin": "sh scripts/pin-workflow-actions.sh",
+		"actions:check": "sh scripts/pin-workflow-actions.sh --diff"
 	},
 	"pnpm": {
 		"onlyBuiltDependencies": [
@@ -14,6 +16,7 @@
 		]
 	},
 	"devDependencies": {
+		"actions-up": "1.12.0",
 		"prettier": "3.8.1",
 		"prettier-plugin-svelte": "3.5.1",
 		"tsx": "^4.19.0",
