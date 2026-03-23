@@ -2,6 +2,8 @@
 
 ## [未リリース]
 
+## [cli 0.14.1] / [collector 0.14.1] / [post-collect 0.14.1] / [web 0.14.1] - 2026-03-23
+
 ### 追加
 
 - Web UI に skill title、ページ間の view tabs、Owner フィルターの View Transition を追加し、card / list / stats / graph 間の遷移でも文脈がつながるようにした

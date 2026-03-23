@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [cli 0.14.1] / [collector 0.14.1] / [post-collect 0.14.1] / [web 0.14.1] - 2026-03-23
+
 ### Added
 
 - Added shared view transitions in the web UI for skill titles, cross-page view tabs, and the owner filter so navigation between card/list/stats/graph views keeps more visual context

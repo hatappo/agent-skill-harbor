@@ -43,11 +43,7 @@ export function getFilteredRepos(repos: RepoInfo[], filter: OwnerFilter): RepoIn
 	return repos.filter((repo) => matchesOwnerFilter(repo.isOrgOwned, filter));
 }
 
-export function getTotalRepos(
-	latest: CollectionEntry | null,
-	filteredRepos: RepoInfo[],
-	filter: OwnerFilter,
-): number {
+export function getTotalRepos(latest: CollectionEntry | null, filteredRepos: RepoInfo[], filter: OwnerFilter): number {
 	if (!latest) return filteredRepos.length;
 	return sumOwnerValues(latest.statistics.org.repos, latest.statistics.community.repos, filter);
 }
@@ -58,11 +54,7 @@ export function getReposWithSkills(
 	filter: OwnerFilter,
 ): number {
 	if (!latest) return filteredRepos.filter((repo) => repo.skillCount > 0).length;
-	return sumOwnerValues(
-		latest.statistics.org.repos_with_skills,
-		latest.statistics.community.repos_with_skills,
-		filter,
-	);
+	return sumOwnerValues(latest.statistics.org.repos_with_skills, latest.statistics.community.repos_with_skills, filter);
 }
 
 export function getRepoAdoptionPct(reposWithSkills: number, totalRepos: number): number {
@@ -130,8 +122,7 @@ function resolveCollectionStats(entry: CollectionEntry, filter: OwnerFilter): Co
 	if (filter === 'community') return entry.statistics.community;
 	return {
 		repos: entry.statistics.org.repos + entry.statistics.community.repos,
-		repos_with_skills:
-			entry.statistics.org.repos_with_skills + entry.statistics.community.repos_with_skills,
+		repos_with_skills: entry.statistics.org.repos_with_skills + entry.statistics.community.repos_with_skills,
 		skills: entry.statistics.org.skills + entry.statistics.community.skills,
 		files: entry.statistics.org.files + entry.statistics.community.files,
 	};
@@ -147,9 +138,7 @@ export function getHistoryRowMetrics(
 
 	const skillDiff = previousStats ? stats.skills - previousStats.skills : 0;
 	const adoptionPct = getRepoAdoptionPct(stats.repos_with_skills, stats.repos);
-	const prevAdoptionPct = previousStats
-		? getRepoAdoptionPct(previousStats.repos_with_skills, previousStats.repos)
-		: 0;
+	const prevAdoptionPct = previousStats ? getRepoAdoptionPct(previousStats.repos_with_skills, previousStats.repos) : 0;
 
 	return {
 		stats,

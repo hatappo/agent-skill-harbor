@@ -28,7 +28,7 @@
 			applyImmediately: true,
 		}}
 	>
-		<Select.Root type="single" {value} onValueChange={onValueChange}>
+		<Select.Root type="single" {value} {onValueChange}>
 			<Select.Trigger size="sm" class={triggerClass}>
 				{triggerLabel}
 			</Select.Trigger>
@@ -41,7 +41,7 @@
 	</div>
 {:else}
 	<div class="inline-block w-fit">
-		<Select.Root type="single" {value} onValueChange={onValueChange}>
+		<Select.Root type="single" {value} {onValueChange}>
 			<Select.Trigger size="sm" class={triggerClass}>
 				{triggerLabel}
 			</Select.Trigger>

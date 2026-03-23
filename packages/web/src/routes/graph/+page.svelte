@@ -159,7 +159,9 @@
 		>
 			<!-- Search + Filter + Tabs (left) -->
 			<div class="pointer-events-auto flex flex-col gap-2">
-				<div class="self-start rounded-lg border border-gray-200 bg-white/80 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/80">
+				<div
+					class="self-start rounded-lg border border-gray-200 bg-white/80 shadow-sm backdrop-blur-sm dark:border-gray-700 dark:bg-gray-900/80"
+				>
 					<ViewTabs activeView="graph" showBottomBorder={false} />
 				</div>
 				<div class="relative">

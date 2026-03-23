@@ -72,11 +72,7 @@
 		>
 			{#if item.icon}
 				<span class="inline-flex items-center justify-center leading-none">
-					<item.icon
-						class="h-4 w-4"
-						size={item.iconSize}
-						animate={item.animateIcon ? expanded : undefined}
-					/>
+					<item.icon class="h-4 w-4" size={item.iconSize} animate={item.animateIcon ? expanded : undefined} />
 				</span>
 			{:else}
 				<span class="inline-flex h-4 items-center text-xs font-medium leading-none">{item.label}</span>

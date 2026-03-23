@@ -22,9 +22,7 @@
 		communityLabel = $t('common.orgOwnership.community'),
 	}: Props = $props();
 
-	let triggerLabel = $derived(
-		value === '__all__' ? $t('filter.allOwner') : $t(`common.orgOwnership.${value}`),
-	);
+	let triggerLabel = $derived(value === '__all__' ? $t('filter.allOwner') : $t(`common.orgOwnership.${value}`));
 
 	const options = $derived([
 		{ value: '__all__', label: allLabel },
