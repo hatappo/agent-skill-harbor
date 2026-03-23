@@ -2,6 +2,12 @@
 
 ## [未リリース]
 
+## [cli 0.14.2] / [collector 0.14.2] / [post-collect 0.14.2] / [web 0.14.2] - 2026-03-23
+
+### 修正
+
+- `collector` と `post-collect` が `shared-internal` への `workspace:*` 依存をそのまま publish していた問題を修正。tsup の `noExternal` でバンドルに含め、`devDependencies` へ移動した
+
 ## [cli 0.14.1] / [collector 0.14.1] / [post-collect 0.14.1] / [web 0.14.1] - 2026-03-23
 
 ### 追加

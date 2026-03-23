@@ -1,6 +1,6 @@
 {
 	"name": "agent-skill-harbor-post-collect",
-	"version": "0.14.1",
+	"version": "0.14.2",
 	"type": "module",
 	"description": "Post-collect runtime package for Agent Skill Harbor.",
 	"license": "MIT",
@@ -25,12 +25,12 @@
 		"verify": "pnpm run format:check && pnpm run lint:check && pnpm run check && pnpm run test"
 	},
 	"dependencies": {
-		"agent-skill-harbor-shared-internal": "workspace:*",
 		"js-yaml": "^4.1.0",
 		"promptfoo": "0.121.2",
 		"tsx": "^4.19.0"
 	},
 	"devDependencies": {
+		"agent-skill-harbor-shared-internal": "workspace:*",
 		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^22.15.0",
 		"eslint": "^9.18.0",

@@ -59,9 +59,6 @@ importers:
       '@octokit/rest':
         specifier: ^21.1.1
         version: 21.1.1
-      agent-skill-harbor-shared-internal:
-        specifier: workspace:*
-        version: link:../shared-internal
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -72,6 +69,9 @@ importers:
       '@types/node':
         specifier: ^22.15.0
         version: 22.19.11
+      agent-skill-harbor-shared-internal:
+        specifier: workspace:*
+        version: link:../shared-internal
       eslint:
         specifier: ^9.18.0
         version: 9.39.3(jiti@2.6.1)
@@ -90,9 +90,6 @@ importers:
 
   packages/post-collect:
     dependencies:
-      agent-skill-harbor-shared-internal:
-        specifier: workspace:*
-        version: link:../shared-internal
       js-yaml:
         specifier: ^4.1.0
         version: 4.1.1
@@ -109,6 +106,9 @@ importers:
       '@types/node':
         specifier: ^22.15.0
         version: 22.19.11
+      agent-skill-harbor-shared-internal:
+        specifier: workspace:*
+        version: link:../shared-internal
       eslint:
         specifier: ^9.18.0
         version: 9.39.3(jiti@2.6.1)

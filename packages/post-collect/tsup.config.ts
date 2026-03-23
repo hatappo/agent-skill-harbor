@@ -10,4 +10,5 @@ export default defineConfig({
 	outDir: 'dist',
 	clean: true,
 	splitting: false,
+	noExternal: ['agent-skill-harbor-shared-internal'],
 });
