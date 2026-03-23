@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [cli 0.14.3] - 2026-03-23
+
+### Fixed
+
+- Fixed CLI package-root resolution to walk up the directory tree instead of checking fixed relative depths, so `init` and `gen` work correctly when tsup inlines `paths.ts` into deeper entry files with `splitting: false`
+
 ## [cli 0.14.2] / [collector 0.14.2] / [post-collect 0.14.2] / [web 0.14.2] - 2026-03-23
 
 ### Fixed

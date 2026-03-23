@@ -5,13 +5,19 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function resolvePackageRoot(): string {
-	// Source runs resolve from packages/cli/src/cli, while built runs resolve from
-	// packages/cli/dist/src/cli. Check both candidate parents and pick the one that
-	// still contains the package metadata and templates.
-	for (const candidate of [resolve(__dirname, '../..'), resolve(__dirname, '../../..')]) {
-		if (existsSync(resolve(candidate, 'package.json')) && existsSync(resolve(candidate, 'templates'))) {
-			return candidate;
+	// Walk up from __dirname looking for the directory that contains both
+	// package.json and templates/.  The depth varies depending on whether
+	// this code runs from source (src/cli/), the standalone built file
+	// (dist/src/cli/paths.js), or inlined into another entry such as
+	// dist/src/cli/commands/init.js (splitting: false).
+	let dir = __dirname;
+	for (let i = 0; i < 6; i++) {
+		if (existsSync(resolve(dir, 'package.json')) && existsSync(resolve(dir, 'templates'))) {
+			return dir;
 		}
+		const parent = dirname(dir);
+		if (parent === dir) break;
+		dir = parent;
 	}
 	throw new Error('Failed to resolve CLI package root.');
 }
