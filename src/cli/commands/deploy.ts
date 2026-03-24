@@ -6,7 +6,7 @@ import { packageRoot, userRoot } from '../paths.js';
 import { getExitCode } from '../utils.js';
 import { runBuildCommand } from './build.js';
 
-export function runDeployCommand(argv = process.argv.slice(3)) {
+export function runDeployCommand(argv: string[] = []): void {
 	const provider = argv[0];
 	const optionArgs = argv.slice(1);
 
@@ -56,5 +56,5 @@ export function runDeployCommand(argv = process.argv.slice(3)) {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-	runDeployCommand();
+	runDeployCommand(process.argv.slice(2));
 }

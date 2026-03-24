@@ -151,10 +151,6 @@ function loadSettingsRaw(): SettingsConfig {
 	}
 }
 
-function loadAdmin(): SettingsConfig {
-	return loadSettingsRaw();
-}
-
 function loadCatalogYaml(): CatalogYaml {
 	if (!existsSync(SKILLS_YAML_PATH)) return { repositories: {} };
 	try {
@@ -220,7 +216,7 @@ function walkSkillDirs(baseDir: string, currentDir: string, results: Map<string,
 function buildCatalogData(): CatalogResult {
 	const { org: orgName, repo: repoName } = detectOrgRepo();
 	const repoFullName = orgName && repoName ? `${orgName}/${repoName}` : orgName;
-	const admin = loadAdmin();
+	const admin = loadSettingsRaw();
 	const freshPeriodDays = admin.catalog?.skill?.fresh_period_days ?? 0;
 	const governance = loadGovernance();
 	const catalogYaml = loadCatalogYaml();

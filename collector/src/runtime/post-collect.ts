@@ -1,11 +1,7 @@
-import { execSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { loadCatalog } from './shared/catalog-store.js';
+import { detectGitHubOrigin, getProjectRoot } from './shared/project.js';
 import { runPostCollect } from './post-collect/run-post-collect.js';
-
-function getProjectRoot(): string {
-	return process.env.SKILL_HARBOR_PROJECT_ROOT || process.cwd();
-}
 
 function parseArgs(argv: string[]): { collectId?: string } {
 	let collectId: string | undefined;
@@ -22,20 +18,7 @@ function parseArgs(argv: string[]): { collectId?: string } {
 }
 
 export function resolveOrgName(projectRoot: string): string | undefined {
-	if (process.env.GH_ORG) return process.env.GH_ORG;
-	try {
-		const remoteUrl = execSync('git remote get-url origin', {
-			encoding: 'utf-8',
-			cwd: projectRoot,
-		}).trim();
-		const sshMatch = remoteUrl.match(/^git@[^:]+:([^/]+)\/([^/.]+)/);
-		if (sshMatch) return sshMatch[1];
-		const httpsMatch = remoteUrl.match(/^https?:\/\/[^/]+\/([^/]+)\/([^/.]+)/);
-		if (httpsMatch) return httpsMatch[1];
-	} catch {
-		// git command failed
-	}
-	return undefined;
+	return detectGitHubOrigin(projectRoot).org ?? undefined;
 }
 
 export async function runPostCollectCli(argv: string[] = process.argv.slice(2)): Promise<void> {

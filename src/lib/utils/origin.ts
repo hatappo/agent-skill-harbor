@@ -1,5 +1,5 @@
 import type { FlatSkillEntry } from '$lib/types';
-import { getResolvedFrom } from '$lib/utils/resolved-from';
+import { getResolvedFrom, parseResolvedFrom } from '$lib/utils/resolved-from';
 
 /** A row within an OriginGroup — one unique skill name with its origin + derivatives. */
 export interface OriginSkillRow {
@@ -19,17 +19,6 @@ export interface OriginGroup {
 }
 
 /**
- * Parse normalized resolved_from ("github.com/owner/repo@sha") into owner and repo.
- */
-function parseFrom(from: unknown): { owner: string; repo: string } | null {
-	const raw = typeof from === 'string' ? from : null;
-	if (!raw) return null;
-	const match = raw.trim().match(/^[^/\s]+\/([^/\s]+)\/([^@\s]+)(?:@.+)?$/);
-	if (!match) return null;
-	return { owner: match[1], repo: match[2] };
-}
-
-/**
  * Resolve the true origin of a skill by following the `_from` chain.
  *
  * - If `_from` points to the same org, find the matching skill (by name) in that repo and continue.
@@ -42,7 +31,8 @@ export function resolveOrigin(skill: FlatSkillEntry, allSkills: FlatSkillEntry[]
 	let current = skill;
 
 	while (true) {
-		const fromRef = parseFrom(getResolvedFrom(current));
+		const resolvedFrom = getResolvedFrom(current);
+		const fromRef = resolvedFrom ? parseResolvedFrom(resolvedFrom) : null;
 		if (!fromRef) {
 			return `${current.owner}/${current.repo}`;
 		}

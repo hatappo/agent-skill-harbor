@@ -528,3 +528,32 @@ test('runPostCollect fails when skill-scanner CLI is unavailable', async () => {
 		/skill-scanner CLI is unavailable[\s\S]*harbor setup builtin\.audit-skill-scanner[\s\S]*requirements\.txt/i,
 	);
 });
+
+test('runPostCollect normalizes invalid label intents to neutral', async () => {
+	const root = mkdtempSync(join(tmpdir(), 'post-collect-intent-'));
+	mkdirSync(join(root, 'collector', 'plugins', 'example-user-defined-plugin'), { recursive: true });
+	mkdirSync(join(root, 'data'), { recursive: true });
+
+	writeFileSync(
+		join(root, 'collector', 'plugins', 'example-user-defined-plugin', 'index.ts'),
+		[
+			'export async function run() {',
+			"  return { label_intents: { Custom: 'not-a-real-intent' }, results: { skill: { label: 'Custom' } } };",
+			'}',
+			'',
+		].join('\n'),
+	);
+
+	await runPostCollect({
+		projectRoot: root,
+		collectId: 'collect-intent',
+		catalog: { repositories: {} },
+		log: false,
+		plugins: [{ id: 'example-user-defined-plugin' }],
+	});
+
+	const output = yamlLoad(readFileSync(join(root, 'data', 'plugins', 'example-user-defined-plugin.yaml'), 'utf-8')) as {
+		label_intents?: Record<string, string>;
+	}[];
+	assert.equal(output[0].label_intents?.Custom, 'neutral');
+});

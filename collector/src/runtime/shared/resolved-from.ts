@@ -17,7 +17,19 @@ interface ParsedRepoRef {
 	sha: string | null;
 }
 
+export interface ParsedResolvedFrom {
+	platform: string;
+	owner: string;
+	repo: string;
+	repoKey: string;
+	sha: string | null;
+}
+
 const DEFAULT_PLATFORM = 'github.com';
+
+export function normalizeRepoKey(platform: string, owner: string, repo: string): string {
+	return `${platform}/${owner}/${repo}`;
+}
 
 function parseRepoRef(from: string): ParsedRepoRef | null {
 	const match = from.trim().match(/^([^/\s]+)\/([^@\s]+)(?:@(.+))?$/);
@@ -26,6 +38,18 @@ function parseRepoRef(from: string): ParsedRepoRef | null {
 		owner: match[1],
 		repo: match[2],
 		sha: match[3] ?? null,
+	};
+}
+
+export function parseResolvedFromRef(from: string): ParsedResolvedFrom | null {
+	const match = from.trim().match(/^([^/\s]+)\/([^/\s]+)\/([^@\s]+)(?:@(.+))?$/);
+	if (!match) return null;
+	return {
+		platform: match[1],
+		owner: match[2],
+		repo: match[3],
+		repoKey: normalizeRepoKey(match[1], match[2], match[3]),
+		sha: match[4] ?? null,
 	};
 }
 

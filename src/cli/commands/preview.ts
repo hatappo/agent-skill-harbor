@@ -8,7 +8,7 @@ import { getExitCode } from '../utils.js';
 const require = createRequire(import.meta.url);
 const viteCli = resolve(dirname(require.resolve('vite/package.json')), 'bin/vite.js');
 
-export function runPreviewCommand() {
+export function runPreviewCommand(): void {
 	console.log('Starting preview server...');
 	console.log(`  Project root: ${userRoot}`);
 

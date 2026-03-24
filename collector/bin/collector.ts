@@ -16,6 +16,7 @@ Options:
   --project-root <path>  Override the target Harbor project root
 `;
 
+// Keep this in sync with bin/cli.ts. The two binaries are intentionally separate.
 async function importLocalCommand(moduleName: string, exportName = 'runCommand'): Promise<void> {
 	const mod = await import(moduleName);
 	const run = mod[exportName];
@@ -25,6 +26,7 @@ async function importLocalCommand(moduleName: string, exportName = 'runCommand')
 	await run(process.argv.slice(3));
 }
 
+// Keep this in sync with bin/cli.ts. The two binaries are intentionally separate.
 function extractProjectRoot(argv: string[]): { projectRoot: string | null; argv: string[] } {
 	const nextArgv: string[] = [];
 	let projectRoot: string | null = null;

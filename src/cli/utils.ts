@@ -3,20 +3,11 @@ import { resolve } from 'node:path';
 
 const STAGED_MARKER_FILE = '.skill-harbor-staged';
 
-/**
- * @param {unknown} error
- * @returns {number}
- */
-export function getExitCode(error) {
+export function getExitCode(error: unknown): number {
 	return typeof error === 'object' && error && 'status' in error && typeof error.status === 'number' ? error.status : 1;
 }
 
-/**
- * @param {string} packageRoot
- * @param {string} userRoot
- * @returns {{ cleanup: () => void }}
- */
-export function stageDataAssets(packageRoot, userRoot) {
+export function stageDataAssets(packageRoot: string, userRoot: string): { cleanup: () => void } {
 	const staticAssetsDir = resolve(packageRoot, 'static', 'assets');
 	const dataAssetsDir = resolve(userRoot, 'data', 'assets');
 	rmSync(staticAssetsDir, { recursive: true, force: true });

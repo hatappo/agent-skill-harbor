@@ -1,6 +1,7 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { logCliErrorAndExit } from '../errors.js';
 import { userRoot } from '../paths.js';
 import { detectEnabledPluginManifests } from '../../runtime/post-collect/enabled-plugin-manifests.js';
 
@@ -28,7 +29,7 @@ function parseArgs(argv: string[]): Args {
 	return { output };
 }
 
-export async function runCommand(argv: string[] = process.argv.slice(2)): Promise<void> {
+export async function runCommand(argv: string[] = []): Promise<void> {
 	try {
 		const args = parseArgs(argv);
 		const info = detectEnabledPluginManifests(userRoot);
@@ -38,10 +39,8 @@ export async function runCommand(argv: string[] = process.argv.slice(2)): Promis
 		}
 
 		process.stdout.write(JSON.stringify(info));
-	} catch (e: any) {
-		const message = e instanceof Error ? e.message : String(e);
-		if (message) console.error(`Error: ${message}`);
-		process.exit(e.status ?? 1);
+	} catch (error: unknown) {
+		logCliErrorAndExit(error);
 	}
 }
 

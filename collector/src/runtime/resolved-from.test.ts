@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
 	normalizeResolvedFromFrontmatter,
 	normalizeResolvedFromSkillsLock,
+	parseResolvedFromRef,
 	parseProjectSkillsLock,
 	resolveSkillLookupName,
 } from './shared/resolved-from.js';
@@ -49,4 +50,14 @@ test('normalizeResolvedFromSkillsLock ignores non-GitHub entries', () => {
 
 test('resolveSkillLookupName falls back to the skill directory name', () => {
 	assert.equal(resolveSkillLookupName({}, '.claude/skills/deploy-to-vercel/SKILL.md'), 'deploy-to-vercel');
+});
+
+test('parseResolvedFromRef parses repo key and sha from normalized refs', () => {
+	assert.deepEqual(parseResolvedFromRef('github.com/example/origin@abc123'), {
+		platform: 'github.com',
+		owner: 'example',
+		repo: 'origin',
+		repoKey: 'github.com/example/origin',
+		sha: 'abc123',
+	});
 });

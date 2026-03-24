@@ -1,25 +1,7 @@
 import { readFileSync } from 'node:fs';
-import { load as yamlLoad } from 'js-yaml';
-import { resolveSkillLookupName, type ProjectSkillsLockEntry } from '../../shared/resolved-from.js';
+import { parseFrontmatter } from '../../shared/frontmatter.js';
+import { parseResolvedFromRef, resolveSkillLookupName, type ProjectSkillsLockEntry } from '../../shared/resolved-from.js';
 import type { BuiltinPostCollectPlugin, PostCollectCatalog, PostCollectPluginResult } from '../types.js';
-
-function parseFrontmatter(content: string): Record<string, unknown> {
-	if (!content.startsWith('---')) return {};
-	const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
-	if (!match) return {};
-	try {
-		const parsed = yamlLoad(match[1]);
-		return parsed && typeof parsed === 'object' ? { ...(parsed as Record<string, unknown>) } : {};
-	} catch {
-		return {};
-	}
-}
-
-function parseResolvedFromRef(value: string): { repoKey: string; sha: string | null } | null {
-	const match = value.match(/^([^/]+\/[^/]+\/[^/@]+)(?:@([A-Fa-f0-9]+))?$/);
-	if (!match) return null;
-	return { repoKey: match[1], sha: match[2] ?? null };
-}
 
 function readSkillIdentity(skillFilePath: string, skillPath: string): string | null {
 	try {

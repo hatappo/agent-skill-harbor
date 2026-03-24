@@ -1,13 +1,13 @@
 import type { FlatSkillEntry } from '$lib/types';
 
-interface ParsedResolvedFrom {
+export interface ParsedResolvedFrom {
 	platform: string;
 	owner: string;
 	repo: string;
 	sha: string | null;
 }
 
-function parseRepoRef(value: string): ParsedResolvedFrom | null {
+export function parseResolvedFrom(value: string): ParsedResolvedFrom | null {
 	const match = value.trim().match(/^([^/\s]+)\/([^/\s]+)\/([^@\s]+)(?:@(.+))?$/);
 	if (!match) return null;
 	return {
@@ -48,5 +48,5 @@ export function getResolvedFromUrl(skill: FlatSkillEntry): string | null {
 function getResolvedFromParsed(skill: FlatSkillEntry): ParsedResolvedFrom | null {
 	const resolvedFrom = getResolvedFrom(skill);
 	if (!resolvedFrom) return null;
-	return parseRepoRef(resolvedFrom);
+	return parseResolvedFrom(resolvedFrom);
 }

@@ -1,29 +1,12 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { load as yamlLoad } from 'js-yaml';
 import type { BuiltinPostCollectPlugin, LabelIntent } from '../types.js';
+import { type CollectEntry, type CategoryStats } from '../../collects.js';
+import { loadYamlArray } from '../../shared/yaml.js';
+import { isLabelIntent } from '../label-intent.js';
 
 const DEFAULT_HIGHLIGHT_INTENTS = new Set<LabelIntent>(['warn', 'danger']);
 // Keep this list narrow by default. Add or remove intents here if the built-in default should change.
-
-interface CategoryStats {
-	repos: number;
-	repos_with_skills: number;
-	skills: number;
-	files: number;
-}
-
-interface CollectEntry {
-	collect_id?: string;
-	collecting: {
-		collected_at: string;
-		duration_sec: number;
-	};
-	statistics: {
-		org: CategoryStats;
-		community: CategoryStats;
-	};
-}
 
 interface SavedPluginEntry {
 	collect_id?: string;
@@ -51,26 +34,9 @@ interface SlackBlock {
 	elements?: SlackTextObject[];
 }
 
-function loadYamlArray<T>(filePath: string): T[] {
-	if (!existsSync(filePath)) return [];
-	try {
-		const raw = yamlLoad(readFileSync(filePath, 'utf-8'));
-		return Array.isArray(raw) ? (raw as T[]) : [];
-	} catch {
-		return [];
-	}
-}
-
 function parseConfig(pluginConfig: Record<string, unknown> | undefined): NotifySlackConfig {
 	const highlightIntents = Array.isArray(pluginConfig?.highlight_intents)
-		? pluginConfig.highlight_intents.filter(
-				(intent): intent is LabelIntent =>
-					intent === 'neutral' ||
-					intent === 'info' ||
-					intent === 'success' ||
-					intent === 'warn' ||
-					intent === 'danger',
-			)
+		? pluginConfig.highlight_intents.filter((intent): intent is LabelIntent => isLabelIntent(intent))
 		: undefined;
 
 	return {

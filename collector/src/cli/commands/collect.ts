@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { logCliErrorAndExit } from '../errors.js';
 import { loadOptionalEnvFile } from '../env.js';
 import { runCollectOrgSkills } from '../../runtime/collect-org-skills.js';
 import { userRoot } from '../paths.js';
@@ -19,7 +20,7 @@ export function parseArgs(argv: string[]): { force: boolean } {
 	return { force };
 }
 
-export async function runCommand(argv: string[] = process.argv.slice(2)): Promise<void> {
+export async function runCommand(argv: string[] = []): Promise<void> {
 	try {
 		const args = parseArgs(argv);
 		const envFile = resolve(userRoot, '.env');
@@ -36,12 +37,9 @@ export async function runCommand(argv: string[] = process.argv.slice(2)): Promis
 			console.log(`  Force:        enabled`);
 		}
 
-		process.env.SKILL_HARBOR_PROJECT_ROOT = userRoot;
 		await runCollectOrgSkills({ force: args.force });
-	} catch (e: any) {
-		const message = e instanceof Error ? e.message : String(e);
-		if (message) console.error(`Error: ${message}`);
-		process.exit(e.status ?? 1);
+	} catch (error: unknown) {
+		logCliErrorAndExit(error);
 	}
 }
 

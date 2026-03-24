@@ -18,6 +18,7 @@ Options:
   --project-root <path>  Override the target Harbor project root
   --help    Show this help message`;
 
+// Keep this in sync with collector/bin/collector.ts. The two binaries are intentionally separate.
 function extractProjectRoot(argv: string[]): { projectRoot: string | null; argv: string[] } {
 	const nextArgv: string[] = [];
 	let projectRoot: string | null = null;
@@ -39,6 +40,7 @@ function extractProjectRoot(argv: string[]): { projectRoot: string | null; argv:
 	return { projectRoot, argv: nextArgv };
 }
 
+// Keep this in sync with collector/bin/collector.ts. The two binaries are intentionally separate.
 async function importLocalCommand(moduleName: string, exportName = 'runCommand'): Promise<void> {
 	const mod = await import(moduleName);
 	const run = mod[exportName];

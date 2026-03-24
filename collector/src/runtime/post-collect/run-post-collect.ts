@@ -9,14 +9,14 @@ import { detectDriftPlugin } from './plugins/detect-drift.js';
 import { notifySlackPlugin } from './plugins/notify-slack.js';
 import type {
 	BuiltinPostCollectPlugin,
-	LabelIntent,
 	PostCollectCatalog,
 	PostCollectPluginConfig,
 	PostCollectPluginContext,
 	PostCollectPluginModule,
 	PostCollectPluginResult,
-	PostCollectSettings,
 } from './types.js';
+import { normalizeLabelIntent } from './label-intent.js';
+import { loadHistoryLimit, loadPostCollectSettings } from './settings.js';
 
 const BUILTIN_PLUGINS = new Map<string, BuiltinPostCollectPlugin>([
 	[detectDriftPlugin.id, detectDriftPlugin],
@@ -24,15 +24,6 @@ const BUILTIN_PLUGINS = new Map<string, BuiltinPostCollectPlugin>([
 	[auditSkillScannerPlugin.id, auditSkillScannerPlugin],
 	[notifySlackPlugin.id, notifySlackPlugin],
 ]);
-
-interface RawSettings {
-	collector?: {
-		history_limit?: number;
-	};
-	post_collect?: {
-		plugins?: PostCollectPluginConfig[];
-	};
-}
 
 interface SavedPluginOutputEntry extends PostCollectPluginResult {
 	generated_at: string;
@@ -43,48 +34,13 @@ function getPluginOutputPath(projectRoot: string, pluginId: string): string {
 	return join(projectRoot, 'data', 'plugins', `${pluginId}.yaml`);
 }
 
-function loadPostCollectSettings(projectRoot: string): PostCollectSettings {
-	const settingsPath = join(projectRoot, 'config', 'harbor.yaml');
-	if (!existsSync(settingsPath)) {
-		return { plugins: [{ id: 'builtin.detect-drift' }] };
-	}
-	try {
-		const raw = yamlLoad(readFileSync(settingsPath, 'utf-8')) as RawSettings | null;
-		return {
-			plugins: raw?.post_collect?.plugins ?? [{ id: 'builtin.detect-drift' }],
-		};
-	} catch {
-		return { plugins: [{ id: 'builtin.detect-drift' }] };
-	}
-}
-
-function loadHistoryLimit(projectRoot: string): number {
-	const settingsPath = join(projectRoot, 'config', 'harbor.yaml');
-	if (!existsSync(settingsPath)) {
-		return 50;
-	}
-	try {
-		const raw = yamlLoad(readFileSync(settingsPath, 'utf-8')) as RawSettings | null;
-		return raw?.collector?.history_limit ?? 50;
-	} catch {
-		return 50;
-	}
-}
-
-function validateIntent(intent: string | undefined): LabelIntent {
-	if (intent === 'neutral' || intent === 'info' || intent === 'success' || intent === 'warn' || intent === 'danger') {
-		return intent;
-	}
-	return 'neutral';
-}
-
 function normalizePluginResult(result: PostCollectPluginResult | null | undefined): PostCollectPluginResult {
 	const next: PostCollectPluginResult = {};
 	if (result?.persist === false) next.persist = false;
 	if (result?.summary) next.summary = String(result.summary);
 	if (result?.label_intents) {
 		next.label_intents = Object.fromEntries(
-			Object.entries(result.label_intents).map(([label, intent]) => [label, validateIntent(intent)]),
+			Object.entries(result.label_intents).map(([label, intent]) => [label, normalizeLabelIntent(intent)]),
 		);
 	}
 	if (Array.isArray(result?.sub_artifacts)) {

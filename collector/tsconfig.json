@@ -4,12 +4,12 @@
 		"module": "ES2022",
 		"moduleResolution": "bundler",
 		"outDir": "dist",
-		"rootDir": ".",
+		"rootDir": "..",
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"declaration": false,
 		"sourceMap": false
 	},
-	"include": ["bin/**/*.ts", "src/**/*.ts"]
+	"include": ["../shared/**/*.ts", "bin/**/*.ts", "src/**/*.ts"]
 }

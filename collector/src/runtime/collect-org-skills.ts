@@ -1,6 +1,5 @@
 import { Octokit } from '@octokit/rest';
 import { load as yamlLoad } from 'js-yaml';
-import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -12,12 +11,17 @@ import {
 	type CatalogYaml,
 } from './shared/catalog-store.js';
 import {
+	normalizeRepoKey,
 	normalizeResolvedFromFrontmatter,
 	normalizeResolvedFromSkillsLock,
 	parseProjectSkillsLock,
+	parseResolvedFromRef,
 	resolveSkillLookupName,
 	type ProjectSkillsLockEntry,
+	type ParsedResolvedFrom,
 } from './shared/resolved-from.js';
+import { parseFrontmatter } from './shared/frontmatter.js';
+import { detectGitHubOrigin, getProjectRoot } from './shared/project.js';
 import { createCollectEntry, prependCollectEntry, type CategoryStats, type CollectEntry } from './collects.js';
 
 interface SettingsConfig {
@@ -28,10 +32,6 @@ interface SettingsConfig {
 		included_extra_repos?: string[];
 		history_limit?: number;
 	};
-}
-
-function getProjectRoot(): string {
-	return process.env.SKILL_HARBOR_PROJECT_ROOT || process.cwd();
 }
 
 function loadSettings(projectRoot = getProjectRoot()): SettingsConfig {
@@ -75,14 +75,6 @@ interface RepoTarget {
 
 export interface CollectOptions {
 	force?: boolean;
-}
-
-interface ParsedResolvedFrom {
-	platform: string;
-	owner: string;
-	repo: string;
-	repoKey: string;
-	sha: string | null;
 }
 
 interface LoadedProjectSkillsLock {
@@ -152,22 +144,6 @@ function pruneStaleCollectedRepos(projectRoot: string, catalog: CatalogYaml, kee
 	return pruned;
 }
 
-function parseFrontmatter(content: string): Record<string, unknown> {
-	if (!content.startsWith('---')) return {};
-	const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
-	if (!match) return {};
-
-	try {
-		const parsed = yamlLoad(match[1]);
-		if (!parsed || typeof parsed !== 'object') return {};
-		const frontmatter = { ...(parsed as Record<string, unknown>) };
-		delete frontmatter._excerpt;
-		return frontmatter;
-	} catch {
-		return {};
-	}
-}
-
 function readFrontmatterFromSavedSkill(repoDir: string, skillPath: string): Record<string, unknown> {
 	const fullPath = join(repoDir, skillPath);
 	if (!existsSync(fullPath)) return {};
@@ -207,22 +183,22 @@ function formatApiError(error: unknown): string {
 }
 
 async function withRetry<T>(fn: () => Promise<T>, label: string, maxRetries = 3): Promise<T> {
-	for (let attempt = 0; attempt <= maxRetries; attempt++) {
+	let attempt = 0;
+	while (true) {
 		try {
 			return await fn();
 		} catch (error) {
-			if (attempt < maxRetries && isRetryableError(error)) {
-				const delaySec = 2 ** attempt; // 1s, 2s, 4s
+			if (attempt >= maxRetries || !isRetryableError(error)) {
+				throw error;
+			}
+			const delaySec = 2 ** attempt; // 1s, 2s, 4s
 				console.log(
 					`  [retry] ${label}: ${formatApiError(error)} — retrying in ${delaySec}s (${attempt + 1}/${maxRetries})`,
 				);
-				await sleep(delaySec * 1000);
-				continue;
-			}
-			throw error;
+			attempt += 1;
+			await sleep(delaySec * 1000);
 		}
 	}
-	throw new Error('unreachable');
 }
 
 async function checkRateLimit(octokit: Octokit): Promise<void> {
@@ -349,23 +325,6 @@ async function fetchOptionalFileContent(
 		}
 		throw error;
 	}
-}
-
-function normalizeRepoKey(platform: string, owner: string, repo: string): string {
-	return `${platform}/${owner}/${repo}`;
-}
-
-function parseResolvedFromRef(from: string): ParsedResolvedFrom | null {
-	const trimmed = from.trim();
-	const match = trimmed.match(/^([^/\s]+)\/([^/\s]+)\/([^@\s]+)(?:@(.+))?$/);
-	if (!match) return null;
-	return {
-		platform: match[1],
-		owner: match[2],
-		repo: match[3],
-		repoKey: normalizeRepoKey(match[1], match[2], match[3]),
-		sha: match[4] ?? null,
-	};
 }
 
 function parseGitHubRepoUrl(url: string): { owner: string; repo: string } | null {
@@ -610,38 +569,11 @@ async function collectRepoSkills(
 	};
 }
 
-function detectOrgRepo(): { org: string | null; repo: string | null } {
-	let org = process.env.GH_ORG || null;
-	let repo = process.env.GH_REPO || null;
-	if (org && repo) return { org, repo };
-	try {
-		const remoteUrl = execSync('git remote get-url origin', {
-			encoding: 'utf-8',
-			cwd: getProjectRoot(),
-		}).trim();
-		const sshMatch = remoteUrl.match(/^git@[^:]+:([^/]+)\/([^/.]+)/);
-		if (sshMatch) {
-			org = org ?? sshMatch[1];
-			repo = repo ?? sshMatch[2];
-			return { org, repo };
-		}
-		const httpsMatch = remoteUrl.match(/^https?:\/\/[^/]+\/([^/]+)\/([^/.]+)/);
-		if (httpsMatch) {
-			org = org ?? httpsMatch[1];
-			repo = repo ?? httpsMatch[2];
-			return { org, repo };
-		}
-	} catch {
-		// git command failed
-	}
-	return { org, repo };
-}
-
 export async function runCollectOrgSkills(options: CollectOptions = {}): Promise<void> {
 	const projectRoot = getProjectRoot();
 	const force = options.force ?? false;
 	const token = process.env.GH_TOKEN;
-	const { org, repo: selfRepo } = detectOrgRepo();
+	const { org, repo: selfRepo } = detectGitHubOrigin(projectRoot);
 
 	if (!token) {
 		throw new Error('GH_TOKEN environment variable is required.');
@@ -862,6 +794,7 @@ export async function runCollectOrgSkills(options: CollectOptions = {}): Promise
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+	// This direct entrypoint is mainly for debugging and advanced local use. The normal path is via harbor-collector.
 	try {
 		await runCollectOrgSkills();
 	} catch (error) {
