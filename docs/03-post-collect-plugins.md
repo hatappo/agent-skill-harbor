@@ -151,7 +151,7 @@ Then uncomment the plugin entry in `config/harbor.yaml`.
 
 - collect summary
 - plugin summaries
-- highlighted warnings based on selected `label_intents`
+- highlighted sections based on selected `highlight_intents`
 
 It uses `text + blocks` and does not need setup files.
 
@@ -166,4 +166,9 @@ post_collect:
         webhook_url: https://hooks.slack.com/services/...
         disable_send: false
         use_debug_message: false
+        highlight_intents:
+          - warn
+          - danger
+
+`highlight_intents` is optional. By default, `builtin.notify-slack` highlights `warn` and `danger`.
 ```

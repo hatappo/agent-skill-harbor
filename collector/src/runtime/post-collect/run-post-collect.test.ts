@@ -369,7 +369,7 @@ test('runPostCollect logs summary even when persist is false', async () => {
 	assert.match(logs.join('\n'), /builtin\.notify-slack \(done\)/);
 	assert.match(
 		logs.join('\n'),
-		/summary: Prepared Slack notification with 0 plugin summary section\(s\) and 0 highlighted warning section\(s\)\./,
+		/summary: Prepared Slack notification with 0 plugin summary section\(s\) and 0 highlighted section\(s\)\./,
 	);
 	assert.match(logs.join('\n'), /persist: false \(skipped saving plugin output\)/);
 });

@@ -201,7 +201,7 @@ export async function runPostCollect(options: RunPostCollectOptions): Promise<vo
 		return;
 	}
 
-	if (log) console.log(`Running post_collect plugins: ${plugins.map((plugin) => plugin.id).join(', ')}`);
+	if (log) console.log(`\nRunning post_collect plugins: ${plugins.map((plugin) => plugin.id).join(', ')}`);
 
 	for (const plugin of plugins) {
 		const builtIn = BUILTIN_PLUGINS.get(plugin.id);
@@ -211,7 +211,7 @@ export async function runPostCollect(options: RunPostCollectOptions): Promise<vo
 			...(plugin.config ? { plugin_config: plugin.config } : {}),
 		};
 		const outputPath = getPluginOutputPath(options.projectRoot, plugin.id);
-		if (log) console.log(`  -> ${plugin.id} (start)`);
+		if (log) console.log(`\n  -> ${plugin.id} (start)`);
 		const result = builtIn
 			? await builtIn.run(context)
 			: await (await loadUserPlugin(options.projectRoot, plugin.id)).run(context);

@@ -1,10 +1,10 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { load as yamlLoad } from 'js-yaml';
-import type { BuiltinPostCollectPlugin } from '../types.js';
+import type { BuiltinPostCollectPlugin, LabelIntent } from '../types.js';
 
-const HIGHLIGHT_INTENTS = new Set(['danger']);
-// Add other intents such as "warn" here if you want to highlight them too.
+const DEFAULT_HIGHLIGHT_INTENTS = new Set<LabelIntent>(['warn', 'danger']);
+// Keep this list narrow by default. Add or remove intents here if the built-in default should change.
 
 interface CategoryStats {
 	repos: number;
@@ -36,6 +36,7 @@ interface NotifySlackConfig {
 	webhook_url?: string;
 	disable_send?: boolean;
 	use_debug_message?: boolean;
+	highlight_intents?: LabelIntent[];
 }
 
 interface SlackTextObject {
@@ -61,10 +62,22 @@ function loadYamlArray<T>(filePath: string): T[] {
 }
 
 function parseConfig(pluginConfig: Record<string, unknown> | undefined): NotifySlackConfig {
+	const highlightIntents = Array.isArray(pluginConfig?.highlight_intents)
+		? pluginConfig.highlight_intents.filter(
+				(intent): intent is LabelIntent =>
+					intent === 'neutral' ||
+					intent === 'info' ||
+					intent === 'success' ||
+					intent === 'warn' ||
+					intent === 'danger',
+			)
+		: undefined;
+
 	return {
 		webhook_url: typeof pluginConfig?.webhook_url === 'string' ? pluginConfig.webhook_url : undefined,
 		disable_send: pluginConfig?.disable_send === true,
 		use_debug_message: pluginConfig?.use_debug_message === true,
+		highlight_intents: highlightIntents && highlightIntents.length > 0 ? highlightIntents : undefined,
 	};
 }
 
@@ -105,7 +118,11 @@ function collectPluginEntries(
 		.filter((value): value is { pluginId: string; entry: SavedPluginEntry } => value !== null);
 }
 
-function summarizeWarnings(pluginId: string, entry: SavedPluginEntry): string | null {
+function summarizeWarnings(
+	pluginId: string,
+	entry: SavedPluginEntry,
+	highlightIntents: ReadonlySet<LabelIntent>,
+): string | null {
 	const labelIntents = entry.label_intents ?? {};
 	const counts = new Map<string, number>();
 
@@ -113,7 +130,15 @@ function summarizeWarnings(pluginId: string, entry: SavedPluginEntry): string | 
 		const label = typeof result?.label === 'string' ? result.label : undefined;
 		if (!label) continue;
 		const intent = labelIntents[label];
-		if (!intent || !HIGHLIGHT_INTENTS.has(intent)) continue;
+		if (
+			intent !== 'neutral' &&
+			intent !== 'info' &&
+			intent !== 'success' &&
+			intent !== 'warn' &&
+			intent !== 'danger'
+		)
+			continue;
+		if (!highlightIntents.has(intent)) continue;
 		counts.set(label, (counts.get(label) ?? 0) + 1);
 	}
 
@@ -128,6 +153,7 @@ function buildNotification(
 	collectId: string | null,
 	collectEntry: CollectEntry | undefined,
 	pluginEntries: { pluginId: string; entry: SavedPluginEntry }[],
+	highlightIntents: ReadonlySet<LabelIntent>,
 ) {
 	const collectedAt = collectEntry?.collecting.collected_at ?? 'unknown';
 	const collectSummaryLines = collectEntry
@@ -141,22 +167,22 @@ function buildNotification(
 			? pluginEntries.map(({ pluginId, entry }) => `- *${pluginId}*: ${entry.summary ?? 'No summary provided.'}`)
 			: ['- No plugin summaries available.'];
 	const warningLines = pluginEntries
-		.map(({ pluginId, entry }) => summarizeWarnings(pluginId, entry))
+		.map(({ pluginId, entry }) => summarizeWarnings(pluginId, entry, highlightIntents))
 		.filter((line): line is string => line !== null);
 
 	const textLines = [
-		`Agent Skill Harbor post-collect summary (${collectedAt})`,
+		`Agent Skill Harbor collected summary (${collectedAt})`,
 		...collectSummaryLines,
 		'Plugin summaries:',
 		...pluginSummaryLines.map((line) => line.replace(/^\- \*/, '- ').replace(/\*:/g, ':')),
-		'Warnings:',
-		...(warningLines.length > 0 ? warningLines : ['No highlighted warnings.']),
+		'Highlights:',
+		...(warningLines.length > 0 ? warningLines : ['No highlights.']),
 	];
 
 	const blocks: SlackBlock[] = [
 		{
 			type: 'header',
-			text: { type: 'plain_text', text: 'Agent Skill Harbor post-collect summary', emoji: true },
+			text: { type: 'plain_text', text: 'Agent Skill Harbor collected summary', emoji: true },
 		},
 		{
 			type: 'context',
@@ -186,7 +212,7 @@ function buildNotification(
 			type: 'section',
 			text: {
 				type: 'mrkdwn',
-				text: `*Warnings*\n${warningLines.length > 0 ? warningLines.join('\n') : 'No highlighted warnings.'}`,
+				text: `*Highlights*\n${warningLines.length > 0 ? warningLines.join('\n') : 'No highlights.'}`,
 			},
 		},
 	];
@@ -216,25 +242,26 @@ export const notifySlackPlugin: BuiltinPostCollectPlugin = {
 	id: 'builtin.notify-slack',
 	async run(context) {
 		const config = parseConfig(context.plugin_config);
+		const highlightIntents = new Set(config.highlight_intents ?? DEFAULT_HIGHLIGHT_INTENTS);
 		const collectEntries = loadYamlArray<CollectEntry>(context.paths.collects_yaml);
 		const collectEntry = selectCollectEntry(collectEntries, context.collect_id);
 		const pluginEntries = collectPluginEntries(context.paths.data_dir, context.collect_id, context.plugin_id);
 		const notification = config.use_debug_message
 			? {
-					text: `notify-slack debug message for collect ${context.collect_id ?? 'latest'}`,
+					text: `DEBUG notify-slack message for collect ${context.collect_id ?? 'latest'}`,
 					blocks: [
 						{
 							type: 'section' as const,
 							text: {
 								type: 'mrkdwn' as const,
-								text: `*notify-slack debug message*\ncollect_id: ${context.collect_id ?? 'latest'}`,
+								text: `*DEBUG notify-slack message*\ncollect_id: ${context.collect_id ?? 'latest'}`,
 							},
 						},
 					],
 					warningCount: 0,
 					pluginSummaryCount: pluginEntries.length,
 				}
-			: buildNotification(context.collect_id, collectEntry, pluginEntries);
+			: buildNotification(context.collect_id, collectEntry, pluginEntries, highlightIntents);
 
 		if (config.disable_send) {
 			console.log('[builtin.notify-slack] Slack send disabled by config.disable_send=true');
@@ -251,7 +278,7 @@ export const notifySlackPlugin: BuiltinPostCollectPlugin = {
 
 		return {
 			persist: false,
-			summary: `Prepared Slack notification with ${notification.pluginSummaryCount} plugin summary section(s) and ${notification.warningCount} highlighted warning section(s).`,
+			summary: `Prepared Slack notification with ${notification.pluginSummaryCount} plugin summary section(s) and ${notification.warningCount} highlighted section(s).`,
 		};
 	},
 };

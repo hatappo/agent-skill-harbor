@@ -153,7 +153,7 @@ pip install -r collector/plugins/builtin.audit-skill-scanner/requirements.txt
 
 - collect summary
 - plugin summary
-- 指定した `label_intents` に基づく warning
+- 指定した `highlight_intents` に基づく highlight
 
 `text + blocks` を使い、setup file は不要です。
 
@@ -168,4 +168,9 @@ post_collect:
         webhook_url: https://hooks.slack.com/services/...
         disable_send: false
         use_debug_message: false
+        highlight_intents:
+          - warn
+          - danger
+
+`highlight_intents` は省略可能です。既定では `warn` と `danger` を強調対象にします。
 ```
