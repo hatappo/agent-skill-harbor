@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import test from 'node:test';
 import { sanitizeCatalogForSave } from './shared/catalog-store.js';
-import { collectFromResolvedFrom, runCollectOrgSkills } from './collect-org-skills.js';
+import { collectFromResolvedFrom, fetchFileContent, runCollectOrgSkills } from './collect-org-skills.js';
 
 test('sanitizeCatalogForSave strips copied frontmatter from skills.yaml entries', () => {
 	assert.deepEqual(
@@ -82,6 +82,36 @@ test('collectFromResolvedFrom ignores already queued repos', () => {
 
 	assert.deepEqual(refs, []);
 	assert.equal(queuedRepoKeys.size, 1);
+});
+
+test('fetchFileContent accepts empty files and returns an empty string', async () => {
+	const octokit = {
+		repos: {
+			getContent: async () => ({
+				data: {
+					type: 'file',
+					content: '',
+				},
+			}),
+		},
+		rateLimit: {
+			get: async () => ({
+				data: {
+					resources: {
+						core: {
+							remaining: 1,
+							reset: Math.floor(Date.now() / 1000) + 60,
+						},
+					},
+				},
+			}),
+		},
+	} as never;
+
+	await assert.doesNotReject(async () => {
+		const content = await fetchFileContent(octokit, 'anthropics', 'skills', 'empty.txt');
+		assert.equal(content, '');
+	});
 });
 
 test('runCollectOrgSkills fails when config/harbor.yaml is missing', async () => {

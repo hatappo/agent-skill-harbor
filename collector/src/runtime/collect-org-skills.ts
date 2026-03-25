@@ -308,9 +308,9 @@ async function findSkillFilesFallback(octokit: Octokit, owner: string, repo: str
 	return skills;
 }
 
-async function fetchFileContent(octokit: Octokit, owner: string, repo: string, path: string): Promise<string> {
+export async function fetchFileContent(octokit: Octokit, owner: string, repo: string, path: string): Promise<string> {
 	const { data } = await withRetry(() => octokit.repos.getContent({ owner, repo, path }), `${owner}/${repo}/${path}`);
-	if (Array.isArray(data) || data.type !== 'file' || !data.content) {
+	if (Array.isArray(data) || data.type !== 'file' || typeof data.content !== 'string') {
 		throw new Error(`Unexpected response for ${path}`);
 	}
 	return Buffer.from(data.content, 'base64').toString('utf-8');
