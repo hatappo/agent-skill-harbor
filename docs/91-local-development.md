@@ -23,6 +23,45 @@ These scripts expand to:
 - `pnpm build` → `node node_modules/agent-skill-harbor/dist/src/runtime/build.js`
 - `pnpm preview` → `node node_modules/agent-skill-harbor/dist/src/runtime/preview.js`
 
+### Testing Unpublished Local Packages in a Generated Project
+
+If you want to verify generated-project behavior before `npm publish`, the simplest option is to point dependencies at the local working tree.
+
+In the generated project:
+
+- set `package.json` to `file:/absolute/path/to/agent-skill-harbor`
+- set `collector/package.json` to `file:/absolute/path/to/agent-skill-harbor/collector`
+
+Example:
+
+```json
+{
+	"dependencies": {
+		"agent-skill-harbor": "file:/Users/you/ws/agent-skill-harbor"
+	}
+}
+```
+
+```json
+{
+	"dependencies": {
+		"agent-skill-harbor-collector": "file:/Users/you/ws/agent-skill-harbor/collector"
+	}
+}
+```
+
+Then rebuild the local packages and reinstall them in the generated project:
+
+```bash
+cd /absolute/path/to/agent-skill-harbor
+pnpm cli:build
+pnpm --dir collector build
+
+cd /absolute/path/to/generated-project
+pnpm install
+pnpm install --dir collector
+```
+
 ## For Contributors
 
 ### Prerequisites

@@ -23,6 +23,45 @@ pnpm preview
 - `pnpm build` → `node node_modules/agent-skill-harbor/dist/src/runtime/build.js`
 - `pnpm preview` → `node node_modules/agent-skill-harbor/dist/src/runtime/preview.js`
 
+### 未 publish のローカル package を生成プロジェクトで試す方法
+
+`npm publish` 前に generated project 側の挙動を確認したいときは、依存先をローカル作業ツリーへ向けるのがいちばん簡単です。
+
+生成プロジェクト側で:
+
+- `package.json` を `file:/absolute/path/to/agent-skill-harbor` に向ける
+- `collector/package.json` を `file:/absolute/path/to/agent-skill-harbor/collector` に向ける
+
+例:
+
+```json
+{
+	"dependencies": {
+		"agent-skill-harbor": "file:/Users/you/ws/agent-skill-harbor"
+	}
+}
+```
+
+```json
+{
+	"dependencies": {
+		"agent-skill-harbor-collector": "file:/Users/you/ws/agent-skill-harbor/collector"
+	}
+}
+```
+
+そのうえで、ローカル package を build してから generated project 側で入れ直します。
+
+```bash
+cd /absolute/path/to/agent-skill-harbor
+pnpm cli:build
+pnpm --dir collector build
+
+cd /absolute/path/to/generated-project
+pnpm install
+pnpm install --dir collector
+```
+
 ## コントリビューター向け
 
 ### 前提
