@@ -2,6 +2,25 @@
 
 ## [未リリース]
 
+## [cli 0.15.0] / [collector 0.15.0] - 2026-03-25
+
+### 追加
+
+- `builtin.notify-slack` の通知内容を改善し、highlight 対象 intent の設定と、post-collect 通知フロー向けのより分かりやすい debug 出力を追加
+- frontmatter 解析、GitHub origin 検出、YAML 配列読み込み、label intent 正規化の小さな shared utility を collector/runtime に追加し、重複ロジックを削減
+
+### 変更
+
+- repository 構成を root の `agent-skill-harbor` package と `collector/` に寄せ、以前の `packages/*` 分割を整理した。あわせて template、workflow、関連ドキュメントも現行構成に更新
+- root scripts を、Web 用の `dev` / `build` / `preview`、配布用 CLI build の `build:cli`、保守用の `typecheck` / `verify` / `fix` を中心とした構成に整理
+- コントリビューター向け・リリース向けドキュメントを、現在の package 構成、command 名、ローカル開発フローに合わせて更新
+
+### 修正
+
+- collect / post-collect runtime 間で重複していた解析・検証ロジックを共通 module へ寄せ、実装のばらつきを修正
+- built-in plugin の結果集計が Slack 通知へより一貫して反映されるようにし、通知サマリと highlight 件数の扱いを修正
+- setup / release 手順に残っていた古い command 名を修正し、現在の script 構成と一致させた
+
 ## [cli 0.14.3] - 2026-03-23
 
 ### 修正

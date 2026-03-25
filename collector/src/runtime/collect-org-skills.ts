@@ -192,9 +192,9 @@ async function withRetry<T>(fn: () => Promise<T>, label: string, maxRetries = 3)
 				throw error;
 			}
 			const delaySec = 2 ** attempt; // 1s, 2s, 4s
-				console.log(
-					`  [retry] ${label}: ${formatApiError(error)} — retrying in ${delaySec}s (${attempt + 1}/${maxRetries})`,
-				);
+			console.log(
+				`  [retry] ${label}: ${formatApiError(error)} — retrying in ${delaySec}s (${attempt + 1}/${maxRetries})`,
+			);
 			attempt += 1;
 			await sleep(delaySec * 1000);
 		}

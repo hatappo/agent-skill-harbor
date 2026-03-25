@@ -11,15 +11,14 @@ test('detectEnabledPluginManifests returns enabled ids and python presence', () 
 	mkdirSync(join(root, 'collector', 'plugins', 'builtin.audit-skill-scanner'), { recursive: true });
 	writeFileSync(
 		join(root, 'config', 'harbor.yaml'),
-		[
-			'post_collect:',
-			'  plugins:',
-			'    - id: builtin.detect-drift',
-			'    - id: builtin.audit-skill-scanner',
-			'',
-		].join('\n'),
+		['post_collect:', '  plugins:', '    - id: builtin.detect-drift', '    - id: builtin.audit-skill-scanner', ''].join(
+			'\n',
+		),
 	);
-	writeFileSync(join(root, 'collector', 'plugins', 'builtin.audit-skill-scanner', 'requirements.txt'), 'example==1.0.0\n');
+	writeFileSync(
+		join(root, 'collector', 'plugins', 'builtin.audit-skill-scanner', 'requirements.txt'),
+		'example==1.0.0\n',
+	);
 
 	const result = detectEnabledPluginManifests(root);
 	assert.deepEqual(result.enabledPluginIds, ['builtin.detect-drift', 'builtin.audit-skill-scanner']);

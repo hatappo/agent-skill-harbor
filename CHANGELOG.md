@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+## [cli 0.15.0] / [collector 0.15.0] - 2026-03-25
+
+### Added
+
+- Added richer `builtin.notify-slack` reporting with configurable highlighted intents and clearer debug output for post-collect notification flows
+- Added small shared collector/runtime utilities for frontmatter parsing, GitHub origin detection, YAML array loading, and label-intent normalization to reduce duplicated logic
+
+### Changed
+
+- Simplified the runtime package layout by consolidating the repository around the root `agent-skill-harbor` package and `collector/`, removing the older `packages/*` split and updating templates, workflows, and docs accordingly
+- Reorganized root scripts around `dev` / `build` / `preview` for web flows, `build:cli` for the packaged CLI build, and `typecheck` / `verify` / `fix` for repository maintenance
+- Updated contributor and release documentation to match the current package layout, command names, and local development flow
+
+### Fixed
+
+- Fixed duplicated parsing and validation logic across collect and post-collect runtimes by moving shared implementations into common modules
+- Fixed Slack notification summaries and highlight counting so built-in plugin results are reported more consistently
+- Fixed several stale command references in setup and release guidance so they match the current script layout
+
 ## [cli 0.14.3] - 2026-03-23
 
 ### Fixed

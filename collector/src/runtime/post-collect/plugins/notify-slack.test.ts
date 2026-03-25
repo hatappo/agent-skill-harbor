@@ -30,8 +30,8 @@ test('notify-slack uses warn and danger as default highlighted intents', async (
 				summary: 'scanner summary',
 				label_intents: { LOW: 'warn', CRITICAL: 'danger' },
 				results: {
-					'a': { label: 'LOW' },
-					'b': { label: 'CRITICAL' },
+					a: { label: 'LOW' },
+					b: { label: 'CRITICAL' },
 				},
 			},
 		]),
@@ -59,7 +59,10 @@ test('notify-slack uses warn and danger as default highlighted intents', async (
 			plugin_config: { disable_send: true },
 		});
 
-		assert.equal(result.summary, 'Prepared Slack notification with 1 plugin summary section(s) and 1 highlighted section(s).');
+		assert.equal(
+			result.summary,
+			'Prepared Slack notification with 1 plugin summary section(s) and 1 highlighted section(s).',
+		);
 		assert.match(logs.join('\n'), /builtin\.audit-skill-scanner: LOW: 1, CRITICAL: 1/);
 	} finally {
 		console.log = originalLog;

@@ -96,13 +96,7 @@ function summarizeWarnings(
 		const label = typeof result?.label === 'string' ? result.label : undefined;
 		if (!label) continue;
 		const intent = labelIntents[label];
-		if (
-			intent !== 'neutral' &&
-			intent !== 'info' &&
-			intent !== 'success' &&
-			intent !== 'warn' &&
-			intent !== 'danger'
-		)
+		if (intent !== 'neutral' && intent !== 'info' && intent !== 'success' && intent !== 'warn' && intent !== 'danger')
 			continue;
 		if (!highlightIntents.has(intent)) continue;
 		counts.set(label, (counts.get(label) ?? 0) + 1);

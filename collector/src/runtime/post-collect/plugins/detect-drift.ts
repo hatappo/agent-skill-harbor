@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { parseFrontmatter } from '../../shared/frontmatter.js';
-import { parseResolvedFromRef, resolveSkillLookupName, type ProjectSkillsLockEntry } from '../../shared/resolved-from.js';
+import {
+	parseResolvedFromRef,
+	resolveSkillLookupName,
+	type ProjectSkillsLockEntry,
+} from '../../shared/resolved-from.js';
 import type { BuiltinPostCollectPlugin, PostCollectCatalog, PostCollectPluginResult } from '../types.js';
 
 function readSkillIdentity(skillFilePath: string, skillPath: string): string | null {
