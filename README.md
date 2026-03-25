@@ -28,8 +28,11 @@ cd my-skill-harbor
 pnpm install
 pnpm install --dir collector
 
-# edit .env and set GH_TOKEN / GH_ORG if needed
-pnpm collect
+# edit .env and set GH_ORG
+
+gh auth login && GH_TOKEN=$(gh auth token) pnpm collect
+# Or edit .env and set GH_TOKEN, then run:
+# pnpm collect
 pnpm dev
 ```
 

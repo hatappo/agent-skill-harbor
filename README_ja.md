@@ -28,8 +28,11 @@ cd my-skill-harbor
 pnpm install
 pnpm install --dir collector
 
-# 必要なら .env で GH_TOKEN / GH_ORG を設定
-pnpm collect
+# .env で GH_ORG を設定
+
+gh auth login && GH_TOKEN=$(gh auth token) pnpm collect
+# あるいは .env で GH_TOKEN を設定してから:
+# pnpm collect
 pnpm dev
 ```
 

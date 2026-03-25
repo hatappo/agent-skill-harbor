@@ -186,15 +186,17 @@ function printNextSteps(targetArg?: string): void {
 Done! Next steps:
 
   1. cd ${targetArg || '.'}
-  2. Edit .env: uncomment and set GH_TOKEN, GH_ORG, if needed
+  2. Edit .env: uncomment and set GH_ORG
   3. Install dependencies:
-     pnpm install   (or npm install)
+     pnpm install
   4. Install collector runtime dependencies:
-     pnpm install --dir collector   (or npm install --prefix collector)
-  5. Start development server:
-     pnpm dev       (or npx harbor dev)
-  6. Collect skills from your organization:
-     pnpm collect
+     pnpm install --dir collector
+  5. Authenticate GitHub CLI and collect skills:
+     gh auth login && GH_TOKEN=$(gh auth token) pnpm collect
+  5'. Or edit .env and set GH_TOKEN, then run:
+      pnpm collect
+  6. Start development server:
+     pnpm dev
 `);
 }
 
