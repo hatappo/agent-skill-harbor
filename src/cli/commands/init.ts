@@ -196,7 +196,9 @@ Done! Next steps:
      GH_TOKEN=$(gh auth token) pnpm collect
   5'. Or edit .env and set GH_TOKEN, then run:
       pnpm collect
-  6. Start development server:
+  6. Run post-collect plugins:
+     pnpm post-collect
+  7. Start development server:
      pnpm dev
 `);
 }
