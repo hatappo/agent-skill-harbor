@@ -1,4 +1,5 @@
 export { loadOptionalEnvFile } from '../../../shared/load-optional-env-file.js';
+export { isExecutedDirectly } from '../../../shared/is-executed-directly.js';
 
 export function getErrorMessage(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);

@@ -1,7 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { logRuntimeErrorAndExit } from '../shared/runtime-command-support.js';
+import { isExecutedDirectly, logRuntimeErrorAndExit } from '../shared/runtime-command-support.js';
 import { userRoot } from '../shared/runtime-paths.js';
 import { detectEnabledPluginManifests } from './post-collect/enabled-plugin-manifests.js';
 
@@ -44,6 +43,6 @@ export async function runDetectEnabledPluginManifestsCommand(argv: string[] = []
 	}
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isExecutedDirectly(import.meta.url)) {
 	await runDetectEnabledPluginManifestsCommand(process.argv.slice(2));
 }

@@ -192,7 +192,8 @@ Done! Next steps:
   4. Install collector runtime dependencies:
      pnpm install --dir collector
   5. Authenticate GitHub CLI and collect skills:
-     gh auth login && GH_TOKEN=$(gh auth token) pnpm collect
+     gh auth login
+     GH_TOKEN=$(gh auth token) pnpm collect
   5'. Or edit .env and set GH_TOKEN, then run:
       pnpm collect
   6. Start development server:

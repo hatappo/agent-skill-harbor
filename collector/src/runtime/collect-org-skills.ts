@@ -2,7 +2,6 @@ import { Octokit } from '@octokit/rest';
 import { load as yamlLoad } from 'js-yaml';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { pathToFileURL } from 'node:url';
 import {
 	loadCatalog,
 	saveCatalog,
@@ -21,6 +20,7 @@ import {
 	type ParsedResolvedFrom,
 } from './shared/resolved-from.js';
 import { parseFrontmatter } from './shared/frontmatter.js';
+import { isExecutedDirectly } from '../shared/runtime-command-support.js';
 import { detectGitHubOrigin, getProjectRoot } from './shared/project.js';
 import { createCollectEntry, prependCollectEntry, type CategoryStats, type CollectEntry } from './collects.js';
 
@@ -798,7 +798,7 @@ export async function runCollectOrgSkills(options: CollectOptions = {}): Promise
 	);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isExecutedDirectly(import.meta.url)) {
 	// This direct entrypoint is mainly for debugging and advanced local use. Generated projects call the packaged module path directly.
 	try {
 		await runCollectOrgSkills();

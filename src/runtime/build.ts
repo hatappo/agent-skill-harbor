@@ -1,8 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { getExitCode, packageRoot, stageDataAssets, userRoot } from '../shared/runtime-support.js';
+import { getExitCode, isExecutedDirectly, packageRoot, stageDataAssets, userRoot } from '../shared/runtime-support.js';
 
 const require = createRequire(import.meta.url);
 
@@ -35,6 +34,6 @@ export function runBuild(argv: string[] = []): void {
 	}
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isExecutedDirectly(import.meta.url)) {
 	runBuild(process.argv.slice(2));
 }

@@ -1,6 +1,7 @@
 import { cpSync, existsSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+export { isExecutedDirectly } from '../../shared/is-executed-directly.js';
 
 const STAGED_MARKER_FILE = '.skill-harbor-staged';
 const __dirname = dirname(fileURLToPath(import.meta.url));

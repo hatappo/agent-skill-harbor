@@ -1,7 +1,6 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
-import { loadOptionalEnvFile, logRuntimeErrorAndExit } from '../shared/runtime-command-support.js';
+import { isExecutedDirectly, loadOptionalEnvFile, logRuntimeErrorAndExit } from '../shared/runtime-command-support.js';
 import { userRoot } from '../shared/runtime-paths.js';
 import { runCollectOrgSkills } from './collect-org-skills.js';
 
@@ -42,6 +41,6 @@ export async function runCollectCommand(argv: string[] = []): Promise<void> {
 	}
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isExecutedDirectly(import.meta.url)) {
 	await runCollectCommand(process.argv.slice(2));
 }

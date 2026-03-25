@@ -1,4 +1,4 @@
-import { pathToFileURL } from 'node:url';
+import { isExecutedDirectly } from '../shared/runtime-command-support.js';
 import { loadCatalog } from './shared/catalog-store.js';
 import { detectGitHubOrigin, getProjectRoot } from './shared/project.js';
 import { runPostCollect } from './post-collect/run-post-collect.js';
@@ -33,6 +33,6 @@ export async function runPostCollectCli(argv: string[] = process.argv.slice(2)):
 	});
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+if (isExecutedDirectly(import.meta.url)) {
 	await runPostCollectCli(process.argv.slice(2));
 }
