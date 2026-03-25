@@ -2,6 +2,23 @@
 
 ## [未リリース]
 
+## [cli 0.15.1] / [collector 0.15.1] - 2026-03-25
+
+### 追加
+
+- Web アプリケーションに Storybook を追加し、light/dark theme 切り替えと、Skill 画面系・Config 画面系の初期 component story を追加
+
+### 変更
+
+- `builtin.notify-slack` の実送信では `HARBOR_SLACK_WEBHOOK_URL` を必須に変更し、secret を環境変数で扱う前提に template / docs を更新した。あわせて `post-collect` が `.env` を読むようにした
+- Storybook の story を `Components/Skills/*` と `Components/Config/*` に整理し、UI カタログを拡張しやすい構成にした
+
+### 修正
+
+- package 同梱の既定 Guide コンテンツを復旧し、`/guide` が repository root の `README` にフォールバックしないよう修正して `pnpm build` が再び通るようにした
+- collector runtime の settings 読み込みを整理し、重複した設定ファイル読込・wrapper・解析処理を削減した
+- collector README の言語リンクなど、小さなドキュメント不整合を修正した
+
 ## [cli 0.15.0] / [collector 0.15.0] - 2026-03-25
 
 ### 追加

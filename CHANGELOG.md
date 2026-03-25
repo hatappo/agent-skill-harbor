@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+## [cli 0.15.1] / [collector 0.15.1] - 2026-03-25
+
+### Added
+
+- Added Storybook for the web application with light/dark theme switching and initial component stories for skill and config screens
+
+### Changed
+
+- Changed `builtin.notify-slack` to require `HARBOR_SLACK_WEBHOOK_URL` for live sends, updated templates/docs to prefer env-based secret handling, and made `post-collect` load `.env`
+- Reorganized Storybook stories under grouped `Components/Skills/*` and `Components/Config/*` sections to make the UI catalog easier to expand
+
+### Fixed
+
+- Fixed the packaged Guide default content so `/guide` no longer falls back to the repository root `README`, and `pnpm build` succeeds again
+- Fixed collector runtime settings loading by removing repeated config reads, centralizing defaults, and trimming remaining wrapper/parsing duplication
+- Fixed small documentation inconsistencies including the collector README language links
+
 ## [cli 0.15.0] / [collector 0.15.0] - 2026-03-25
 
 ### Added
