@@ -10,6 +10,7 @@ const projectRoot = realpathSync(process.env.SKILL_HARBOR_PROJECT_ROOT || resolv
 const webPackageRoot = realpathSync(resolve(import.meta.dirname));
 const svelteKitRoot = realpathSync(dirname(require.resolve('@sveltejs/kit/package.json')));
 const viteRoot = realpathSync(dirname(require.resolve('vite/package.json')));
+const graphDependencies = ['3d-force-graph', 'three-forcegraph', 'ngraph.graph', 'ngraph.forcelayout'];
 const allowList = [
 	searchForWorkspaceRoot(projectRoot),
 	projectRoot,
@@ -22,6 +23,9 @@ const allowList = [
 export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	envDir: projectRoot,
+	optimizeDeps: {
+		include: graphDependencies,
+	},
 	define: {
 		__PROJECT_ROOT__: JSON.stringify(projectRoot),
 		__WEB_PACKAGE_ROOT__: JSON.stringify(webPackageRoot),
@@ -31,5 +35,8 @@ export default defineConfig({
 			allow: allowList,
 		},
 	},
-	ssr: { external: ['gray-matter'] },
+	ssr: {
+		external: ['gray-matter'],
+		noExternal: graphDependencies,
+	},
 });
