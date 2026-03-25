@@ -2,6 +2,15 @@
 
 ## [未リリース]
 
+## [cli 0.15.4] / [collector 0.15.4] - 2026-03-26
+
+### 修正
+
+- package 化された runtime entrypoint の起動判定を修正し、generated project で `pnpm collect` / `pnpm post-collect` / `pnpm build` / `pnpm dev` / `pnpm preview` を pnpm の symlink 経由でも正しく実行できるようにした
+- `sveltekit-view-transition` を runtime dependency として扱うよう修正し、generated project の `pnpm dev` が依存不足で失敗する不具合を修正した
+- Python の `__init__.py` のような空ファイルを collector が正しく保存できるようにし、`Unexpected response` 扱いで失敗しないよう修正した
+- init 後の next steps に `pnpm post-collect` を追加し、未 publish のローカル package を generated project から試す手順を docs に追記した
+
 ## [cli 0.15.3] / [collector 0.15.3] - 2026-03-26
 
 ### 修正

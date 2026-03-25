@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [cli 0.15.4] / [collector 0.15.4] - 2026-03-26
+
+### Fixed
+
+- Fixed packaged runtime entrypoints so generated projects correctly execute `pnpm collect`, `pnpm post-collect`, `pnpm build`, `pnpm dev`, and `pnpm preview` even when pnpm runs package files through symlinked paths
+- Fixed generated projects failing to start `pnpm dev` because `sveltekit-view-transition` was treated as a development-only dependency instead of a runtime dependency
+- Fixed collector downloads for empty repository files such as Python `__init__.py`, which are now saved as proper empty files instead of being reported as unexpected responses
+- Updated init next-step guidance to include `pnpm post-collect`, and documented how to test unpublished local packages from a generated project without publishing to npm
+
 ## [cli 0.15.3] / [collector 0.15.3] - 2026-03-26
 
 ### Fixed
