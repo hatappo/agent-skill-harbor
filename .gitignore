@@ -9,6 +9,10 @@ collector/plugins/*/node_modules/
 collector/plugins/*/.venv/
 static/assets/
 
+# Collector pack test temporary build outputs; usually cleaned up, but may remain after failed or interrupted tests
+collector/dist-pack-test-collect/
+collector/dist-pack-test-post-collect/
+
 # Environments
 .env
 .env.*
