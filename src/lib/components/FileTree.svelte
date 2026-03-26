@@ -49,30 +49,35 @@
 			});
 	}
 
+	function collectDirectoryPaths(nodes: TreeNode[]): string[] {
+		const paths: string[] = [];
+		function visit(items: TreeNode[]) {
+			for (const node of items) {
+				if (node.children.length === 0) continue;
+				paths.push(node.path);
+				visit(node.children);
+			}
+		}
+		visit(nodes);
+		return paths;
+	}
+
 	let tree = $derived(buildTree(files));
 
-	let openDirs = new SvelteSet<string>();
+	let allDirectoryPaths = $derived(collectDirectoryPaths(tree));
+	let closedDirs = new SvelteSet<string>();
 
 	function toggle(path: string) {
-		if (openDirs.has(path)) {
-			openDirs.delete(path);
+		if (closedDirs.has(path)) {
+			closedDirs.delete(path);
 		} else {
-			openDirs.add(path);
+			closedDirs.add(path);
 		}
 	}
 
-	// Auto-expand all on mount
-	$effect(() => {
-		function collect(nodes: TreeNode[]) {
-			for (const n of nodes) {
-				if (n.children.length > 0) {
-					openDirs.add(n.path);
-					collect(n.children);
-				}
-			}
-		}
-		collect(tree);
-	});
+	function isOpen(path: string) {
+		return allDirectoryPaths.includes(path) && !closedDirs.has(path);
+	}
 </script>
 
 {#snippet renderNodes(nodes: TreeNode[], depth: number)}
@@ -86,18 +91,18 @@
 					style="padding-left: {depth * 16 + 4}px"
 				>
 					<ChevronRight
-						class="h-3.5 w-3.5 shrink-0 text-gray-400 transition-transform dark:text-gray-500 {openDirs.has(node.path)
+						class="h-3.5 w-3.5 shrink-0 text-gray-400 transition-transform dark:text-gray-500 {isOpen(node.path)
 							? 'rotate-90'
 							: ''}"
 					/>
-					{#if openDirs.has(node.path)}
+					{#if isOpen(node.path)}
 						<FolderOpen class="h-3.5 w-3.5 shrink-0 text-blue-500 dark:text-blue-400" />
 					{:else}
 						<Folder class="h-3.5 w-3.5 shrink-0 text-blue-500 dark:text-blue-400" />
 					{/if}
 					<span class="truncate">{node.name}</span>
 				</button>
-				{#if openDirs.has(node.path)}
+				{#if isOpen(node.path)}
 					<ul>
 						{@render renderNodes(node.children, depth + 1)}
 					</ul>

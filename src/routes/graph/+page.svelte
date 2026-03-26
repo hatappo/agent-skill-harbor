@@ -25,21 +25,19 @@
 
 	let { data }: Props = $props();
 
-	let searchQuery = $state('');
-	let ownerFilterValue = $state<'__all__' | OrgOwnership>('__all__');
+	function parseOwnerFilter(value: string | null): '__all__' | OrgOwnership {
+		if (value === 'org') return 'org';
+		if (value === 'community') return 'community';
+		return '__all__';
+	}
+
+	const initialParams = browser ? new URLSearchParams(window.location.search) : null;
+
+	let searchQuery = $state(initialParams?.get('q') ?? '');
+	let ownerFilterValue = $state<'__all__' | OrgOwnership>(parseOwnerFilter(initialParams?.get('owner') ?? null));
 	let graphRef:
 		| { zoomIn: () => void; zoomOut: () => void; zoomReset: () => void; getCanvasDataURL: () => string | null }
 		| undefined = $state();
-
-	$effect(() => {
-		if (!browser) return;
-		const params = new URLSearchParams(window.location.search);
-		searchQuery = params.get('q') ?? '';
-		const owner = params.get('owner');
-		if (owner === 'org') ownerFilterValue = 'org';
-		else if (owner === 'community') ownerFilterValue = 'community';
-		else ownerFilterValue = '__all__';
-	});
 
 	let ownerFilter = $derived(ownerFilterValue !== '__all__' ? ownerFilterValue : null);
 	let ownerOptionCounts = $derived.by(() => {
@@ -82,41 +80,40 @@
 		win.document.close();
 	}
 
-	let selectedNodeId = $state<string | null>(null);
-	let selectedAttrs = $state<GraphNodeAttrs | null>(null);
-	let panelOpen = $derived(selectedNodeId !== null && selectedAttrs !== null);
+	let selectedNodeIdState = $state<string | null>(null);
+	let selectedAttrsState = $state<GraphNodeAttrs | null>(null);
+
+	let selectedNodeData = $derived.by(() => {
+		const attrs = selectedAttrsState;
+		const nodeId = selectedNodeIdState;
+		if (!attrs || !nodeId) return null;
+
+		if (attrs.nodeType === 'skill') {
+			const matches = data.skills.some((skill) => `skill:${skill.key}` === nodeId);
+			return matches ? { nodeId, attrs } : null;
+		}
+
+		const matches = data.skills.some((skill) => {
+			const ownerRepo = `${skill.owner}/${skill.repo}`;
+			const fromStr = getResolvedFromRepoLabel(skill);
+			return ownerRepo === attrs.label || fromStr === attrs.label;
+		});
+		return matches ? { nodeId, attrs } : null;
+	});
+
+	let selectedNodeId = $derived(selectedNodeData?.nodeId ?? null);
+	let selectedAttrs = $derived(selectedNodeData?.attrs ?? null);
+	let panelOpen = $derived(selectedNodeData !== null);
 
 	function handleNodeSelect(nodeId: string | null, attrs: GraphNodeAttrs | null) {
-		selectedNodeId = nodeId;
-		selectedAttrs = attrs;
+		selectedNodeIdState = nodeId;
+		selectedAttrsState = attrs;
 	}
 
 	function closePanel() {
-		selectedNodeId = null;
-		selectedAttrs = null;
+		selectedNodeIdState = null;
+		selectedAttrsState = null;
 	}
-
-	$effect(() => {
-		const selected = selectedAttrs;
-		const skills = data.skills;
-		if (!selected) return;
-
-		if (selected.nodeType === 'skill' && !skills.some((skill) => `skill:${skill.key}` === selectedNodeId)) {
-			closePanel();
-			return;
-		}
-
-		if (
-			selected.nodeType === 'repo' &&
-			!skills.some((skill) => {
-				const ownerRepo = `${skill.owner}/${skill.repo}`;
-				const fromStr = getResolvedFromRepoLabel(skill);
-				return ownerRepo === selected.label || fromStr === selected.label;
-			})
-		) {
-			closePanel();
-		}
-	});
 
 	let skillDetailPath = $derived.by(() => {
 		if (!selectedAttrs || selectedAttrs.nodeType !== 'skill') return null;

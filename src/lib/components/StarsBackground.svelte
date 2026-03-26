@@ -65,7 +65,10 @@
 	onMount(() => {
 		// Theme detection via MutationObserver (matches dark class toggle)
 		function checkTheme() {
-			isLight = !document.documentElement.classList.contains('dark');
+			const nextIsLight = !document.documentElement.classList.contains('dark');
+			if (nextIsLight === isLight && layerShadows.some(Boolean)) return;
+			isLight = nextIsLight;
+			regenerateStars();
 		}
 		checkTheme();
 
@@ -98,12 +101,6 @@
 			observer.disconnect();
 			cancelAnimationFrame(animationId);
 		};
-	});
-
-	$effect(() => {
-		// Re-generate stars when theme changes
-		isLight;
-		regenerateStars();
 	});
 </script>
 
