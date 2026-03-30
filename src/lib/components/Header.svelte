@@ -8,18 +8,14 @@
 	import LocaleToggle from './LocaleToggle.svelte';
 
 	interface Props {
-		repoFullName?: string | null;
 		title?: string;
 	}
 
-	let { repoFullName = null, title = 'Agent Skill Harbor' }: Props = $props();
-
-	let orgName = $derived(repoFullName?.split('/')[0] ?? null);
-	let repoName = $derived(repoFullName?.split('/')[1] ?? null);
+	let { title = 'Agent Skill Harbor' }: Props = $props();
 
 	const navItems = [
 		{ href: '/skills', label: 'header.catalog', matches: ['/skills', '/stats', '/graph'] },
-		{ href: '/config/harbor', label: 'header.config', matches: ['/config'] },
+		{ href: '/config', label: 'header.config', matches: ['/config'] },
 		{ href: '/guide', label: 'Guide', matches: ['/guide'] },
 	] as const;
 
@@ -48,22 +44,6 @@
 					>{item.label.startsWith('header.') ? $t(item.label) : item.label}</a
 				>
 			{/each}
-			{#if orgName}
-				<span class="min-w-0 max-w-full truncate text-gray-500 dark:text-gray-400 sm:max-w-64">
-					<a href="https://github.com/{orgName}" target="_blank" rel="noopener noreferrer" class="hover:underline"
-						>{orgName}</a
-					>
-					{#if repoName}
-						<span class="mx-0.5">/</span>
-						<a
-							href="https://github.com/{orgName}/{repoName}"
-							target="_blank"
-							rel="noopener noreferrer"
-							class="hover:underline">{repoName}</a
-						>
-					{/if}
-				</span>
-			{/if}
 			<LocaleToggle />
 			<ThemeToggle />
 			<BackgroundToggle />

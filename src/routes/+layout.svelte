@@ -24,7 +24,7 @@
 
 {#snippet pageContent()}
 	<div class="flex min-h-screen flex-col">
-		<Header repoFullName={data.repoFullName} title={data.settings.ui.title} />
+		<Header title={data.settings.ui.title} />
 		<main class="flex-1">
 			{@render children()}
 		</main>

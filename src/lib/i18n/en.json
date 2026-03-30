@@ -197,6 +197,14 @@
 		"collector": {
 			"title": "Collector"
 		},
+		"tabs": {
+			"overview": "General",
+			"harbor": "harbor.yaml",
+			"governance": "governance.yaml"
+		},
+		"overview": {
+			"repository": "Repository"
+		},
 		"catalog": {
 			"title": "Catalog"
 		},
