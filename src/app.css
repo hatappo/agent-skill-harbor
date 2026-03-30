@@ -24,6 +24,12 @@
 		color: var(--color-foreground);
 	}
 
+	@media (prefers-reduced-motion: no-preference) {
+		html {
+			scroll-behavior: smooth;
+		}
+	}
+
 	.dark {
 		--color-background: oklch(0.145 0.004 285.82);
 		--color-foreground: oklch(0.985 0 0);

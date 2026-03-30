@@ -20,6 +20,7 @@ import type {
 } from '$lib/types';
 import { governancePolicySchema, type GovernanceConfig } from '$lib/schemas/governance';
 import { settingsSchema, type SettingsConfig } from '$lib/schemas/settings';
+import { hasHighlightedPluginIntent } from '$lib/utils/plugin-intents';
 import { normalizeResolvedFromFrontmatter } from '$lib/utils/resolved-from';
 
 declare const __PROJECT_ROOT__: string;
@@ -220,6 +221,7 @@ function buildCatalogData(): CatalogResult {
 	const repoFullName = orgName && repoName ? `${orgName}/${repoName}` : orgName;
 	const admin = loadSettingsRaw();
 	const freshPeriodDays = admin.catalog?.skill?.fresh_period_days ?? 0;
+	const highlightIntents = admin.catalog?.skill?.highlight_intents ?? ['danger'];
 	const governance = loadGovernance();
 	const catalogYaml = loadCatalogYaml();
 	const pluginLabelMap = buildPluginLabelMap(loadLatestPluginOutputs());
@@ -268,6 +270,7 @@ function buildCatalogData(): CatalogResult {
 			const frontmatter = fromFs.frontmatter;
 			const body = fromFs.body;
 			const resolvedFrom = skillData.resolved_from ?? normalizeResolvedFromFrontmatter(frontmatter._from);
+			const pluginLabels = pluginLabelMap.get(key);
 
 			if (body) {
 				bodyMap.set(key, body);
@@ -293,7 +296,8 @@ function buildCatalogData(): CatalogResult {
 				tree_sha: skillData.tree_sha ?? null,
 				...(repoEntry.fork ? { is_fork: true } : {}),
 				...(resolvedFrom ? { resolved_from: resolvedFrom } : {}),
-				...(pluginLabelMap.get(key)?.length ? { plugin_labels: pluginLabelMap.get(key) } : {}),
+				...(pluginLabels?.length ? { plugin_labels: pluginLabels } : {}),
+				has_highlight_intent: hasHighlightedPluginIntent(pluginLabels, highlightIntents),
 			};
 
 			skills.push(entry);

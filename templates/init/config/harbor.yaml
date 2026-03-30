@@ -60,7 +60,8 @@ post_collect:
 catalog:
   skill:
     fresh_period_days: 30 # 0 = disable "New" badge
-
+    highlight_intents: # plugin intents that should receive stronger visual emphasis in Card/List views
+      - danger
 
 # ui:
 #   title: Agent Skill Harbor

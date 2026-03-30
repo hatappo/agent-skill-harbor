@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { createDefaultPostCollectPlugins, DEFAULT_HISTORY_LIMIT } from '../../../shared/settings-defaults.js';
+import { labelIntentSchema } from './label-intent.js';
 
 const collectorSchema = z.object({
 	exclude_forks: z.boolean().default(true),
@@ -11,6 +12,7 @@ const collectorSchema = z.object({
 
 const skillSchema = z.object({
 	fresh_period_days: z.number().default(7),
+	highlight_intents: z.array(labelIntentSchema).default(['danger']),
 });
 
 const catalogSchema = z.object({

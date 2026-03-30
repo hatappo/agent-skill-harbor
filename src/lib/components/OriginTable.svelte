@@ -8,6 +8,7 @@
 	import { isSkillNew } from '$lib/utils/skills';
 	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
 	import { setupViewTransition } from 'sveltekit-view-transition';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 
 	interface Props {
 		groups: OriginGroup[];
@@ -29,6 +30,41 @@
 
 	function isNew(skill: FlatSkillEntry): boolean {
 		return isSkillNew(skill, freshPeriodDays);
+	}
+
+	function hasHighlightedRow(row: OriginGroup['rows'][number]): boolean {
+		return (
+			(row.origin?.has_highlight_intent ?? false) ||
+			row.derivatives.some((derivative) => derivative.has_highlight_intent)
+		);
+	}
+
+	function hasHighlightedGroup(group: OriginGroup): boolean {
+		return group.rows.some((row) => hasHighlightedRow(row));
+	}
+
+	function getGroupRowClass(group: OriginGroup): string {
+		if (hasHighlightedGroup(group)) {
+			return 'bg-red-100/70 hover:bg-red-100/90 dark:bg-red-950/20 dark:hover:bg-red-950/35';
+		}
+		return 'hover:bg-gray-50 dark:hover:bg-gray-800/50';
+	}
+
+	function getOriginSkillRowClass(row: OriginGroup['rows'][number]): string {
+		if (row.origin?.has_highlight_intent) {
+			return 'bg-red-100/60 dark:bg-red-950/15';
+		}
+		if (hasHighlightedRow(row)) {
+			return 'bg-red-100/40 dark:bg-red-950/10';
+		}
+		return 'bg-gray-50/50 dark:bg-gray-800/30';
+	}
+
+	function getDerivativeRowClass(skill: FlatSkillEntry): string {
+		if (skill.has_highlight_intent) {
+			return 'bg-red-100/40 dark:bg-red-950/10';
+		}
+		return 'bg-gray-50/30 dark:bg-gray-800/20';
 	}
 </script>
 
@@ -63,7 +99,7 @@
 			<tbody class="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
 				{#each groups as group (group.originKey)}
 					{@const isExpanded = expanded.has(group.originKey)}
-					<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
+					<tr class="transition-colors {getGroupRowClass(group)}">
 						<td class="px-2 py-3 text-center text-gray-400 dark:text-gray-500">
 							<button
 								type="button"
@@ -87,6 +123,9 @@
 						</td>
 						<td class="px-4 py-3">
 							<div class="flex items-center gap-2">
+								{#if hasHighlightedGroup(group)}
+									<CircleAlert class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+								{/if}
 								{#if group.isExternal}
 									<button
 										type="button"
@@ -136,11 +175,14 @@
 						{#each group.rows as row (row.skillName)}
 							{@const rowCount = (row.origin ? 1 : 0) + row.derivatives.length}
 							<!-- Origin skill row -->
-							<tr class="bg-gray-50/50 dark:bg-gray-800/30">
+							<tr class={getOriginSkillRowClass(row)}>
 								<td class="px-2 py-2"></td>
 								<td class="px-4 py-2">
 									<div class="flex items-center gap-1.5 pl-4">
 										{#if row.origin}
+											{#if row.origin.has_highlight_intent}
+												<CircleAlert class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+											{/if}
 											<a
 												href="{base}/skills/{row.origin.key}"
 												class="text-sm font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
@@ -174,10 +216,13 @@
 							</tr>
 							<!-- Derivative skill rows -->
 							{#each row.derivatives as derivative (derivative.key)}
-								<tr class="bg-gray-50/30 dark:bg-gray-800/20">
+								<tr class={getDerivativeRowClass(derivative)}>
 									<td class="px-2 py-1"></td>
 									<td class="px-4 py-1">
 										<div class="flex items-center gap-1.5 pl-10">
+											{#if derivative.has_highlight_intent}
+												<CircleAlert class="h-3.5 w-3.5 shrink-0 text-red-600 dark:text-red-400" />
+											{/if}
 											<span class="text-gray-300 dark:text-gray-600">&#x2514;</span>
 											<a
 												href="{base}/skills/{derivative.key}"

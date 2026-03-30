@@ -9,6 +9,7 @@
 	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
 	import { setupViewTransition } from 'sveltekit-view-transition';
 	import Building2 from '@lucide/svelte/icons/building-2';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import Globe from '@lucide/svelte/icons/globe';
 
 	interface Props {
@@ -33,16 +34,25 @@
 	let skillDescription = $derived(String(skill.frontmatter.description ?? ''));
 	let metadata = $derived((skill.frontmatter.metadata ?? {}) as Record<string, unknown>);
 	let showOrigin = $derived(!!origin);
+	let isHighlighted = $derived(skill.has_highlight_intent ?? false);
+	let cardClass = $derived(
+		isHighlighted
+			? 'border-red-200 bg-red-100/70 ring-red-500/10 hover:border-red-300 hover:bg-red-100/90 hover:shadow-red-200/70 dark:border-red-900/70 dark:bg-red-950/30 dark:ring-red-400/15 dark:hover:border-red-800 dark:hover:bg-red-950/40 dark:hover:shadow-red-950/80'
+			: 'border-gray-200/80 bg-white ring-gray-950/5 hover:border-gray-300 hover:shadow-gray-200/70 dark:border-gray-700/80 dark:bg-gray-900 dark:ring-white/8 dark:hover:border-gray-600 dark:hover:shadow-gray-950/80',
+	);
 	const { transition: viewTransition } = setupViewTransition();
 </script>
 
 <a
 	href="{base}/skills/{skill.key}"
-	class="block min-w-0 overflow-hidden rounded-xl border border-gray-200/80 bg-white p-5 shadow-sm ring-1 ring-gray-950/5 transition-[border-color,box-shadow,transform] duration-200 hover:-translate-y-0.5 hover:border-gray-300 hover:shadow-lg hover:shadow-gray-200/70 dark:border-gray-700/80 dark:bg-gray-900 dark:ring-white/8 dark:hover:border-gray-600 dark:hover:shadow-gray-950/80"
+	class="block min-w-0 overflow-hidden rounded-xl border p-5 shadow-sm ring-1 transition-[border-color,box-shadow,transform,background-color] duration-200 hover:-translate-y-0.5 hover:shadow-lg {cardClass}"
 >
 	<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 		<div class="min-w-0 flex-1">
-			<h3 class="truncate text-lg font-semibold text-gray-900 dark:text-gray-100">
+			<h3 class="flex items-center gap-2 truncate text-lg font-semibold text-gray-900 dark:text-gray-100">
+				{#if isHighlighted}
+					<CircleAlert class="h-5 w-5 shrink-0 text-red-600 dark:text-red-400" />
+				{/if}
 				<span
 					use:viewTransition={{
 						name: getSkillTitleTransitionName(skill.key),

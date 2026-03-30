@@ -10,6 +10,7 @@
 	import { setupViewTransition } from 'sveltekit-view-transition';
 	import ChevronUp from '@lucide/svelte/icons/chevron-up';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 
 	interface Props {
 		skills: FlatSkillEntry[];
@@ -92,6 +93,20 @@
 	function getPluginLabel(skill: FlatSkillEntry, pluginId: string): { label: string; intent: LabelIntent } | null {
 		return skill.plugin_labels?.find((entry) => entry.plugin_id === pluginId) ?? null;
 	}
+
+	function getRowClass(skill: FlatSkillEntry): string {
+		if (skill.has_highlight_intent) {
+			return 'bg-red-100/70 hover:bg-red-100/90 dark:bg-red-950/20 dark:hover:bg-red-950/35';
+		}
+		return 'bg-white hover:bg-gray-50 dark:bg-gray-900 dark:hover:bg-gray-800/50';
+	}
+
+	function getStickyCellClass(skill: FlatSkillEntry): string {
+		if (skill.has_highlight_intent) {
+			return 'bg-red-100/70 dark:bg-red-950/20';
+		}
+		return 'bg-white dark:bg-gray-900';
+	}
 </script>
 
 {#if skills.length === 0}
@@ -144,11 +159,16 @@
 							: skill.visibility === 'internal'
 								? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
 								: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'}
-					<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
+					<tr class="transition-colors {getRowClass(skill)}">
 						<td
-							class="sticky left-0 z-10 max-w-[20rem] bg-white px-4 py-3 shadow-[1px_0_0_0_rgba(229,231,235,1)] dark:bg-gray-900 dark:shadow-[1px_0_0_0_rgba(55,65,81,1)]"
+							class="sticky left-0 z-10 max-w-[20rem] px-4 py-3 shadow-[1px_0_0_0_rgba(229,231,235,1)] dark:shadow-[1px_0_0_0_rgba(55,65,81,1)] {getStickyCellClass(
+								skill,
+							)}"
 						>
 							<div class="flex items-center gap-1.5">
+								{#if skill.has_highlight_intent}
+									<CircleAlert class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+								{/if}
 								<a
 									href="{base}/skills/{skill.key}"
 									class="truncate font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"

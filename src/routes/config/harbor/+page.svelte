@@ -300,6 +300,25 @@
 							{data.settings.catalog.skill.fresh_period_days}
 						</td>
 					</tr>
+					<tr>
+						<td class="px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+							<div class="flex items-center gap-1.5">
+								<span>{$t(getLabelKey('catalog.skill.highlight_intents'))}</span>
+								{@render yamlKeyHint('catalog.skill.highlight_intents')}
+							</div>
+						</td>
+						<td class="px-4 py-3 text-sm text-gray-900 dark:text-gray-100">
+							{#if data.settings.catalog.skill.highlight_intents.length > 0}
+								<div class="flex flex-wrap gap-1.5">
+									{#each data.settings.catalog.skill.highlight_intents as intent}
+										<code class="rounded bg-gray-100 px-2 py-0.5 text-xs dark:bg-gray-800">{intent}</code>
+									{/each}
+								</div>
+							{:else}
+								<span class="text-gray-400 dark:text-gray-500">{$t('settings.empty_list')}</span>
+							{/if}
+						</td>
+					</tr>
 				</tbody>
 			</table>
 		</div>

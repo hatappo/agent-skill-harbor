@@ -147,7 +147,8 @@
 			},
 			"catalog": {
 				"skill": {
-					"fresh_period_days": "\"New\" badge duration (days)"
+					"fresh_period_days": "\"New\" badge duration (days)",
+					"highlight_intents": "Highlighted plugin intents"
 				}
 			},
 			"ui": {
@@ -167,7 +168,8 @@
 			},
 			"catalog": {
 				"skill": {
-					"fresh_period_days": "Controls how long newly updated skills keep the \"New\" badge."
+					"fresh_period_days": "Controls how long newly updated skills keep the \"New\" badge.",
+					"highlight_intents": "Plugin intents that should receive stronger visual emphasis, including red-tinted backgrounds and alert icons, in catalog views."
 				}
 			},
 			"ui": {

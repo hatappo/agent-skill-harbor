@@ -147,7 +147,8 @@
 			},
 			"catalog": {
 				"skill": {
-					"fresh_period_days": "「New」バッジの表示期間（日数）"
+					"fresh_period_days": "「New」バッジの表示期間（日数）",
+					"highlight_intents": "強調表示するプラグイン intent"
 				}
 			},
 			"ui": {
@@ -167,7 +168,8 @@
 			},
 			"catalog": {
 				"skill": {
-					"fresh_period_days": "\"New\" バッジを表示し続ける日数を制御します。"
+					"fresh_period_days": "\"New\" バッジを表示し続ける日数を制御します。",
+					"highlight_intents": "カタログ上で赤系背景やアラートアイコン付きでより強く視覚強調するプラグイン intent の一覧です。"
 				}
 			},
 			"ui": {

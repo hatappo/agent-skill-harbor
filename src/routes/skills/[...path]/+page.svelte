@@ -19,6 +19,7 @@
 	import Building2 from '@lucide/svelte/icons/building-2';
 	import Globe from '@lucide/svelte/icons/globe';
 	import GitFork from '@lucide/svelte/icons/git-fork';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 	import GitHubLogo from '$lib/components/icons/GitHubLogo.svelte';
 	import SkillsmpLogo from '$lib/components/icons/SkillsmpLogo.svelte';
 
@@ -272,12 +273,22 @@
 	<div class="mb-8">
 		<div class="flex items-start justify-between gap-4">
 			<h1
-				class="text-3xl font-bold text-gray-900 dark:text-gray-100"
+				class="flex items-center gap-2 text-3xl font-bold text-gray-900 dark:text-gray-100"
 				use:viewTransition={{
 					name: getSkillTitleTransitionName(skill.key),
 					applyImmediately: true,
 				}}
 			>
+				{#if skill.has_highlight_intent}
+					<a
+						href="#plugin-outputs"
+						class="shrink-0 rounded text-red-600 transition-colors hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500/40 dark:text-red-400 dark:hover:text-red-300"
+						aria-label="Jump to plugin outputs"
+						title="Jump to plugin outputs"
+					>
+						<CircleAlert class="h-7 w-7" />
+					</a>
+				{/if}
 				{skillName}
 			</h1>
 			<div class="flex shrink-0 items-center gap-2">
@@ -485,7 +496,10 @@
 	{/if}
 
 	{#if pluginOutputs.length > 0}
-		<div class="mb-8 rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900">
+		<div
+			id="plugin-outputs"
+			class="mb-8 rounded-lg border border-gray-200 bg-white p-5 dark:border-gray-700 dark:bg-gray-900"
+		>
 			<h2 class="mb-3 text-sm font-medium text-gray-500 dark:text-gray-400">Plugin Outputs</h2>
 			<div class="space-y-4">
 				{#each pluginOutputs as plugin}

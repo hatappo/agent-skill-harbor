@@ -1,3 +1,6 @@
+import type { LabelIntent } from '$lib/schemas/label-intent';
+export type { LabelIntent } from '$lib/schemas/label-intent';
+
 export type UsagePolicy = 'recommended' | 'discouraged' | 'prohibited' | 'none';
 export type Visibility = 'public' | 'private' | 'internal';
 
@@ -53,8 +56,6 @@ export interface CollectionEntry {
 		community: CategoryStats;
 	};
 }
-
-export type LabelIntent = 'neutral' | 'info' | 'success' | 'warn' | 'danger';
 
 export interface PluginSkillResult {
 	label?: string;
@@ -125,4 +126,5 @@ export interface FlatSkillEntry {
 	is_fork?: boolean;
 	resolved_from?: string;
 	plugin_labels?: PluginLabelEntry[];
+	has_highlight_intent?: boolean;
 }

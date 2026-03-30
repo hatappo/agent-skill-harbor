@@ -8,6 +8,7 @@
 	import { isSkillNew } from '$lib/utils/skills';
 	import { getSkillTitleTransitionName } from '$lib/utils/view-transition';
 	import { setupViewTransition } from 'sveltekit-view-transition';
+	import CircleAlert from '@lucide/svelte/icons/circle-alert';
 
 	interface Props {
 		repos: RepoInfo[];
@@ -43,6 +44,24 @@
 
 	function isNew(skill: FlatSkillEntry): boolean {
 		return isSkillNew(skill, freshPeriodDays);
+	}
+
+	function hasHighlightedSkill(skills: FlatSkillEntry[]): boolean {
+		return skills.some((skill) => skill.has_highlight_intent);
+	}
+
+	function getRepoRowClass(repoSkills: FlatSkillEntry[]): string {
+		if (hasHighlightedSkill(repoSkills)) {
+			return 'bg-red-100/70 hover:bg-red-100/90 dark:bg-red-950/20 dark:hover:bg-red-950/35';
+		}
+		return 'hover:bg-gray-50 dark:hover:bg-gray-800/50';
+	}
+
+	function getSkillRowClass(skill: FlatSkillEntry): string {
+		if (skill.has_highlight_intent) {
+			return 'bg-red-100/60 hover:bg-red-100/80 dark:bg-red-950/15 dark:hover:bg-red-950/30';
+		}
+		return 'bg-gray-50/50 hover:bg-gray-100/50 dark:bg-gray-800/30 dark:hover:bg-gray-800/50';
 	}
 </script>
 
@@ -84,7 +103,7 @@
 							: repo.visibility === 'internal'
 								? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
 								: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300'}
-					<tr class="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50">
+					<tr class="transition-colors {getRepoRowClass(repoSkills)}">
 						<td class="px-2 py-3 text-center text-gray-400 dark:text-gray-500">
 							<button
 								type="button"
@@ -108,6 +127,9 @@
 						</td>
 						<td class="px-4 py-3">
 							<div class="flex items-center gap-2">
+								{#if hasHighlightedSkill(repoSkills)}
+									<CircleAlert class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+								{/if}
 								<button
 									type="button"
 									class="font-medium text-gray-900 hover:text-blue-600 dark:text-gray-100 dark:hover:text-blue-400"
@@ -161,12 +183,13 @@
 							{#each repoSkills as skill (skill.key)}
 								{@const skillName = String(skill.frontmatter.name ?? skill.repo)}
 								{@const skillDescription = String(skill.frontmatter.description ?? '')}
-								<tr
-									class="bg-gray-50/50 transition-colors hover:bg-gray-100/50 dark:bg-gray-800/30 dark:hover:bg-gray-800/50"
-								>
+								<tr class="transition-colors {getSkillRowClass(skill)}">
 									<td class="px-2 py-2"></td>
 									<td class="px-4 py-2">
 										<div class="flex items-center gap-1.5 pl-4">
+											{#if skill.has_highlight_intent}
+												<CircleAlert class="h-4 w-4 shrink-0 text-red-600 dark:text-red-400" />
+											{/if}
 											<a
 												href="{base}/skills/{skill.key}"
 												class="text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-300 dark:hover:text-blue-400"
